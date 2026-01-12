@@ -1,0 +1,50 @@
+name: Branch name lint
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  branch-name:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Determine branch name
+        id: b
+        shell: bash
+        run: |
+          if [ -n "${{ github.head_ref }}" ]; then
+            echo "name=${{ github.head_ref }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate branch name
+        shell: bash
+        run: |
+          BRANCH="${{ steps.b.outputs.name }}"
+          echo "Branch: $BRANCH"
+
+          # <type>/<description>
+          # type = feature | fix | hotfix | chore | refactor | test | docs
+          REGEX='^(feature|fix|hotfix|chore|refactor|test|docs)/[a-z0-9._-]+$'
+
+          if [[ ! "$BRANCH" =~ $REGEX ]]; then
+            echo "::error::Invalid branch name: $BRANCH"
+            echo ""
+            echo "Expected format (all lowercase):"
+            echo "  <type>/<description>"
+            echo ""
+            echo "Valid types:"
+            echo "  feature/"
+            echo "  fix/"
+            echo "  hotfix/"
+            echo "  chore/"
+            echo "  refactor/"
+            echo "  test/"
+            echo "  docs/"
+            echo ""
+            echo "Example:"
+            echo "  feature/arm-limit-switch"
+            exit 1
+          fi
