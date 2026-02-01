@@ -1,0 +1,112 @@
+package frc.robot.subsystems.shooter;
+
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.ShooterConstants;
+
+import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import yams.gearing.GearBox;
+import yams.gearing.MechanismGearing;
+import yams.mechanisms.config.FlyWheelConfig;
+import yams.mechanisms.velocity.FlyWheel;
+import yams.motorcontrollers.SmartMotorController;
+import yams.motorcontrollers.SmartMotorControllerConfig;
+import yams.motorcontrollers.remote.TalonFXWrapper;
+
+import java.util.function.Supplier;
+
+import static edu.wpi.first.units.Units.*;
+
+public class FlywheelSubsystem extends SubsystemBase {
+	private final Distance flywheelDiameter = Inches.of(3);
+	private final TalonFX flywheelMotor = new TalonFX(ShooterConstants.FlywheelID);
+
+	private final SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
+			.withClosedLoopController(0.00016541, 0, 0, RPM.of(5000), RotationsPerSecondPerSecond.of(2500))
+			.withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
+			.withIdleMode(SmartMotorControllerConfig.MotorMode.COAST)
+			.withTelemetry("FlywheelMotor", SmartMotorControllerConfig.TelemetryVerbosity.HIGH)
+			.withStatorCurrentLimit(Amps.of(40))
+			.withMotorInverted(false)
+			.withClosedLoopRampRate(Seconds.of(0.25))
+			.withOpenLoopRampRate(Seconds.of(0.25))
+			.withFeedforward(new SimpleMotorFeedforward(0.27937, 0.089836, 0.014557))
+			.withSimFeedforward(new SimpleMotorFeedforward(0.27937, 0.089836, 0.014557))
+			.withControlMode(SmartMotorControllerConfig.ControlMode.CLOSED_LOOP);
+
+	private final SmartMotorController motor = new TalonFXWrapper(flywheelMotor, DCMotor.getKrakenX60(2), motorConfig);
+
+	private final FlyWheelConfig flywheelConfig = new FlyWheelConfig(motor)
+			.withDiameter(Inches.of(4))
+			.withMass(Pounds.of(1))
+			.withTelemetry("FlywheelMech", SmartMotorControllerConfig.TelemetryVerbosity.HIGH)
+			.withSoftLimit(RPM.of(-5000), RPM.of(5000))
+			.withSpeedometerSimulation(RPM.of(7500));
+
+	private final FlyWheel flywheel = new FlyWheel(flywheelConfig);
+
+	public FlywheelSubsystem()
+	{
+	}
+
+	public AngularVelocity getVelocity()
+	{
+		return flywheel.getSpeed();
+	}
+
+	public Command setVelocity(AngularVelocity speed)
+	{
+		return flywheel.setSpeed(speed);
+	}
+
+	public Command setDutyCycle(double dutyCycle)
+	{
+		return flywheel.set(dutyCycle);
+	}
+
+	public Command setVelocity(Supplier<AngularVelocity> speed)
+	{
+		return flywheel.setSpeed(speed);
+	}
+
+	public Command setDutyCycle(Supplier<Double> dutyCycle)
+	{
+		return flywheel.set(dutyCycle);
+	}
+
+	public Command sysId()
+	{
+		return flywheel.sysId(Volts.of(10), Volts.of(1).per(Second), Seconds.of(5));
+	}
+
+	@Override
+	public void periodic()
+	{
+		flywheel.updateTelemetry();
+	}
+
+	@Override
+	public void simulationPeriodic()
+	{
+		flywheel.simIterate();
+	}
+
+	public Command setRPM(LinearVelocity speed)
+	{
+		return flywheel.setSpeed(RotationsPerSecond.of(speed.in(MetersPerSecond) / flywheelDiameter.times(Math.PI).in(Meters)));
+	}
+
+	public void setRPMDirect(LinearVelocity speed)
+	{
+		motor.setVelocity(RotationsPerSecond.of(speed.in(MetersPerSecond) / flywheelDiameter.times(Math.PI).in(Meters)));
+	}
+}
