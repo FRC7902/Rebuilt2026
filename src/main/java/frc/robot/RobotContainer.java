@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 public class RobotContainer {
 	public ShooterSubsystem shooter = new ShooterSubsystem(); // holds hood, flywheel and turret
 	public CommandXboxController xboxController = new CommandXboxController(0);
@@ -24,6 +26,7 @@ public class RobotContainer {
 	private void configureBindings() {
 		xboxController.a().whileTrue(shooter.runShooter()).whileFalse(shooter.stopShooter());
 		xboxController.b().whileTrue(shooter.runShooter(Units.DegreesPerSecond.of(720))).whileFalse(shooter.stopShooter());
+		xboxController.x().whileTrue(shooter.feed()).whileFalse(shooter.stopFeeder());
 	}
 
 	public Command getAutonomousCommand() {
