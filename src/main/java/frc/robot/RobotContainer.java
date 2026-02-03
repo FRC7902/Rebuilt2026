@@ -26,7 +26,8 @@ public class RobotContainer {
 	private void configureBindings() {
 		xboxController.a().whileTrue(shooter.runShooter()).whileFalse(shooter.stopShooter());
 		xboxController.b().whileTrue(shooter.runShooter(Units.DegreesPerSecond.of(720))).whileFalse(shooter.stopShooter());
-		xboxController.x().whileTrue(shooter.feed()).whileFalse(shooter.stopFeeder());
+		xboxController.x().whileTrue(shooter.feed(Degrees.of(90))).whileFalse(shooter.stopFeeder());
+		xboxController.y().whileTrue(shooter.reset()).whileFalse(shooter.stopShooter());
 	}
 
 	public Command getAutonomousCommand() {
