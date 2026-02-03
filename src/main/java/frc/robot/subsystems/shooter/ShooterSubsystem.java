@@ -3,15 +3,15 @@ package frc.robot.subsystems.shooter;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.*;
 
 import frc.robot.Constants.ShooterConstants;
 
 import java.util.function.Supplier;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 
 public class ShooterSubsystem extends SubsystemBase {
@@ -21,13 +21,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	private final FeederSubsystem feederSubsystem = new FeederSubsystem();
 
 	private Supplier<AngularVelocity> flywheelVelocitySupplier = () -> DegreesPerSecond.of(1);
-
-	private PIDController hoodPIDController = new PIDController(
-			ShooterConstants.HoodKp, ShooterConstants.HoodKi, ShooterConstants.HoodKd
-	);
-	private PIDController flywheelPIDController = new PIDController(
-			ShooterConstants.FlywheelKp, ShooterConstants.FlywheelKi, ShooterConstants.FlywheelKd
-	);
+	private static Angle defaultAngle = Degrees.of(90);
 
 
 	public ShooterSubsystem() {
@@ -39,8 +33,11 @@ public class ShooterSubsystem extends SubsystemBase {
 	public Command feed(Angle angle){
 		return feederSubsystem.setAngle(angle);
 	}
-	public Command stopFeeder(){
+	public Command reset(){
 		return feederSubsystem.reset();
+	}
+	public Command stopFeeder(){
+		return feederSubsystem.stop();
 	}
 	public Command aimAt(Angle hoodAngle){
 		return hoodSubsystem.setAngle(hoodAngle);
@@ -54,6 +51,30 @@ public class ShooterSubsystem extends SubsystemBase {
 	}
 	public Command stopShooter(){
 		return flywheelSubsystem.setVelocity(DegreesPerSecond.of(0));
+	}
+	public Command runFeeder(){
+		if(FeederSubsystem.getBeamBreakRightFeeder() || FeederSubsystem.getBeamBreakLeftFeeder()){
+			return feederSubsystem.run();
+		}
+		if(FeederSubsystem.getBeamBreakTop()){
+			return new ParallelCommandGroup(
+					new SequentialCommandGroup(
+							feederSubsystem.run(),
+							new WaitCommand(2),
+							reset(),
+							new WaitCommand(2),
+							feederSubsystem.stop()
+					),
+					new SequentialCommandGroup(
+							aimAt(defaultAngle),
+							runShooter(),
+							new WaitCommand(2),
+							stopShooter()
+					)
+
+			);
+		}
+		return new InstantCommand(() -> DriverStation.reportWarning("No object found from left beam break or right beam break", true));
 	}
 	public Command runShooter(AngularVelocity velocity) {
 		if (velocity == null) {
