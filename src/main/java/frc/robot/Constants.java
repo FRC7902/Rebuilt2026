@@ -29,5 +29,9 @@ public final class Constants {
 		public static final double FeederKs = 0.27937;
 		public static final double FeederKv = 0.089836;
 		public static final double FeederKa = 0.014557;
+
+		public static final int BeamBreakL = 4;
+		public static final int BeamBreakR = 5;
+		public static final int BeamBreakT = 6;
 	}
 }
