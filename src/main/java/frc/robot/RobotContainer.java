@@ -6,13 +6,20 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.LEDSubsystem;
 
 public class RobotContainer {
+
+  LEDSubsystem leds = new LEDSubsystem();
+
   public RobotContainer() {
     configureBindings();
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    leds.getHubTrigger().whileTrue(leds.runPattern(leds.getHubPattern()));
+    // leds.getHopperTrigger().whileTrue(leds.runPattern(leds.getHopperEmptyPattern())); // might not need this
+  }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");

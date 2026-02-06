@@ -7,7 +7,8 @@ package frc.robot;
 /** Add your docs here. */
 public class Constants {
     public static class LEDConstants {
-        public static int PWM_PORT = -1; //CHANGE
+        public static int PWM_PORT = -1; //TODO: Change constants
         public static int LED_LENGTH = -1;
+        public static int shiftInterval = 5; // in secs
     }
 }
