@@ -28,32 +28,30 @@ import java.util.function.Supplier;
 import static edu.wpi.first.units.Units.*;
 
 public class HoodSubsystem extends SubsystemBase {
-	private final TalonFX hoodMotor = new TalonFX(ShooterConstants.HoodID);
+	private final TalonFX hoodMotor = new TalonFX(ShooterConstants.HOOD_ID);
 	private TalonFXSimState  hoodSim = hoodMotor.getSimState();
 
 	private final SmartMotorControllerConfig hoodMotorConfig = new SmartMotorControllerConfig(this)
-			.withClosedLoopController(0.00016541, 0, 0, RPM.of(5000), RotationsPerSecondPerSecond.of(2500))
-			.withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
-			.withIdleMode(SmartMotorControllerConfig.MotorMode.COAST)
+			.withClosedLoopController(ShooterConstants.HOOD_KP, ShooterConstants.HOOD_KI, ShooterConstants.HOOD_KD, ShooterConstants.HOOD_MAX_VELOCITY, ShooterConstants.HOOD_MAX_ACCELERATION)
+			.withGearing(ShooterConstants.HOOD_GEARING)
+			.withIdleMode(ShooterConstants.HOOD_IDLE)
 			.withTelemetry("HoodMotor", SmartMotorControllerConfig.TelemetryVerbosity.HIGH)
-			.withStatorCurrentLimit(Amps.of(40))
+			.withStatorCurrentLimit(ShooterConstants.HOOD_STATOR)
 			.withMotorInverted(false)
-			.withClosedLoopRampRate(Seconds.of(0.25))
-			.withOpenLoopRampRate(Seconds.of(0.25))
-			.withFeedforward(new SimpleMotorFeedforward(0.27937, 0.089836, 0.014557))
-			.withSimFeedforward(new SimpleMotorFeedforward(0.27937, 0.089836, 0.014557))
+			.withClosedLoopRampRate(ShooterConstants.HOOD_CLOSED_RATE)
+			.withOpenLoopRampRate(ShooterConstants.HOOD_OPEN_RATE)
+			.withFeedforward(new SimpleMotorFeedforward(ShooterConstants.HOOD_KS, ShooterConstants.HOOD_KV, ShooterConstants.HOOD_KA))
+			.withSimFeedforward(new SimpleMotorFeedforward(ShooterConstants.HOOD_KS, ShooterConstants.HOOD_KV, ShooterConstants.HOOD_KA))
 			.withControlMode(SmartMotorControllerConfig.ControlMode.CLOSED_LOOP);
 
 	private final SmartMotorController hoodSMC = new TalonFXWrapper(hoodMotor, DCMotor.getKrakenX44(1), hoodMotorConfig);
-	MomentOfInertia Inertia = KilogramSquareMeters.of(0.25);
 	private final ArmConfig hoodConfig = new ArmConfig(hoodSMC)
-			.withStartingPosition(Degrees.of(0))
-			.withLength(Inches.of(3))
-			.withMOI(Inertia)
+			.withStartingPosition(ShooterConstants.HOOD_START_POSITION)
+			.withLength(ShooterConstants.FEEDER_LENGTH)
+			.withMOI(ShooterConstants.HOOD_MOI)
 			.withTelemetry("HoodMech", SmartMotorControllerConfig.TelemetryVerbosity.HIGH)
-			.withSoftLimits(Degrees.of(5), Degrees.of(100))
-			.withHardLimit(Degrees.of(0), Degrees.of(120)); // The Hood can be modeled as an arm since it has a
-	// gravitational force acted upon based on the angle its in
+			.withSoftLimits(ShooterConstants.HOOD_SOFT_LIMIT_LOW, ShooterConstants.HOOD_SOFT_LIMIT_HIGH)
+			.withHardLimit(ShooterConstants.HOOD_HARD_LIMIT_LOW, ShooterConstants.HOOD_HARD_LIMIT_HIGH);
 
 	private final Arm hood = new Arm(hoodConfig);
 
