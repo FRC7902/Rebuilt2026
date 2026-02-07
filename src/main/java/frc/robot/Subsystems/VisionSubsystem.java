@@ -145,9 +145,14 @@ public class VisionSubsystem extends SubsystemBase {
    * @return the angle in radians (using WPILib's coordinate system)
    */
   private double findAngleToHubRadians() {
-    // TODO: Add inertial calculation to aim into the future :O
-    Translation2d robotHubDeltaTranslation2d = robotHubDeltaTranslation2d();
+    Translation2d robotHubDeltaTranslation2d = robotHubDeltaTranslation2d().plus(velocityDeltaCompensator());
     return Math.atan2(robotHubDeltaTranslation2d.getY(),robotHubDeltaTranslation2d.getX()) - (Math.PI/2);
+  }
+
+  private Translation2d velocityDeltaCompensator() {
+    Translation2d velocityTranslation2d = new Translation2d(swerveSubsystem.getSwerveDrive().getRobotVelocity().vxMetersPerSecond, swerveSubsystem.getSwerveDrive().getRobotVelocity().vyMetersPerSecond);
+    Translation2d deltaCompensator = velocityTranslation2d.times(VisionConstants.VELOCITY_COMPENSATOR_COEFFICIENT);
+    return deltaCompensator;
   }
 
   /**
