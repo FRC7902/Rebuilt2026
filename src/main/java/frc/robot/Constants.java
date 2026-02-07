@@ -5,6 +5,7 @@ public final class Constants {
 		//Device ID
 		public static final int HoodID = 1;
 		public static final int FlywheelID = 1;
+		public static final int ShooterID = 2;
 
 
 		//Flywheel PID

@@ -4,14 +4,26 @@
 
 package frc.robot;
 
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
 
 public class RobotContainer {
+	public ShooterSubsystem shooter = new ShooterSubsystem(); // holds hood, flywheel and turret
+	public CommandXboxController xboxController = new CommandXboxController(0);
 
 	public RobotContainer() {
+		DriverStation.silenceJoystickConnectionWarning(true);
+		configureBindings();
+	}
 
+	private void configureBindings() {
+		xboxController.a().whileTrue(shooter.runShooter()).whileFalse(shooter.stopShooter());
+		xboxController.b().whileTrue(shooter.runShooter(Units.DegreesPerSecond.of(720))).whileFalse(shooter.stopShooter());
 	}
 
 	public Command getAutonomousCommand() {
