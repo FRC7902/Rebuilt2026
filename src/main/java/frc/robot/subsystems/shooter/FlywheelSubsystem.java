@@ -27,30 +27,29 @@ import java.util.function.Supplier;
 import static edu.wpi.first.units.Units.*;
 
 public class FlywheelSubsystem extends SubsystemBase {
-	private final Distance flywheelDiameter = Inches.of(3);
-	private final TalonFX flywheelMotor = new TalonFX(ShooterConstants.FlywheelID);
+	private final TalonFX flywheelMotor = new TalonFX(ShooterConstants.FLYWHEEL_ID);
 
 	private final SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
-			.withClosedLoopController(0.00016541, 0, 0, RPM.of(5000), RotationsPerSecondPerSecond.of(2500))
-			.withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
-			.withIdleMode(SmartMotorControllerConfig.MotorMode.COAST)
+			.withClosedLoopController(ShooterConstants.FLYWHEEL_KP, ShooterConstants.FLYWHEEL_KI, ShooterConstants.FLYWHEEL_KD, ShooterConstants.FLYWHEEL_MAX_VELOCITY, ShooterConstants.FLYWHEEL_MAX_ACCELERATION)
+			.withGearing(ShooterConstants.FLYWHEEL_GEARING)
+			.withIdleMode(ShooterConstants.FLYWHEEL_IDLE)
 			.withTelemetry("FlywheelMotor", SmartMotorControllerConfig.TelemetryVerbosity.HIGH)
-			.withStatorCurrentLimit(Amps.of(40))
+			.withStatorCurrentLimit(ShooterConstants.FLYWHEEL_STATOR)
 			.withMotorInverted(false)
-			.withClosedLoopRampRate(Seconds.of(0.25))
-			.withOpenLoopRampRate(Seconds.of(0.25))
-			.withFeedforward(new SimpleMotorFeedforward(0.27937, 0.089836, 0.014557))
-			.withSimFeedforward(new SimpleMotorFeedforward(0.27937, 0.089836, 0.014557))
+			.withClosedLoopRampRate(ShooterConstants.FLYWHEEL_CLOSED_RATE)
+			.withOpenLoopRampRate(ShooterConstants.FLYWHEEL_OPEN_RATE)
+			.withFeedforward(new SimpleMotorFeedforward(ShooterConstants.FLYWHEEL_KS, ShooterConstants.FLYWHEEL_KV, ShooterConstants.FLYWHEEL_KA))
+			.withSimFeedforward(new SimpleMotorFeedforward(ShooterConstants.FLYWHEEL_KS, ShooterConstants.FLYWHEEL_KV, ShooterConstants.FLYWHEEL_KA))
 			.withControlMode(SmartMotorControllerConfig.ControlMode.CLOSED_LOOP);
 
 	private final SmartMotorController motor = new TalonFXWrapper(flywheelMotor, DCMotor.getKrakenX60(2), motorConfig);
 
 	private final FlyWheelConfig flywheelConfig = new FlyWheelConfig(motor)
-			.withDiameter(Inches.of(4))
-			.withMass(Pounds.of(1))
+			.withDiameter(ShooterConstants.FLYWHEEL_DIAMETER)
+			.withMass(ShooterConstants.FLYWHEEL_MASS)
 			.withTelemetry("FlywheelMech", SmartMotorControllerConfig.TelemetryVerbosity.HIGH)
-			.withSoftLimit(RPM.of(-5000), RPM.of(5000))
-			.withSpeedometerSimulation(RPM.of(7500));
+			.withSoftLimit(ShooterConstants.FLYWHEEL_LIMIT_LOW, ShooterConstants.FLYWHEEL_LIMIT_HIGH)
+			.withSpeedometerSimulation(ShooterConstants.FLYWHEEL_MAX_VELOCITY);
 
 	private final FlyWheel flywheel = new FlyWheel(flywheelConfig);
 
@@ -102,11 +101,11 @@ public class FlywheelSubsystem extends SubsystemBase {
 
 	public Command setRPM(LinearVelocity speed)
 	{
-		return flywheel.setSpeed(RotationsPerSecond.of(speed.in(MetersPerSecond) / flywheelDiameter.times(Math.PI).in(Meters)));
+		return flywheel.setSpeed(RotationsPerSecond.of(speed.in(MetersPerSecond) / ShooterConstants.FLYWHEEL_DIAMETER.times(Math.PI).in(Meters)));
 	}
 
 	public void setRPMDirect(LinearVelocity speed)
 	{
-		motor.setVelocity(RotationsPerSecond.of(speed.in(MetersPerSecond) / flywheelDiameter.times(Math.PI).in(Meters)));
+		motor.setVelocity(RotationsPerSecond.of(speed.in(MetersPerSecond) / ShooterConstants.FLYWHEEL_DIAMETER.times(Math.PI).in(Meters)));
 	}
 }

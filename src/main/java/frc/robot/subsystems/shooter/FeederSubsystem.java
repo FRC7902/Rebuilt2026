@@ -5,15 +5,12 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Constants.ShooterConstants;
-import yams.gearing.GearBox;
-import yams.gearing.MechanismGearing;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 
@@ -25,54 +22,35 @@ import java.util.function.Supplier;
 
 import static edu.wpi.first.units.Units.*;
 
-/*
-	Description:
-	Feeder
-
-  Driven by one Kraken x60 motor
-
-	Speed should be match with shooter’s recovery time (time it takes for flywheel to return to correct speed after shooting a fuel)
-
-	Store up to 4 fuel (two per side) in the feeder
-
-	Beam breaks TBD; Current idea to have one beam break at the top, right before the flywheel,
-	and two beam breaks on the bottom/entrance of the feeder, one on each side
-
-	Top beam break is about 2” away from the flywheel
- */
-
 public class FeederSubsystem extends SubsystemBase {
-	private static final TalonFX feederMotor = new TalonFX(ShooterConstants.FeederID);
+	private static final TalonFX feederMotor = new TalonFX(ShooterConstants.FEEDER_ID);
 	private final SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
-			.withControlMode(SmartMotorControllerConfig.ControlMode.CLOSED_LOOP)
-			.withClosedLoopController(ShooterConstants.FeederKp, 0, 0, DegreesPerSecond.of(360), DegreesPerSecondPerSecond.of(180))
-			// Configure Motor and Mechanism properties
-			.withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
-			.withIdleMode(SmartMotorControllerConfig.MotorMode.BRAKE)
+			.withClosedLoopController(ShooterConstants.FEEDER_KP, ShooterConstants.FEEDER_KI, ShooterConstants.FEEDER_KD, ShooterConstants.FEEDER_MAX_VELOCITY, ShooterConstants.FEEDER_MAX_ACCELERATION)
+			.withGearing(ShooterConstants.FEEDER_GEARING)
+			.withIdleMode(ShooterConstants.FEEDER_IDLE)
 			.withMotorInverted(false)
-			// Setup Telemetry
 			.withTelemetry("FeederMotor", SmartMotorControllerConfig.TelemetryVerbosity.HIGH)
-			// Power Optimization
-			.withStatorCurrentLimit(Amps.of(40))
-			.withClosedLoopRampRate(Seconds.of(0.25))
-			.withFeedforward(new SimpleMotorFeedforward(0.27937, 0.089836, 0.014557))
-			.withSimFeedforward(new SimpleMotorFeedforward(0.27937, 0.089836, 0.014557))
-			.withOpenLoopRampRate(Seconds.of(0.25));
+			.withStatorCurrentLimit(ShooterConstants.FEEDER_STATOR)
+			.withClosedLoopRampRate(ShooterConstants.FEEDER_CLOSED_RATE)
+			.withOpenLoopRampRate(ShooterConstants.FEEDER_OPEN_RATE)
+			.withFeedforward(new SimpleMotorFeedforward(ShooterConstants.FEEDER_KS, ShooterConstants.FEEDER_KV, ShooterConstants.FEEDER_KA))
+			.withSimFeedforward(new SimpleMotorFeedforward(ShooterConstants.FEEDER_KS, ShooterConstants.FEEDER_KV, ShooterConstants.FEEDER_KA))
+			.withControlMode(SmartMotorControllerConfig.ControlMode.CLOSED_LOOP);
 
 	private final SmartMotorController motor = new TalonFXWrapper(feederMotor, DCMotor.getKrakenX60(1), motorConfig);
 
 	private final PivotConfig  pivotConfig = new PivotConfig(motor)
 			.withSimColor(new Color8Bit(Color.kOrange))
 			.withTelemetry("Feeder", SmartMotorControllerConfig.TelemetryVerbosity.HIGH)
-			.withMOI(Meters.of(0.20), Kilogram.of(0.1))
-			.withHardLimit(Degrees.of(0), Degrees.of(360))
-			.withStartingPosition(Degrees.of(0));
+			.withMOI(ShooterConstants.FEEDER_LENGTH, ShooterConstants.FEEDER_MASS)
+			.withHardLimit(ShooterConstants.FEEDER_HARD_LIMIT_LOW, ShooterConstants.FEEDER_HARD_LIMIT_HIGH)
+			.withStartingPosition(ShooterConstants.FEEDER_START_POSITION);
 
 	private final Pivot feeder = new Pivot(pivotConfig);
 
-	private static final DigitalInput BeamBreakLeftFeeder = new DigitalInput(ShooterConstants.BeamBreakL);
-	private static final DigitalInput BeamBreakRightFeeder = new DigitalInput(ShooterConstants.BeamBreakR);
-	private static final DigitalInput BeamBreakTop = new DigitalInput(ShooterConstants.BeamBreakT);
+	private static final DigitalInput BeamBreakLeftFeeder = new DigitalInput(ShooterConstants.BEAM_BREAK_LEFT_ID);
+	private static final DigitalInput BeamBreakRightFeeder = new DigitalInput(ShooterConstants.BEAM_BREAK_RIGHT_ID);
+	private static final DigitalInput BeamBreakTop = new DigitalInput(ShooterConstants.BEAM_BREAK_TOP_ID);
 
 	public static boolean getBeamBreakLeftFeeder(){
 		return BeamBreakLeftFeeder.get();
