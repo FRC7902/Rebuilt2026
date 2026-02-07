@@ -16,17 +16,21 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 
 public class ShooterSubsystem extends SubsystemBase {
 	//initialize required subsystems
-	private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
-	private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
-	private final FeederSubsystem feederSubsystem = new FeederSubsystem();
+	private final HoodSubsystem hoodSubsystem;
+	private final FlywheelSubsystem flywheelSubsystem;
+	private final FeederSubsystem feederSubsystem;
 
+	//Necessary variables
 	private Supplier<AngularVelocity> flywheelVelocitySupplier = () -> DegreesPerSecond.of(1);
 	private static Angle defaultAngle = Degrees.of(90);
 
-
+//empty constructor
 	public ShooterSubsystem() {
-
+		hoodSubsystem = new HoodSubsystem();
+		flywheelSubsystem = new FlywheelSubsystem();
+		feederSubsystem = new FeederSubsystem();
 	}
+	//FeederSubsystem Commands
 	public Command feed(){
 		return feederSubsystem.run();
 	}
@@ -39,9 +43,13 @@ public class ShooterSubsystem extends SubsystemBase {
 	public Command stopFeeder(){
 		return feederSubsystem.stop();
 	}
+
+	//Hood aiming
 	public Command aimAt(Angle hoodAngle){
 		return hoodSubsystem.setAngle(hoodAngle);
 	}
+
+	//Shooter Commands
 	public Command runShooter(){
 		if(flywheelVelocitySupplier == null){
 			DriverStation.reportWarning("Shooter velocity set to null, not running shooter", true);
@@ -52,6 +60,19 @@ public class ShooterSubsystem extends SubsystemBase {
 	public Command stopShooter(){
 		return flywheelSubsystem.setVelocity(DegreesPerSecond.of(0));
 	}
+	public Command runShooter(AngularVelocity velocity) {
+		if (velocity == null) {
+			DriverStation.reportWarning("Shooter velocity set to null, defaulting to 0", true);
+			velocity = DegreesPerSecond.of(0);
+		}
+
+		return flywheelSubsystem.setVelocity(velocity);
+	}
+	public void setVelocitySupplier(Supplier<AngularVelocity> velocitySupplier) {
+		this.flywheelVelocitySupplier = velocitySupplier;
+	}
+
+	//Feeder Beam Break usage
 	public Command runFeeder(){
 		if(FeederSubsystem.getBeamBreakRightFeeder() || FeederSubsystem.getBeamBreakLeftFeeder()){
 			return feederSubsystem.run();
@@ -76,16 +97,8 @@ public class ShooterSubsystem extends SubsystemBase {
 		}
 		return new InstantCommand(() -> DriverStation.reportWarning("No object found from left beam break or right beam break", true));
 	}
-	public Command runShooter(AngularVelocity velocity) {
-		if (velocity == null) {
-			DriverStation.reportWarning("Shooter velocity set to null, defaulting to 0", true);
-			velocity = DegreesPerSecond.of(0);
-		}
-
-		return flywheelSubsystem.setVelocity(velocity);
-	}
-	public void setVelocitySupplier(Supplier<AngularVelocity> velocitySupplier) {
-		this.flywheelVelocitySupplier = velocitySupplier;
+	public void setDefaultAngle(Angle angle){
+		defaultAngle = angle;
 	}
 
 }
