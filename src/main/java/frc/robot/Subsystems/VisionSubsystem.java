@@ -7,6 +7,7 @@ package frc.robot.Subsystems;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.PositionConstants;
 import frc.robot.RobotContainer;
@@ -59,6 +60,14 @@ public class VisionSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    // SmartDashboard.putNumber("Delta x to  hub", robotHubDeltaTranslation2d().getX());
+    // SmartDashboard.putNumber("Delta y to  hub", robotHubDeltaTranslation2d().getY());
+    // SmartDashboard.putNumber("Desired angle", Math.toDegrees(findAngleToHubRadians()));
+    // SmartDashboard.putNumber("Direct drive x", xSupplier().getAsDouble());
+    // SmartDashboard.putNumber("Direct drive y", ySupplier().getAsDouble());
+    // SmartDashboard.putNumber("Angle of  unit cirlce", Math.toDegrees(Math.atan2(ySupplier().getAsDouble(), xSupplier().getAsDouble())));
+    SmartDashboard.putNumber("Compensator delta x", velocityDeltaCompensator().getX());
+    SmartDashboard.putNumber("Compensator delta y", velocityDeltaCompensator().getY());
   }
 
   /**
@@ -145,12 +154,12 @@ public class VisionSubsystem extends SubsystemBase {
    * @return the angle in radians (using WPILib's coordinate system)
    */
   private double findAngleToHubRadians() {
-    Translation2d robotHubDeltaTranslation2d = robotHubDeltaTranslation2d().plus(velocityDeltaCompensator());
+    Translation2d robotHubDeltaTranslation2d = robotHubDeltaTranslation2d().minus(velocityDeltaCompensator());
     return Math.atan2(robotHubDeltaTranslation2d.getY(),robotHubDeltaTranslation2d.getX()) - (Math.PI/2);
   }
 
   private Translation2d velocityDeltaCompensator() {
-    Translation2d velocityTranslation2d = new Translation2d(swerveSubsystem.getSwerveDrive().getRobotVelocity().vxMetersPerSecond, swerveSubsystem.getSwerveDrive().getRobotVelocity().vyMetersPerSecond);
+    Translation2d velocityTranslation2d = new Translation2d(swerveSubsystem.getSwerveDrive().getFieldVelocity().vxMetersPerSecond, swerveSubsystem.getSwerveDrive().getRobotVelocity().vyMetersPerSecond);
     Translation2d deltaCompensator = velocityTranslation2d.times(VisionConstants.VELOCITY_COMPENSATOR_COEFFICIENT);
     return deltaCompensator;
   }
@@ -171,7 +180,7 @@ public class VisionSubsystem extends SubsystemBase {
    */
   public DoubleSupplier ySupplier() {
     return () ->  {
-      return Math.sin(findAngleToHubRadians());
+      return -Math.sin(findAngleToHubRadians());
     };
   }
 }
