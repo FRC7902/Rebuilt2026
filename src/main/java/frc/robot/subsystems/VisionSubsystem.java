@@ -7,6 +7,7 @@ package frc.robot.Subsystems;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.PositionConstants;
 import frc.robot.RobotContainer;
@@ -18,6 +19,7 @@ import limelight.networktables.Orientation3d;
 import limelight.networktables.PoseEstimate;
 
 import java.util.Optional;
+import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 
@@ -58,6 +60,14 @@ public class VisionSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    // SmartDashboard.putNumber("Delta x to  hub", robotHubDeltaTranslation2d().getX());
+    // SmartDashboard.putNumber("Delta y to  hub", robotHubDeltaTranslation2d().getY());
+    // SmartDashboard.putNumber("Desired angle", Math.toDegrees(findAngleToHubRadians()));
+    // SmartDashboard.putNumber("Direct drive x", xSupplier().getAsDouble());
+    // SmartDashboard.putNumber("Direct drive y", ySupplier().getAsDouble());
+    // SmartDashboard.putNumber("Angle of  unit cirlce", Math.toDegrees(Math.atan2(ySupplier().getAsDouble(), xSupplier().getAsDouble())));
+    SmartDashboard.putNumber("Compensator delta x", velocityDeltaCompensator().getX());
+    SmartDashboard.putNumber("Compensator delta y", velocityDeltaCompensator().getY());
   }
 
   /**
@@ -136,8 +146,41 @@ public class VisionSubsystem extends SubsystemBase {
    */
   private Translation2d robotHubDeltaTranslation2d() {
     Translation2d robotPosition = swerveSubsystem.getPose().getTranslation();
-    return robotPosition.minus(isRedAlliance() ? PositionConstants.RED_HUB_T_2D : PositionConstants.BLUE_HUB_T_2D);
+    return (isRedAlliance() ? PositionConstants.RED_HUB_T_2D : PositionConstants.BLUE_HUB_T_2D).minus(robotPosition);
   }
 
-  
+  /**
+   * Find the angle at which the robot must point at in order to aim directly at the hub
+   * @return the angle in radians (using WPILib's coordinate system)
+   */
+  private double findAngleToHubRadians() {
+    Translation2d robotHubDeltaTranslation2d = robotHubDeltaTranslation2d().minus(velocityDeltaCompensator());
+    return Math.atan2(robotHubDeltaTranslation2d.getY(),robotHubDeltaTranslation2d.getX()) - (Math.PI/2);
+  }
+
+  private Translation2d velocityDeltaCompensator() {
+    Translation2d velocityTranslation2d = new Translation2d(swerveSubsystem.getSwerveDrive().getFieldVelocity().vxMetersPerSecond, swerveSubsystem.getSwerveDrive().getRobotVelocity().vyMetersPerSecond);
+    Translation2d deltaCompensator = velocityTranslation2d.times(VisionConstants.VELOCITY_COMPENSATOR_COEFFICIENT);
+    return deltaCompensator;
+  }
+
+  /**
+   * Double supplier of the x value to be plugged into the direct angle swerve controller for auto-aim
+   * @return DoubleSupplier of x
+   */
+  public DoubleSupplier xSupplier() {
+    return () ->  {
+      return Math.cos(findAngleToHubRadians());
+    };
+  }
+
+  /**
+   * Double supplier of the y value to be plugged into the direct angle swerve controller for auto-aim
+   * @return DoubleSupplier of y
+   */
+  public DoubleSupplier ySupplier() {
+    return () ->  {
+      return -Math.sin(findAngleToHubRadians());
+    };
+  }
 }

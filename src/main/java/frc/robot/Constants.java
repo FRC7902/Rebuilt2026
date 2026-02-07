@@ -552,12 +552,3 @@ public final class Constants {
     public static final SwerveDriveTelemetry.TelemetryVerbosity SWERVE_TELEMETRY_VERBOSITY = SwerveDriveTelemetry.TelemetryVerbosity.POSE;
     public static final boolean TELEMETRY = false; // Set to false for competition to reduce network traffic
 }
-
-
-    
-
-    
-
-      
-
-    
