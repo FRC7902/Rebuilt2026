@@ -18,6 +18,7 @@ import limelight.networktables.Orientation3d;
 import limelight.networktables.PoseEstimate;
 
 import java.util.Optional;
+import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 
@@ -136,8 +137,36 @@ public class VisionSubsystem extends SubsystemBase {
    */
   private Translation2d robotHubDeltaTranslation2d() {
     Translation2d robotPosition = swerveSubsystem.getPose().getTranslation();
-    return robotPosition.minus(isRedAlliance() ? PositionConstants.RED_HUB_T_2D : PositionConstants.BLUE_HUB_T_2D);
+    return (isRedAlliance() ? PositionConstants.RED_HUB_T_2D : PositionConstants.BLUE_HUB_T_2D).minus(robotPosition);
   }
 
-  
+  /**
+   * Find the angle at which the robot must point at in order to aim directly at the hub
+   * @return the angle in radians (using WPILib's coordinate system)
+   */
+  private double findAngleToHubRadians() {
+    // TODO: Add inertial calculation to aim into the future :O
+    Translation2d robotHubDeltaTranslation2d = robotHubDeltaTranslation2d();
+    return Math.atan2(robotHubDeltaTranslation2d.getY(),robotHubDeltaTranslation2d.getX()) - (Math.PI/2);
+  }
+
+  /**
+   * Double supplier of the x value to be plugged into the direct angle swerve controller for auto-aim
+   * @return DoubleSupplier of x
+   */
+  public DoubleSupplier xSupplier() {
+    return () ->  {
+      return Math.cos(findAngleToHubRadians());
+    };
+  }
+
+  /**
+   * Double supplier of the y value to be plugged into the direct angle swerve controller for auto-aim
+   * @return DoubleSupplier of y
+   */
+  public DoubleSupplier ySupplier() {
+    return () ->  {
+      return Math.sin(findAngleToHubRadians());
+    };
+  }
 }
