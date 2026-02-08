@@ -94,23 +94,22 @@ public class ShooterSubsystem extends SubsystemBase {
 		);
 	}
 	public Command runContinuous(){
-		return new ConditionalCommand(
-				new InstantCommand(),
+		return
 				new ParallelCommandGroup(
 						new InstantCommand(FeederSubsystem::StartTimer),
 						runFeeder()
-				),
-				FeederSubsystem::isTimerEnded
-		);
-
+				).until(FeederSubsystem::isTimerEnded);
 	}
-	@Override
-	public void periodic() {
-		if(FeederSubsystem.isTimerEnded()){
-			stopFeeder();
-			stopShooter();
-		}
+	public static boolean isTimerEnded(){
+		return FeederSubsystem.isTimerEnded();
 	}
+//	@Override
+//	public void periodic() {
+//		if(FeederSubsystem.isTimerEnded()){
+//			stopFeeder();
+//			stopShooter();
+//		}
+//	}
 	public void setDefaultAngle(Angle angle){
 		defaultAngle = angle;
 	}

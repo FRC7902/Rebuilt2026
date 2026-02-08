@@ -15,19 +15,19 @@ import frc.robot.subsystems.shooter.ShooterSubsystem;
 import static edu.wpi.first.units.Units.Degrees;
 
 public class RobotContainer {
-	public ShooterSubsystem shooter = new ShooterSubsystem(); // holds hood, flywheel and turret
+	public static ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem(); // holds hood, flywheel and turret
 	public CommandXboxController xboxController = new CommandXboxController(0);
 
 	public RobotContainer() {
 		DriverStation.silenceJoystickConnectionWarning(true);
 		configureBindings();
-	}
+	}      
 
 	private void configureBindings() {
-		xboxController.a().whileTrue(shooter.runShooter()).whileFalse(shooter.stopShooter());
-		xboxController.b().whileTrue(shooter.runShooter(Units.DegreesPerSecond.of(720))).whileFalse(shooter.stopShooter());
-		xboxController.x().whileTrue(shooter.feed(Degrees.of(90))).whileFalse(shooter.stopFeeder());
-		xboxController.y().whileTrue(shooter.reset()).whileFalse(shooter.stopShooter());
+		xboxController.a().whileTrue(m_shooterSubsystem.runShooter()).whileFalse(m_shooterSubsystem.stopShooter());
+		xboxController.b().whileTrue(m_shooterSubsystem.runShooter(Units.DegreesPerSecond.of(720))).whileFalse(m_shooterSubsystem.stopShooter());
+		xboxController.x().whileTrue(m_shooterSubsystem.feed(Degrees.of(90))).whileFalse(m_shooterSubsystem.stopFeeder());
+		xboxController.y().whileTrue(m_shooterSubsystem.reset()).whileFalse(m_shooterSubsystem.stopShooter());
 	}
 
 	public Command getAutonomousCommand() {
