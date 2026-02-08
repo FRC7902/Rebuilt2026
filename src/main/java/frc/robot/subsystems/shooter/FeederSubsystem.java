@@ -6,6 +6,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -24,6 +25,8 @@ import static edu.wpi.first.units.Units.*;
 
 public class FeederSubsystem extends SubsystemBase {
 	private static final TalonFX feederMotor = new TalonFX(ShooterConstants.FEEDER_ID);
+	private static final Timer timer = new Timer();
+	private static boolean timerEnded = true;
 	private final SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
 			.withClosedLoopController(ShooterConstants.FEEDER_KP, ShooterConstants.FEEDER_KI, ShooterConstants.FEEDER_KD, ShooterConstants.FEEDER_MAX_VELOCITY, ShooterConstants.FEEDER_MAX_ACCELERATION)
 			.withGearing(ShooterConstants.FEEDER_GEARING)
@@ -76,8 +79,15 @@ public class FeederSubsystem extends SubsystemBase {
 
 	}
 	public Command run() {
-		return new ConditionalCommand(stop(),
-				setAngle(defaultAngle),
+		return new ConditionalCommand(
+				new SequentialCommandGroup(
+						stop(),
+						reset()
+				),
+				new SequentialCommandGroup(
+						setAngle(defaultAngle),
+						reset()
+				),
 				() -> getAngle() == defaultAngle
 			);
 	}
@@ -133,6 +143,23 @@ public class FeederSubsystem extends SubsystemBase {
 		SmartDashboard.putBoolean("Feeder/Beam Break top: ", getBeamBreakTop());
 		SmartDashboard.putNumber("Feeder/Feeder Angle", getAngle().in(Units.Degrees));
 		feeder.updateTelemetry();
+		if(BeamBreakLeftFeeder.get() || BeamBreakRightFeeder.get()){
+			timer.reset();
+		}
+		if(timer.hasElapsed(ShooterConstants.FEEDER_TIME_PERIOD)){
+			ShooterSubsystem.switchContinuous();
+			timerEnded = true;
+			timer.stop();
+		}
+	}
+	public static void StartTimer(){
+		ShooterSubsystem.switchContinuous();
+		timerEnded = false;
+		timer.stop();
+		timer.reset();
+	}
+	public static boolean isTimerEnded(){
+		return timerEnded;
 	}
 
 	@Override

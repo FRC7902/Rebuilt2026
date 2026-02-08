@@ -75,6 +75,7 @@ public final class Constants {
 		public static final Angle FEEDER_HARD_LIMIT_LOW = Degrees.of(0);
 		public static final Angle  FEEDER_HARD_LIMIT_HIGH = Degrees.of(120);
 		public static final Angle FEEDER_START_POSITION = Degrees.of(0);
+		public static final double FEEDER_TIME_PERIOD = 2;
 
 		public static final int BEAM_BREAK_LEFT_ID = 3;
 		public static final int BEAM_BREAK_RIGHT_ID = 4;
