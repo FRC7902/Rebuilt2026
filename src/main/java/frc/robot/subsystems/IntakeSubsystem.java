@@ -66,9 +66,20 @@ public IntakeSubsystem() {
     m_intakemotor.stopMotor();
   }
 
-  public void deploy(){
+  public void deploy() {
+    // If already hit the deep beam break, don't keep driving the motor
+    if (isDeepBeamBreakBroken()) {
+      stopDeploy();
+      return;
+    }
     m_LID.set(IntakeConstants.FULL_SPEED);
   }
+  
+  public void stopDeploy() {
+    m_LID.set(0);
+    m_LID.stopMotor();
+  }
+  
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

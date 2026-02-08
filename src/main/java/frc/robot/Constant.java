@@ -19,4 +19,9 @@ public class Constant {
 
         public static final int MOTOR_CURRENT_LIMIT = 20;
     }
+    public static class OperatorConstants {
+        public static final int DRIVER_CONTROLLER_PORT = 0;
+        public static final int OPERATOR_CONTROLLER_PORT = 1;
+        public static final double DEADBAND = 0.15;
+    }
 }
