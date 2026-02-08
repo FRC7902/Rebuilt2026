@@ -1,13 +1,9 @@
 package frc.robot.subsystems.shooter;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
-
-import frc.robot.Constants.ShooterConstants;
 
 import java.util.function.Supplier;
 
@@ -71,34 +67,51 @@ public class ShooterSubsystem extends SubsystemBase {
 	public void setVelocitySupplier(Supplier<AngularVelocity> velocitySupplier) {
 		this.flywheelVelocitySupplier = velocitySupplier;
 	}
-
+	private static boolean shootContinuous = false;
+	public static void switchContinuous(){
+		shootContinuous = !shootContinuous;
+	}
 	//Feeder Beam Break usage
 	public Command runFeeder(){
-		if(FeederSubsystem.getBeamBreakRightFeeder() || FeederSubsystem.getBeamBreakLeftFeeder()){
-			return feederSubsystem.run();
-		}
-		if(FeederSubsystem.getBeamBreakTop()){
-			return new ParallelCommandGroup(
-					new SequentialCommandGroup(
-							feederSubsystem.run(),
-							new WaitCommand(2),
-							reset(),
-							new WaitCommand(2),
-							feederSubsystem.stop()
-					),
-					new SequentialCommandGroup(
-							aimAt(defaultAngle),
-							runShooter(),
-							new WaitCommand(2),
-							stopShooter()
-					)
+		return new ParallelCommandGroup(
+				feederSubsystem.run().repeatedly(),
+				new ConditionalCommand(
+						new SequentialCommandGroup(
+								aimAt(defaultAngle),
+								runShooter(),
+								new ConditionalCommand(
+										new InstantCommand(),
+										new SequentialCommandGroup(
+												new WaitCommand(2),
+												stopShooter()
+										),
+										() -> shootContinuous
+								)
+						),
+						new InstantCommand(),
+						FeederSubsystem::getBeamBreakTop
+				)
+		);
+	}
+	public Command runContinuous(){
+		return new ConditionalCommand(
+				new InstantCommand(),
+				new ParallelCommandGroup(
+						new InstantCommand(FeederSubsystem::StartTimer),
+						runFeeder()
+				),
+				FeederSubsystem::isTimerEnded
+		);
 
-			);
+	}
+	@Override
+	public void periodic() {
+		if(FeederSubsystem.isTimerEnded()){
+			stopFeeder();
+			stopShooter();
 		}
-		return new InstantCommand(() -> DriverStation.reportWarning("No object found from left beam break or right beam break", true));
 	}
 	public void setDefaultAngle(Angle angle){
 		defaultAngle = angle;
 	}
-
 }
