@@ -9,10 +9,12 @@ import frc.robot.RobotContainer;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class Intake extends Command {
+  private static final double FULL_SPEED = 1.0;
+
   /** Creates a new Intake. */
   public Intake() {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.m_IntakeSubsystem);
+    addRequirements(RobotContainer.getIntakeSubsystem());
   }
 
   // Called when the command is initially scheduled.
@@ -21,7 +23,9 @@ public class Intake extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    RobotContainer.getIntakeSubsystem().setIndexerSpeed(FULL_SPEED);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
