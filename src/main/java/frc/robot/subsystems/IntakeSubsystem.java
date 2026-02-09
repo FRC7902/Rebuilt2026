@@ -30,15 +30,15 @@ public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new IntakeSubsystem. */
   public final TalonFX m_intakemotor;
   public final TalonFX m_LID;
-  private final DigitalInput m_shallowBeamBreak;
-  private final DigitalInput m_deepBeamBreak;
+  private final DigitalInput m_fullyRetractedLimitSwitch;
+  private final DigitalInput m_fullyExtendedLimitSwitch;
   private final TalonFXConfiguration m_intakemotorConfig;
 
 public IntakeSubsystem() {
   m_intakemotor = new TalonFX(IntakeConstants.INTAKE_MOTOR_CAN_ID); 
   m_LID = new TalonFX(IntakeConstants.LID_MOTOR_CAN_ID); 
-  m_shallowBeamBreak = new DigitalInput(IntakeConstants.SHALLOW_BEAM_BREAK_DIO);
-  m_deepBeamBreak = new DigitalInput(IntakeConstants.DEEP_BEAM_BREAK_DIO);
+  m_fullyRetractedLimitSwitch = new DigitalInput(IntakeConstants.SHALLOW_BUTTON_BREAK_DIO);
+  m_fullyExtendedLimitSwitch = new DigitalInput(IntakeConstants.DEEP_BUTTON_BREAK_DIO);
   
   m_intakemotorConfig = new TalonFXConfiguration();
   CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs()
@@ -49,12 +49,12 @@ public IntakeSubsystem() {
   m_LID.getConfigurator().apply(m_intakemotorConfig);
 }
 
-  public boolean isShallowBeamBreakBroken() {
-    return !m_shallowBeamBreak.get();
+  public boolean m_isfullyRetractedLimitSwitch() {
+    return !m_fullyRetractedLimitSwitch.get();
   }
 
-  public boolean isDeepBeamBreakBroken() {
-    return !m_deepBeamBreak.get();
+  public boolean m_isfullyExtendedLimitSwitch() {
+    return !m_fullyExtendedLimitSwitch.get();
   }
 
   public void Intake_speed(double speed) {
@@ -68,7 +68,7 @@ public IntakeSubsystem() {
 
   public void deploy() {
     // If already hit the deep beam break, don't keep driving the motor
-    if (isDeepBeamBreakBroken()) {
+    if (m_isfullyExtendedLimitSwitch()) {
       stopDeploy();
       return;
     }

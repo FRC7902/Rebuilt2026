@@ -14,8 +14,8 @@ public class Constant {
         public static final double OUTTAKE_SPEED = 0.25;
         public static final double STOP_SPEED = 0.0;
 
-        public static final int SHALLOW_BEAM_BREAK_DIO = 2;
-        public static final int DEEP_BEAM_BREAK_DIO = 3;
+        public static final int SHALLOW_BUTTON_BREAK_DIO = 2;
+        public static final int DEEP_BUTTON_BREAK_DIO = 3;
 
         public static final int MOTOR_CURRENT_LIMIT = 20;
     }
