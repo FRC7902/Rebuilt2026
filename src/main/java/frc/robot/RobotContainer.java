@@ -61,7 +61,7 @@ public class RobotContainer {
             () -> m_funnelIndexerSubsystem.stopDeploy(),
             m_funnelIndexerSubsystem
         )
-        .until(() -> m_funnelIndexerSubsystem.isDeepBeamBreakBroken())
+        .until(() -> m_funnelIndexerSubsystem.m_isfullyExtendedLimitSwitch())
         .withName("DeployUntilDeepBeamBreak");
   }
 

@@ -24,7 +24,7 @@ public class Intake extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    RobotContainer.getIntakeSubsystem().setIndexerSpeed(FULL_SPEED);
+    RobotContainer.getIntakeSubsystem().setSpeed(FULL_SPEED);
   }
 
   // Called once the command ends or is interrupted.
