@@ -25,6 +25,8 @@ public class ShooterSubsystem extends SubsystemBase {
 		hoodSubsystem = new HoodSubsystem();
 		flywheelSubsystem = new FlywheelSubsystem();
 		feederSubsystem = new FeederSubsystem();
+		hoodSubsystem.setDefaultCommand(hoodSubsystem.setDutyCycle(() -> 0.0));
+
 	}
 	//FeederSubsystem Commands
 	public Command feed(){
