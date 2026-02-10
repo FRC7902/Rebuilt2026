@@ -1,22 +1,15 @@
 package frc.robot.subsystems.shooter;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Mass;
-import edu.wpi.first.units.measure.MomentOfInertia;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.ShooterConstants;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import yams.gearing.GearBox;
-import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ArmConfig;
 import yams.mechanisms.positional.Arm;
 import yams.motorcontrollers.SmartMotorController;
@@ -28,8 +21,7 @@ import java.util.function.Supplier;
 import static edu.wpi.first.units.Units.*;
 
 public class HoodSubsystem extends SubsystemBase {
-	private final TalonFX hoodMotor = new TalonFX(ShooterConstants.HOOD_ID);
-	private TalonFXSimState  hoodSim = hoodMotor.getSimState();
+	public final TalonFX hoodMotor = new TalonFX(ShooterConstants.HOOD_ID);
 
 	private final SmartMotorControllerConfig hoodMotorConfig = new SmartMotorControllerConfig(this)
 			.withClosedLoopController(ShooterConstants.HOOD_KP, ShooterConstants.HOOD_KI, ShooterConstants.HOOD_KD, ShooterConstants.HOOD_MAX_VELOCITY, ShooterConstants.HOOD_MAX_ACCELERATION)
@@ -47,7 +39,7 @@ public class HoodSubsystem extends SubsystemBase {
 	private final SmartMotorController hoodSMC = new TalonFXWrapper(hoodMotor, DCMotor.getKrakenX44(1), hoodMotorConfig);
 	private final ArmConfig hoodConfig = new ArmConfig(hoodSMC)
 			.withStartingPosition(ShooterConstants.HOOD_START_POSITION)
-			.withLength(ShooterConstants.FEEDER_LENGTH)
+			.withLength(ShooterConstants.HOOD_LENGTH)
 			.withMOI(ShooterConstants.HOOD_MOI)
 			.withTelemetry("HoodMech", SmartMotorControllerConfig.TelemetryVerbosity.HIGH)
 			.withSoftLimits(ShooterConstants.HOOD_SOFT_LIMIT_LOW, ShooterConstants.HOOD_SOFT_LIMIT_HIGH)
@@ -63,9 +55,9 @@ public class HoodSubsystem extends SubsystemBase {
 		return hood.setAngle(angle);
 	}
 
-	public void setAngleDirect(Angle angle)
+	public Command setAngleDirect(Angle angle)
 	{
-		hoodSMC.setPosition(angle);
+		return new InstantCommand(()->hoodSMC.setPosition(angle));
 	}
 
 	public Command setAngle(Supplier<Angle> angleSupplier) {
@@ -94,6 +86,7 @@ public class HoodSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
+		SmartDashboard.putNumber("Hood degrees", getAngle().in(Degrees));
 		hood.updateTelemetry();
 	}
 
