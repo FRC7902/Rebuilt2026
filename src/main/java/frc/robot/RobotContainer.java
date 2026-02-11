@@ -1,24 +1,18 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constant.IntakeConstants;
-import frc.robot.Constant.OperatorConstants;
+import frc.commands.Intake;
+import frc.commands.Outtake;
+import frc.commands.Unstuck;
+import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 
 public class RobotContainer {
-  public static final IntakeSubsystem m_funnelIndexerSubsystem = new IntakeSubsystem();
-  private static IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-  public static IntakeSubsystem getIntakeSubsystem() {
+  private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
 
-    return intakeSubsystem;
-  }
-  private static final CommandXboxController m_operatorController =
+  private final CommandXboxController m_operatorController =
       new CommandXboxController(OperatorConstants.OPERATOR_CONTROLLER_PORT);
 
   public RobotContainer() {
@@ -26,46 +20,31 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    // Intake while holding POV Up
-    m_operatorController.povUp()
-        .whileTrue(
-            Commands.run(
-                () -> m_funnelIndexerSubsystem.Intake_speed(IntakeConstants.FULL_SPEED),
-                m_funnelIndexerSubsystem))
-        .onFalse(
-            Commands.runOnce(
-                () -> m_funnelIndexerSubsystem.Intake_speed(IntakeConstants.STOP_SPEED),
-                m_funnelIndexerSubsystem));
 
-    // Outtake while holding POV Down
-    m_operatorController.povDown()
-        .whileTrue(
-            Commands.run(
-                () -> m_funnelIndexerSubsystem.Intake_speed(-IntakeConstants.OUTTAKE_SPEED),
-                m_funnelIndexerSubsystem))
-        .onFalse(
-            Commands.runOnce(
-                () -> m_funnelIndexerSubsystem.Intake_speed(IntakeConstants.STOP_SPEED),
-                m_funnelIndexerSubsystem));
+    // Intake bindings (POV up or A)
+    m_operatorController.povUp().whileTrue(new Intake(m_intakeSubsystem));
+    m_operatorController.a().whileTrue(new Intake(m_intakeSubsystem));
+    
+    m_operatorController.povDown().whileTrue(new Outtake(m_intakeSubsystem));
 
     // DEPLOY: press Right Bumper once -> deploy until deep beam break is hit -> stop automatically
-    m_operatorController.rightBumper()
-        .onTrue(deployUntilDeepBeamBreak());
+    m_operatorController.rightBumper().onTrue(deployUntilDeepBeamBreak());
+
+        // Unstuck bindings (Left bumper or X)
+    m_operatorController.leftBumper().whileTrue(new Unstuck(m_intakeSubsystem));
+    m_operatorController.x().whileTrue(new Unstuck(m_intakeSubsystem));
   }
 
-  private Command deployUntilDeepBeamBreak() {
-    return Commands.runEnd(
-            // start / execute (runs every cycle)
-            () -> m_funnelIndexerSubsystem.deploy(),
-            // end (runs once when finished or interrupted)
-            () -> m_funnelIndexerSubsystem.stopDeploy(),
-            m_funnelIndexerSubsystem
-        )
-        .until(() -> m_funnelIndexerSubsystem.m_isfullyExtendedLimitSwitch())
+  private edu.wpi.first.wpilibj2.command.Command deployUntilDeepBeamBreak() {
+    return Commands.startEnd(
+            () -> m_intakeSubsystem.setLinearMotorSpeed(IntakeConstants.LINEAR_INTAKE_DEPLOY_SPEED),
+            m_intakeSubsystem::stopLinearMotor,
+            m_intakeSubsystem)
+        .until(m_intakeSubsystem::isFullyExtendedLimitSwitchTriggered)
         .withName("DeployUntilDeepBeamBreak");
   }
 
-  public Command getAutonomousCommand() {
+  public edu.wpi.first.wpilibj2.command.Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
   }
 }
