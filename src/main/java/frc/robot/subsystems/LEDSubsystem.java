@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,6 +31,7 @@ public class LEDSubsystem extends SubsystemBase {
 
   ArrayList<Double> TransitionTimes;
 
+  // TODO: call addperiodic() to change the frequency of periodic
   public LEDSubsystem() {
     m_led = new AddressableLED(Constants.LEDConstants.PWM_PORT);
     m_ledBuffer = new AddressableLEDBuffer(Constants.LEDConstants.LED_LENGTH);
@@ -40,7 +42,6 @@ public class LEDSubsystem extends SubsystemBase {
     hubTransitionPattern = LEDPattern.solid(ledColor).blink(Seconds.of(1.5));
     // transition times between alliance shifts
     TransitionTimes = new ArrayList<>();
-    TransitionTimes.addAll(Arrays.asList(55.0,80.0,105.0,130.0)); // in seconds
 
     // setting up triggers
     hubTrigger = new Trigger(() -> hubTransition);
@@ -58,6 +59,29 @@ public class LEDSubsystem extends SubsystemBase {
     // sets the color of the led
     m_led.setData(m_ledBuffer);
   }
+  public void teleopPeriodic() {
+    // don't know how efficient it is to keep checking every 20 ms...
+    if (DriverStation.getAlliance().get() == Alliance.Red){
+      if (DriverStation.getGameSpecificMessage().charAt(0) == 'R') { // red is inactive first
+        TransitionTimes.addAll(Arrays.asList(55.0,105.0,130.0)); // in seconds
+        // indicators for 2nd shift, 4th shift and end game
+      }
+      else {
+        TransitionTimes.addAll(Arrays.asList(30.0,80.0,130.0));
+        // indicators for 1st shift, 3rd shift, and end game
+      }
+    }
+    else {
+      if (DriverStation.getGameSpecificMessage().charAt(0) == 'B') { // blue is inactive first
+        TransitionTimes.addAll(Arrays.asList(55.0,105.0,130.0)); // in seconds
+        // indicators for 2nd shift, 4th shift and end game
+      }
+      else {
+        TransitionTimes.addAll(Arrays.asList(30.0,80.0,130.0));
+        // indicators for 1st shift, 3rd shift, and end game
+      }
+    }
+  }
   public Trigger getHubTrigger(){
     return hubTrigger;
   }
@@ -66,8 +90,11 @@ public class LEDSubsystem extends SubsystemBase {
   }
   public void setHubTransition() {
     double matchTime = DriverStation.getMatchTime(); // need to check if this includes auton
-    
-    for (Double i : TransitionTimes){
+    for (Double i : TransitionTimes) {
+      if (i - 130 <= Constants.LEDConstants.shiftInterval * 2) {
+        ledColor = Color.kViolet;
+        // special color to signal end game
+      }
       if (i - matchTime > 0 && i - matchTime <= Constants.LEDConstants.shiftInterval){
         hubTransition = true;
         return;
