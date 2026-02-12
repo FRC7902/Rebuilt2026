@@ -9,23 +9,10 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfigurator;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
-import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.sim.CANcoderSimState;
-import com.ctre.phoenix6.sim.TalonFXSimState;
+
 
 public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new IntakeSubsystem. */
@@ -37,8 +24,8 @@ public class IntakeSubsystem extends SubsystemBase {
   public IntakeSubsystem() {
     m_intakeMotor = new TalonFX(IntakeConstants.INTAKE_MOTOR_CAN_ID);
     m_linearMotor = new TalonFX(IntakeConstants.LINEAR_MOTOR_CAN_ID);
-    m_fullyRetractedLimitSwitch = new DigitalInput(IntakeConstants.SHALLOW_BUTTON_BREAK_DIO);
-    m_fullyExtendedLimitSwitch = new DigitalInput(IntakeConstants.DEEP_BUTTON_BREAK_DIO);
+    m_fullyRetractedLimitSwitch = new DigitalInput(IntakeConstants.FULLY_RETRACTED_BUTTON_BREAK_DIO);
+    m_fullyExtendedLimitSwitch = new DigitalInput(IntakeConstants.FULLY_EXTENDED_BUTTON_BREAK_DIO);
 
     TalonFXConfiguration motorConfig = new TalonFXConfiguration();
     CurrentLimitsConfigs currentLimits =
