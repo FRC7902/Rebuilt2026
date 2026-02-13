@@ -5,6 +5,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Seconds;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -19,83 +20,88 @@ public class LEDSubsystem extends SubsystemBase {
     /**
      * Creates a new LEDSubsystem.
      */
-    static AddressableLED m_led;
-   static  AddressableLEDBuffer m_ledBuffer;
+    AddressableLED m_led;
+    AddressableLEDBuffer m_ledBuffer;
 
-    static boolean hopperEmpty; // TODO: will remove once implemented with shooter subsystem
-    static boolean autoAlignComplete; // TODO: will remove once implemented with vision subsystem
-    static boolean inactiveFirst;
-    static boolean isIntakingNotOuttaking; // TODO: will remove once implemented with intake
+    boolean hopperEmpty; // TODO: will remove once implemented with shooter subsystem
+    boolean autoAlignComplete; // TODO: will remove once implemented with vision subsystem
+    boolean isIntaking; // TODO: will remove once implemented with intake
+    boolean isShooting; //TODO: will remove once implemented with shooter subsystem
 
-    static LEDPattern currentPattern;
-    static LEDPattern previousPattern;
-    static Color ledColor;
+    boolean m_inactiveFirst;
+    LEDPattern m_currentPattern;
+    LEDPattern m_previousPattern;
+    Color m_ledColor;
 
-    static double SHIFT1;
-    static double SHIFT2;
+    double m_SHIFT1;
+    double m_SHIFT2;
 
-    static double SHIFT1START;
-    static double SHIFT2START;
+    double m_SHIFT1START;
+    double m_SHIFT2START;
+
+    // Singleton Instance
+    static LEDSubsystem ledSubsystem = new LEDSubsystem();
 
     // TODO: call addperiodic() to change the frequency of periodic
-    public LEDSubsystem() {
+    private LEDSubsystem() {
         m_led = new AddressableLED(Constants.LEDConstants.PWM_PORT);
         m_ledBuffer = new AddressableLEDBuffer(Constants.LEDConstants.LED_LENGTH);
         m_led.setLength(Constants.LEDConstants.LED_LENGTH);
         m_led.start();
 
         // setting initial
-        ledColor = Color.kRed;
-        currentPattern = LEDPattern.solid(ledColor);
+        m_ledColor = Color.kRed;
+        m_currentPattern = LEDPattern.solid(m_ledColor);
     }
-
+    public static LEDSubsystem getInstance(){
+        return ledSubsystem;
+    }
     @Override
     public void periodic() {
     }
     // is this real
-    public static void teleopInit() {
+    public void teleopInit() {
         if (DriverStation.getAlliance().get() == Alliance.Red) {
-            inactiveFirst = DriverStation.getGameSpecificMessage().charAt(0) == 'R'; // red is inactive first
+            m_inactiveFirst = DriverStation.getGameSpecificMessage().charAt(0) == 'R'; // red is inactive first
         } else {
-            inactiveFirst = DriverStation.getGameSpecificMessage().charAt(0) == 'B'; // blue is inactive first
+            m_inactiveFirst = DriverStation.getGameSpecificMessage().charAt(0) == 'B'; // blue is inactive first
         }
-        SHIFT1 = inactiveFirst ? Constants.LEDConstants.SHIFT_2_TIME_SECONDS : Constants.LEDConstants.SHIFT_2_TIME_SECONDS - Constants.LEDConstants.SECONDS_OFFSET;
-        SHIFT1START = inactiveFirst ? Constants.LEDConstants.SHIFT_2_BLINK_START : Constants.LEDConstants.SHIFT_2_BLINK_START - Constants.LEDConstants.SECONDS_OFFSET;
-        SHIFT2 = inactiveFirst ? Constants.LEDConstants.SHIFT_4_TIME_SECONDS : Constants.LEDConstants.SHIFT_4_TIME_SECONDS - Constants.LEDConstants.SECONDS_OFFSET;
-        SHIFT2START = inactiveFirst ? Constants.LEDConstants.SHIFT_4_BLINK_START : Constants.LEDConstants.SHIFT_4_BLINK_START - Constants.LEDConstants.SECONDS_OFFSET;
+        m_SHIFT1 = m_inactiveFirst ? Constants.LEDConstants.SHIFT_2_TIME_SECONDS : Constants.LEDConstants.SHIFT_2_TIME_SECONDS - Constants.LEDConstants.SECONDS_OFFSET;
+        m_SHIFT1START = m_inactiveFirst ? Constants.LEDConstants.SHIFT_2_BLINK_START : Constants.LEDConstants.SHIFT_2_BLINK_START - Constants.LEDConstants.SECONDS_OFFSET;
+        m_SHIFT2 = m_inactiveFirst ? Constants.LEDConstants.SHIFT_4_TIME_SECONDS : Constants.LEDConstants.SHIFT_4_TIME_SECONDS - Constants.LEDConstants.SECONDS_OFFSET;
+        m_SHIFT2START = m_inactiveFirst ? Constants.LEDConstants.SHIFT_4_BLINK_START : Constants.LEDConstants.SHIFT_4_BLINK_START - Constants.LEDConstants.SECONDS_OFFSET;
     }
 
-    public static void checkForLEDUpdates() {
-        previousPattern = currentPattern;
+    public void checkForLEDUpdates() {
+        m_previousPattern = m_currentPattern;
         double matchTime = DriverStation.getMatchTime(); // TODO: need to check if this includes auton
         if (autoAlignComplete) {
-            ledColor = Color.kRed;
+            m_ledColor = Color.kGreen;
+        } else if (isIntaking){
+            m_ledColor = Color.kBlue;
+        } else if (isShooting){
+            m_ledColor = Color.kRed;
         } else {
-            ledColor = Color.kGreen;
+            m_ledColor = Color.kOrange;
         }
-        if (isIntakingNotOuttaking) {
-            ledColor = Color.kBlue;
-        } else {
-            ledColor = Color.kOrange;
-        }
-
-        if ((matchTime >= SHIFT1 && matchTime < SHIFT1START)
-            || (matchTime >= SHIFT2 && matchTime < SHIFT2START)
+        
+        if ((matchTime >= m_SHIFT1 && matchTime < m_SHIFT1START)
+            || (matchTime >= m_SHIFT2 && matchTime < m_SHIFT2START)
             || (matchTime >= Constants.LEDConstants.END_GAME_BLINK_START && matchTime < Constants.LEDConstants.END_GAME_TIME_SECONDS)) {
-            currentPattern = LEDPattern.solid(ledColor).blink(Seconds.of(1.5));
+            m_currentPattern = LEDPattern.solid(m_ledColor).blink(Seconds.of(1.5));
         } else {
-            currentPattern = LEDPattern.solid(ledColor);
+            m_currentPattern = LEDPattern.solid(m_ledColor);
         }
         if (hopperEmpty) {
-            currentPattern = currentPattern.atBrightness(Percent.of(0.5));
+            m_currentPattern = m_currentPattern.atBrightness(Percent.of(0.2));
         } else {
-            currentPattern = currentPattern.atBrightness(Percent.of(1));
+            m_currentPattern = m_currentPattern.atBrightness(Percent.of(1));
         }
         // makes sure patterns won't be restarted for no good reason
-        if (previousPattern != currentPattern) {
+        if (m_previousPattern != m_currentPattern) {
             // sets the color of the led
             m_led.setData(m_ledBuffer);
-            currentPattern.applyTo(m_ledBuffer);
+            m_currentPattern.applyTo(m_ledBuffer);
         }
     }
 }
