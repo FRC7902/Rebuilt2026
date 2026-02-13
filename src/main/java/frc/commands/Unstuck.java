@@ -50,3 +50,6 @@ public class Unstuck extends Command {
     m_intakeSubsystem.setLinearMotorSpeed(speed);
   }
 }
+//try do half in and half out 
+//have a lower speed
+//use yam library 
