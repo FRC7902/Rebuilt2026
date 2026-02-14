@@ -26,7 +26,7 @@ public class HoodSubsystem extends SubsystemBase {
 	private final SmartMotorControllerConfig hoodMotorConfig = new SmartMotorControllerConfig(this)
 			.withClosedLoopController(ShooterConstants.HOOD_KP, ShooterConstants.HOOD_KI, ShooterConstants.HOOD_KD, ShooterConstants.HOOD_MAX_VELOCITY, ShooterConstants.HOOD_MAX_ACCELERATION)
 			.withGearing(ShooterConstants.HOOD_GEARING)
-			.withIdleMode(ShooterConstants.HOOD_IDLE)
+			.withIdleMode(ShooterConstants.HOOD_MOTOR_IDLE_MODE)
 			.withTelemetry("HoodMotor", SmartMotorControllerConfig.TelemetryVerbosity.LOW)
 			.withStatorCurrentLimit(ShooterConstants.HOOD_STATOR)
 			.withMotorInverted(false)
