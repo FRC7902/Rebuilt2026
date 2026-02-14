@@ -22,7 +22,6 @@ public class ShooterSubsystem extends SubsystemBase {
 	private Supplier<AngularVelocity> flywheelVelocitySupplier = () -> DegreesPerSecond.of(1);
 	private static Angle defaultAngle = Degrees.of(90);
 
-//empty constructor
 	public ShooterSubsystem() {
 		hoodSubsystem = new HoodSubsystem();
 		flywheelSubsystem = new FlywheelSubsystem();
@@ -30,6 +29,11 @@ public class ShooterSubsystem extends SubsystemBase {
 		hoodSubsystem.setDefaultCommand(hoodSubsystem.setDutyCycle(() -> 1.0));
 
 	}
+
+	public void runFeeder(double speed){
+		feederSubsystem.run(speed);
+	}
+
 
 	//Hood aiming
 	public Command aimAt(Angle hoodAngle){
