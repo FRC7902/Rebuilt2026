@@ -58,6 +58,13 @@ public class FeederSubsystem extends SubsystemBase {
 		feederSim.setMotorType(TalonFXSimState.MotorType.KrakenX60);
 	}
 
+	public void run(double speed){
+		feederMotor.set(speed);
+	}
+	public void stop(){
+		feederMotor.stopMotor();
+	}
+
 	public static boolean getBeamBreakLeftFeeder(){
 		return BeamBreakLeftFeeder.get();
 	}
@@ -69,8 +76,10 @@ public class FeederSubsystem extends SubsystemBase {
 	}
 	public void periodic() {
 		SmartDashboard.putBoolean("Feeder/Beam Break left: ", getBeamBreakLeftFeeder());
-		SmartDashboard.putBoolean("Feeder/Beam Break right: ", getBeamBreakLeftFeeder());
+		SmartDashboard.putBoolean("Feeder/Beam Break right: ", getBeamBreakRightFeeder());
 		SmartDashboard.putBoolean("Feeder/Beam Break top: ", getBeamBreakTop());
+		SmartDashboard.putNumber("Feeder/MotorSupplyCurrent: ", feederMotor.getSupplyCurrent().getValueAsDouble());
+		SmartDashboard.putNumber("Feeder/MotorVelocity: ", feederMotor.getVelocity().getValueAsDouble());
 		if(BeamBreakLeftFeeder.get() || BeamBreakRightFeeder.get()){
 			timer.reset();
 		}
