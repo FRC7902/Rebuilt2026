@@ -63,8 +63,8 @@ public class ShooterSubsystem extends SubsystemBase {
 		shootContinuous = !shootContinuous;
 	}
 
-	public static boolean isTimerEnded(){
-		return FeederSubsystem.isTimerEnded();
+	public static boolean isHopperAlmostEmpty(){
+		return FeederSubsystem.isHopperAlmostEmpty();
 	}
 	public void setDefaultAngle(Angle angle){
 		defaultAngle = angle;

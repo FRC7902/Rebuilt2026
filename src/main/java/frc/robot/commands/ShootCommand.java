@@ -19,13 +19,13 @@ public class ShootCommand extends Command {
 	}
 	@Override
 	public void execute(){
-		RobotContainer.m_shooterSubsystem.runContinuous();
+
 	}
 	@Override
 	public void end(boolean interrupted){}
 
 	@Override
 	public boolean isFinished(){
-		return ShooterSubsystem.isTimerEnded();
+		return ShooterSubsystem.isHopperAlmostEmpty();
 	}
 }
