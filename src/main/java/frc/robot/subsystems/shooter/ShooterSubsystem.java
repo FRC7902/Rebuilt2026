@@ -62,35 +62,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	public static void toggleContinuousShooting(){
 		shootContinuous = !shootContinuous;
 	}
-	//Feeder Beam Break usage
-	public Command runFeeder(){
-		return new ParallelCommandGroup(
-				feederSubsystem.run().repeatedly(),
-				new ConditionalCommand(
-						new SequentialCommandGroup(
-								aimAt(defaultAngle),
-								runShooter(),
-								new ConditionalCommand(
-										new InstantCommand(),
-										new SequentialCommandGroup(
-												new WaitCommand(2),
-												stopShooter()
-										),
-										() -> shootContinuous
-								)
-						),
-						new InstantCommand(),
-						FeederSubsystem::getBeamBreakTop
-				)
-		);
-	}
-	public Command runContinuous(){
-		return
-				new ParallelCommandGroup(
-						new InstantCommand(FeederSubsystem::StartTimer),
-						runFeeder()
-				).until(FeederSubsystem::isTimerEnded);
-	}
+
 	public static boolean isTimerEnded(){
 		return FeederSubsystem.isTimerEnded();
 	}
