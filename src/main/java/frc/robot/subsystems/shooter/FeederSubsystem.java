@@ -9,13 +9,16 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Constants.ShooterConstants;
 
+import static edu.wpi.first.hal.simulation.AnalogGyroDataJNI.getAngle;
 import static edu.wpi.first.units.Units.*;
 
 public class FeederSubsystem extends SubsystemBase {
@@ -63,6 +66,27 @@ public class FeederSubsystem extends SubsystemBase {
 	}
 	public static boolean getBeamBreakTop(){
 		return BeamBreakTop.get();
+	}
+	public void periodic() {
+		SmartDashboard.putBoolean("Feeder/Beam Break left: ", getBeamBreakLeftFeeder());
+		SmartDashboard.putBoolean("Feeder/Beam Break right: ", getBeamBreakLeftFeeder());
+		SmartDashboard.putBoolean("Feeder/Beam Break top: ", getBeamBreakTop());
+		if(BeamBreakLeftFeeder.get() || BeamBreakRightFeeder.get()){
+			timer.reset();
+		}
+		if(timer.hasElapsed(ShooterConstants.FEEDER_TIME_PERIOD)){
+
+			timerEnded = true;
+			timer.stop();
+		}
+	}
+	public static void StartTimer(){
+		timerEnded = false;
+		timer.stop();
+		timer.reset();
+	}
+	public static boolean isHopperAlmostEmpty(){
+		return timerEnded;
 	}
 
 	@Override
