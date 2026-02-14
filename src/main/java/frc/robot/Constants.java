@@ -70,7 +70,7 @@ public final class Constants {
 		public static final AngularAcceleration FEEDER_MAX_ACCELERATION = DegreesPerSecondPerSecond.of(180);
 		public static final MechanismGearing FEEDER_GEARING = new MechanismGearing(GearBox.fromReductionStages(3, 4));
 		public static final SmartMotorControllerConfig.MotorMode FEEDER_IDLE = SmartMotorControllerConfig.MotorMode.BRAKE;
-		public static final Current FEEDER_STATOR = Amps.of(40);
+		public static final double FEEDER_STATOR = 40;
 		public static final Time FEEDER_CLOSED_RATE = Seconds.of(0.25);
 		public static final Time FEEDER_OPEN_RATE = Seconds.of(0.25);
 		public static final double FEEDER_KS = 1;
@@ -83,9 +83,12 @@ public final class Constants {
 		public static final Angle  FEEDER_HARD_LIMIT_HIGH = Degrees.of(120);
 		public static final Angle FEEDER_START_POSITION = Degrees.of(0);
 		public static final double FEEDER_TIME_PERIOD = 2;
+		public static final double FEEDER_GEAR_RATIO = 1;
+		public static final double FEEDER_VOLTAGE = 100;
 
 		public static final int BEAM_BREAK_LEFT_ID = 4;
 		public static final int BEAM_BREAK_RIGHT_ID = 5;
 		public static final int BEAM_BREAK_TOP_ID = 6;
+
 	}
 }
