@@ -4,10 +4,18 @@
 
 package frc.robot;
 
+import java.io.File;
+
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Subsystems.SwerveSusbystem;
 
 public class RobotContainer {
+
+
+    public final static SwerveSusbystem m_swerveSubsystem = new SwerveSusbystem(
+            new File(Filesystem.getDeployDirectory(), "swerve"));
   public RobotContainer() {
     configureBindings();
   }
