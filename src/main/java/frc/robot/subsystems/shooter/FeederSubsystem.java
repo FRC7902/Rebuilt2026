@@ -139,7 +139,7 @@ public class FeederSubsystem extends SubsystemBase {
 	@Override
 	public void periodic() {
 		SmartDashboard.putBoolean("Feeder/Beam Break left: ", getBeamBreakLeftFeeder());
-		SmartDashboard.putBoolean("Feeder/Beam Break right: ", getBeamBreakLeftFeeder());
+		SmartDashboard.putBoolean("Feeder/Beam Break right: ", getBeamBreakRightFeeder());
 		SmartDashboard.putBoolean("Feeder/Beam Break top: ", getBeamBreakTop());
 		SmartDashboard.putNumber("Feeder/Feeder Angle", getAngle().in(Units.Degrees));
 		feeder.updateTelemetry();
