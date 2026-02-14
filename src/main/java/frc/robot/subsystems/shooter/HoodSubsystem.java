@@ -27,7 +27,7 @@ public class HoodSubsystem extends SubsystemBase {
 			.withClosedLoopController(ShooterConstants.HOOD_KP, ShooterConstants.HOOD_KI, ShooterConstants.HOOD_KD, ShooterConstants.HOOD_MAX_VELOCITY, ShooterConstants.HOOD_MAX_ACCELERATION)
 			.withGearing(ShooterConstants.HOOD_GEARING)
 			.withIdleMode(ShooterConstants.HOOD_IDLE)
-			.withTelemetry("HoodMotor", SmartMotorControllerConfig.TelemetryVerbosity.HIGH)
+			.withTelemetry("HoodMotor", SmartMotorControllerConfig.TelemetryVerbosity.LOW)
 			.withStatorCurrentLimit(ShooterConstants.HOOD_STATOR)
 			.withMotorInverted(false)
 			.withClosedLoopRampRate(ShooterConstants.HOOD_CLOSED_RATE)
@@ -36,12 +36,12 @@ public class HoodSubsystem extends SubsystemBase {
 			.withSimFeedforward(new SimpleMotorFeedforward(ShooterConstants.HOOD_KS, ShooterConstants.HOOD_KV, ShooterConstants.HOOD_KA))
 			.withControlMode(SmartMotorControllerConfig.ControlMode.CLOSED_LOOP);
 
-	private final SmartMotorController hoodSMC = new TalonFXWrapper(hoodMotor, DCMotor.getKrakenX44(1), hoodMotorConfig);
+	private final SmartMotorController hoodSMC = new TalonFXWrapper(hoodMotor, DCMotor.getKrakenX44Foc(1), hoodMotorConfig);
 	private final ArmConfig hoodConfig = new ArmConfig(hoodSMC)
 			.withStartingPosition(ShooterConstants.HOOD_START_POSITION)
 			.withLength(ShooterConstants.HOOD_LENGTH)
 			.withMOI(ShooterConstants.HOOD_MOI)
-			.withTelemetry("HoodMech", SmartMotorControllerConfig.TelemetryVerbosity.HIGH)
+			.withTelemetry("HoodMech", SmartMotorControllerConfig.TelemetryVerbosity.LOW)
 			.withSoftLimits(ShooterConstants.HOOD_SOFT_LIMIT_LOW, ShooterConstants.HOOD_SOFT_LIMIT_HIGH)
 			.withHardLimit(ShooterConstants.HOOD_HARD_LIMIT_LOW, ShooterConstants.HOOD_HARD_LIMIT_HIGH);
 

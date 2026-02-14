@@ -33,7 +33,7 @@ public class FlywheelSubsystem extends SubsystemBase {
 			.withClosedLoopController(ShooterConstants.FLYWHEEL_KP, ShooterConstants.FLYWHEEL_KI, ShooterConstants.FLYWHEEL_KD, ShooterConstants.FLYWHEEL_MAX_VELOCITY, ShooterConstants.FLYWHEEL_MAX_ACCELERATION)
 			.withGearing(ShooterConstants.FLYWHEEL_GEARING)
 			.withIdleMode(ShooterConstants.FLYWHEEL_IDLE)
-			.withTelemetry("FlywheelMotor", SmartMotorControllerConfig.TelemetryVerbosity.HIGH)
+			.withTelemetry("FlywheelMotor", SmartMotorControllerConfig.TelemetryVerbosity.LOW)
 			.withStatorCurrentLimit(ShooterConstants.FLYWHEEL_STATOR)
 			.withMotorInverted(false)
 			.withClosedLoopRampRate(ShooterConstants.FLYWHEEL_CLOSED_RATE)
@@ -42,12 +42,12 @@ public class FlywheelSubsystem extends SubsystemBase {
 			.withSimFeedforward(new SimpleMotorFeedforward(ShooterConstants.FLYWHEEL_KS, ShooterConstants.FLYWHEEL_KV, ShooterConstants.FLYWHEEL_KA))
 			.withControlMode(SmartMotorControllerConfig.ControlMode.CLOSED_LOOP);
 
-	private final SmartMotorController motor = new TalonFXWrapper(flywheelMotor, DCMotor.getKrakenX60(2), motorConfig);
+	private final SmartMotorController motor = new TalonFXWrapper(flywheelMotor, DCMotor.getKrakenX60Foc(2), motorConfig);
 
 	private final FlyWheelConfig flywheelConfig = new FlyWheelConfig(motor)
 			.withDiameter(ShooterConstants.FLYWHEEL_DIAMETER)
 			.withMass(ShooterConstants.FLYWHEEL_MASS)
-			.withTelemetry("FlywheelMech", SmartMotorControllerConfig.TelemetryVerbosity.HIGH)
+			.withTelemetry("FlywheelMech", SmartMotorControllerConfig.TelemetryVerbosity.LOW)
 			.withSoftLimit(ShooterConstants.FLYWHEEL_LIMIT_LOW, ShooterConstants.FLYWHEEL_LIMIT_HIGH)
 			.withSpeedometerSimulation(ShooterConstants.FLYWHEEL_MAX_VELOCITY);
 
