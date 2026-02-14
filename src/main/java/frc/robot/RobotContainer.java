@@ -17,8 +17,7 @@ import frc.robot.subsystems.shooter.FlywheelSubsystem;
 import frc.robot.subsystems.shooter.HoodSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.*;
 
 public class RobotContainer {
 	public static ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem(); // holds hood, flywheel and turret
@@ -35,11 +34,13 @@ public class RobotContainer {
 	private void configureBindings() {
 		//TODO: Fix hood, setAngle in yams library does not work currently
 		// Test hood movement
-		xboxController.a().whileTrue(hoodSubsystem.setAngle(Degrees.of(75)));
-		xboxController.b().whileTrue(hoodSubsystem.setAngle(Degrees.of(15)));
+		xboxController.a().whileTrue(hoodSubsystem.setAngle(Degrees.of(75))).whileFalse(hoodSubsystem.idle());
+		xboxController.b().whileTrue(hoodSubsystem.setAngle(Degrees.of(15))).whileFalse(hoodSubsystem.idle());
 
 		//test feeder
 		xboxController.x().whileTrue(new InstantCommand(()-> m_shooterSubsystem.runFeeder(1000)));
+		//test Flywheel
+		xboxController.y().whileTrue(m_shooterSubsystem.runShooter(RotationsPerSecond.of(0.5))).whileFalse(m_shooterSubsystem.stopShooter());
 	}
 
 	public Command getAutonomousCommand() {
