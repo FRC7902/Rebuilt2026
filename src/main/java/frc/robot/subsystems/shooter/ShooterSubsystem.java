@@ -16,6 +16,8 @@ public class ShooterSubsystem extends SubsystemBase {
 	private final FlywheelSubsystem flywheelSubsystem;
 	private final FeederSubsystem feederSubsystem;
 
+	private static boolean shootContinuous = false;
+
 	//Necessary variables
 	private Supplier<AngularVelocity> flywheelVelocitySupplier = () -> DegreesPerSecond.of(1);
 	private static Angle defaultAngle = Degrees.of(90);
@@ -27,19 +29,6 @@ public class ShooterSubsystem extends SubsystemBase {
 		feederSubsystem = new FeederSubsystem();
 		hoodSubsystem.setDefaultCommand(hoodSubsystem.setDutyCycle(() -> 1.0));
 
-	}
-	//FeederSubsystem Commands
-	public Command feed(){
-		return feederSubsystem.run();
-	}
-	public Command feed(Angle angle){
-		return feederSubsystem.setAngle(angle);
-	}
-	public Command reset(){
-		return feederSubsystem.reset();
-	}
-	public Command stopFeeder(){
-		return feederSubsystem.stop();
 	}
 
 	//Hood aiming
@@ -53,10 +42,10 @@ public class ShooterSubsystem extends SubsystemBase {
 			DriverStation.reportWarning("Shooter velocity set to null, not running shooter", true);
 			return flywheelSubsystem.idle();
 		}
-		return flywheelSubsystem.setVelocity(flywheelVelocitySupplier);
+		return flywheelSubsystem.setAngularVelocity(flywheelVelocitySupplier);
 	}
 	public Command stopShooter(){
-		return flywheelSubsystem.setVelocity(DegreesPerSecond.of(0));
+		return flywheelSubsystem.setAngularVelocity(DegreesPerSecond.of(0));
 	}
 	public Command runShooter(AngularVelocity velocity) {
 		if (velocity == null) {
@@ -64,13 +53,13 @@ public class ShooterSubsystem extends SubsystemBase {
 			velocity = DegreesPerSecond.of(0);
 		}
 
-		return flywheelSubsystem.setVelocity(velocity);
+		return flywheelSubsystem.setAngularVelocity(velocity);
 	}
 	public void setVelocitySupplier(Supplier<AngularVelocity> velocitySupplier) {
 		this.flywheelVelocitySupplier = velocitySupplier;
 	}
-	private static boolean shootContinuous = false;
-	public static void switchContinuous(){
+
+	public static void toggleContinuousShooting(){
 		shootContinuous = !shootContinuous;
 	}
 	//Feeder Beam Break usage
@@ -105,13 +94,6 @@ public class ShooterSubsystem extends SubsystemBase {
 	public static boolean isTimerEnded(){
 		return FeederSubsystem.isTimerEnded();
 	}
-//	@Override
-//	public void periodic() {
-//		if(FeederSubsystem.isTimerEnded()){
-//			stopFeeder();
-//			stopShooter();
-//		}
-//	}
 	public void setDefaultAngle(Angle angle){
 		defaultAngle = angle;
 	}
