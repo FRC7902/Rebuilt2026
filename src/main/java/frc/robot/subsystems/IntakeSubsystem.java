@@ -12,20 +12,42 @@ import frc.robot.Constants.IntakeConstants;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.spark.SparkMax;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import yams.gearing.GearBox;
+
+import edu.wpi.first.math.system.plant.DCMotor;
+import yams.gearing.MechanismGearing;
+import yams.mechanisms.SmartMechanism;
+import yams.motorcontrollers.SmartMotorControllerConfig;
+import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
+import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
+import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 
 public class IntakeSubsystem extends SubsystemBase {
+  
   /** Creates a new IntakeSubsystem. */
   private final TalonFX m_intakeMotor;
-  private final TalonFX m_linearMotor;
+  private final YamsLinearIntakeController m_linearMotor;
   private final DigitalInput m_fullyRetractedLimitSwitch;
   private final DigitalInput m_fullyExtendedLimitSwitch;
 
   public IntakeSubsystem() {
+    m_fullyRetractedLimitSwitch = new DigitalInput(IntakeConstants.SHALLOW_BUTTON_BREAK_DIO);
+    m_fullyExtendedLimitSwitch = new DigitalInput(IntakeConstants.DEEP_BUTTON_BREAK_DIO);
     m_intakeMotor = new TalonFX(IntakeConstants.INTAKE_MOTOR_CAN_ID);
-    m_linearMotor = new TalonFX(IntakeConstants.LINEAR_MOTOR_CAN_ID);
-    m_fullyRetractedLimitSwitch = new DigitalInput(IntakeConstants.FULLY_RETRACTED_BUTTON_BREAK_DIO);
-    m_fullyExtendedLimitSwitch = new DigitalInput(IntakeConstants.FULLY_EXTENDED_BUTTON_BREAK_DIO);
+    m_linearMotor =
+        new YamsLinearIntakeController(
+            IntakeConstants.LINEAR_MOTOR_CAN_ID,
+            IntakeConstants.SHALLOW_BUTTON_BREAK_DIO,
+            IntakeConstants.DEEP_BUTTON_BREAK_DIO,
+            IntakeConstants.MOTOR_CURRENT_LIMIT);
 
     TalonFXConfiguration motorConfig = new TalonFXConfiguration();
     CurrentLimitsConfigs currentLimits =
@@ -33,50 +55,48 @@ public class IntakeSubsystem extends SubsystemBase {
             .withSupplyCurrentLimit(IntakeConstants.MOTOR_CURRENT_LIMIT)
             .withSupplyCurrentLimitEnable(true);
 
-            motorConfig.CurrentLimits = currentLimits;
-            m_intakeMotor.getConfigurator().apply(motorConfig);
-            m_linearMotor.getConfigurator().apply(motorConfig);
-          }
-        
+    motorConfig.CurrentLimits = currentLimits;
+    m_intakeMotor.getConfigurator().apply(motorConfig);
+  }
   public boolean isFullyRetractedLimitSwitchTriggered() {
-    return !m_fullyRetractedLimitSwitch.get();
+    return m_linearMotor.isFullyRetractedTriggered();
   }
 
   public boolean isFullyExtendedLimitSwitchTriggered() {
-    return !m_fullyExtendedLimitSwitch.get();
+    return m_linearMotor.isFullyExtendedTriggered();
   }
 
-  public void stopIntake() {
+  public void stopRoller() {
     m_intakeMotor.stopMotor();
   }
 
-  public void setLinearMotorSpeed(double speed) {
-    m_linearMotor.set(speed);
-  }
-
-  public void stopLinearMotor() {
-    m_linearMotor.stopMotor();
-  }
-
-  public void setSpeed (double speed) {
+  public void setRollerSpeed(double speed) {
     m_intakeMotor.set(speed);
   }
   
+  public void setLinearIntakePercentOutput(double speed) {
+    m_linearMotor.setManualPercent(speed);
+  }
   
-  public void setLinearIntakePosition(double positionPercent) {
-    double clampedPosition = MathUtil.clamp(positionPercent, 0.0, 1.0);
-  
-    if (clampedPosition >= 1.0) {
-      setLinearMotorSpeed(IntakeConstants.LINEAR_INTAKE_DEPLOY_SPEED);
-    } else if (clampedPosition <= 0.0) {
-      setLinearMotorSpeed(-IntakeConstants.LINEAR_INTAKE_DEPLOY_SPEED);
-    } else {
-      stopLinearMotor();
-    }
+  public void setLinearIntakeTargetPosition(double targetPositionPercent) {
+    m_linearMotor.setTargetPositionPercent(targetPositionPercent);
+  }
+
+  public boolean isLinearIntakeAtTargetPosition() {
+    return m_linearMotor.isAtTargetPosition();
+  }
+
+  public double getLinearIntakeEstimatedPosition() {
+    return m_linearMotor.getEstimatedPositionPercent();
+  }
+
+  public void stopLinearIntake() {
+    m_linearMotor.stop();
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    m_linearMotor.periodic();
   }
 }
