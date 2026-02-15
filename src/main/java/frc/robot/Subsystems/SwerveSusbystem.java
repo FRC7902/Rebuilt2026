@@ -59,9 +59,8 @@ public class SwerveSusbystem extends SubsystemBase {
 
   private boolean m_lowSpeedDriveMode;
   private boolean m_rotationLock;
-  private int m_togglelock=1;
-
-
+  private int m_toggleLock=1;
+  private int m_speedChange=1;
 
   /** Creates a new SwerveSusbystem. */
   public SwerveSusbystem(File directory) {
@@ -299,7 +298,7 @@ public class SwerveSusbystem extends SubsystemBase {
      *                      robot-relative.
      */
     public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
-        swerveDrive.drive(translation, rotation * m_togglelock, fieldRelative, false); // Open loop is disabled
+        swerveDrive.drive(translation, rotation * m_toggleLock, fieldRelative, false); // Open loop is disabled
         // since it shouldn't be
         // used most of the time.
     }
@@ -616,9 +615,9 @@ public class SwerveSusbystem extends SubsystemBase {
 
     public void rotationLock(){
         if(m_rotationLock){
-            m_togglelock=0;
+            m_toggleLock=0;
         } else {
-            m_togglelock=1;
+            m_toggleLock=1;
         }
         m_rotationLock = !m_rotationLock;
     }

@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Commands.RotationLockCommand;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Subsystems.SwerveSusbystem;
 import java.io.File;
@@ -118,6 +119,11 @@ public class RobotContainer {
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
+    //toggling the rotation lock
+    driverXbox.start().onTrue(new RotationLockCommand());
+
+    //toggling the slow
+    
   }
 
   /**
