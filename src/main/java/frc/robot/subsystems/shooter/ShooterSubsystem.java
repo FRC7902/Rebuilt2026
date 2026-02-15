@@ -30,8 +30,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
 	}
 
-	public void runFeeder(double speed){
-		feederSubsystem.run(speed);
+	public void runFeeder(){
+		feederSubsystem.run();
+	}
+	public void stopFeeder(){
+		feederSubsystem.stop();
 	}
 
 

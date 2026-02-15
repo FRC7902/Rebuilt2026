@@ -38,7 +38,7 @@ public final class Constants {
 		//Hood
 		public static final int HOOD_ID = 2;
 		//TODO: needs to be tuned
-		public static final double HOOD_KP = 6;
+		public static final double HOOD_KP = 4;
 		public static final double HOOD_KI = 0;
 		public static final double HOOD_KD = 0;
 		public static final AngularVelocity HOOD_MAX_VELOCITY = RPM.of(5000);
@@ -62,17 +62,19 @@ public final class Constants {
 
 		//Feeder
 		public static final int FEEDER_ID = 3;
-		//TODO: needs to be set to just TalonFX motor
-		public static final double FEEDER_KP = 1;
+		public static final double FEEDER_KP = 100;
 		public static final double FEEDER_KI = 1;
 		public static final double FEEDER_KD = 1;
-		public static final double FEEDER_STATOR = 40;
-		public static final double FEEDER_KV = 1;
-		public static final double FEEDER_KA = 1;
+		public static final double FEEDER_STATOR = 480;
+		public static final double FEEDER_SUPPLY = 480;
+		public static final double FEEDER_KV = 24;
+		public static final double FEEDER_KA = 8;
+
+		public static final double FEEDER_LENGTH = 0.1;
 
 		public static final double FEEDER_TIME_PERIOD = 2;
-		public static final double FEEDER_GEAR_RATIO = 1;
-		public static final double FEEDER_VOLTAGE = 100;
+		public static final double FEEDER_GEAR_RATIO = 10;
+		public static final double FEEDER_VOLTAGE = 12;
 
 		public static final int BEAM_BREAK_LEFT_ID = 4;
 		public static final int BEAM_BREAK_RIGHT_ID = 5;

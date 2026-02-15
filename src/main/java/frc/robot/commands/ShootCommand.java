@@ -22,7 +22,7 @@ public class ShootCommand extends Command {
 	}
 	@Override
 	public void execute(){
-		m_shooterSubsystem.runFeeder(80);
+		m_shooterSubsystem.runFeeder();
 	}
 	@Override
 	public void end(boolean interrupted){}

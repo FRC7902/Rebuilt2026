@@ -38,7 +38,7 @@ public class RobotContainer {
 		xboxController.b().whileTrue(hoodSubsystem.setAngle(Degrees.of(15))).whileFalse(hoodSubsystem.idle());
 
 		//test feeder
-		xboxController.x().whileTrue(new InstantCommand(()-> m_shooterSubsystem.runFeeder(1000)));
+		xboxController.x().whileTrue(Commands.run(()-> m_shooterSubsystem.runFeeder()));
 		//test Flywheel
 		xboxController.y().whileTrue(m_shooterSubsystem.runShooter(RotationsPerSecond.of(0.5))).whileFalse(m_shooterSubsystem.stopShooter());
 	}
