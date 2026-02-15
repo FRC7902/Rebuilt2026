@@ -37,7 +37,7 @@ import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
-// Substitute SwerveSubsystem for autonomous
+// Substitute SwerveSubsystem from Offseason Reefscape for autonomous simulation 
 // TODO: Pull from actual SwerveSubsystem + change deploy constants
 public class SwerveSubsystem extends SubsystemBase {
 
