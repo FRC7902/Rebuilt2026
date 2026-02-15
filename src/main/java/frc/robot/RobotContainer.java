@@ -21,10 +21,7 @@ import static edu.wpi.first.units.Units.*;
 
 public class RobotContainer {
 	public static ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem(); // holds hood, flywheel and turret
-	public static HoodSubsystem hoodSubsystem = new HoodSubsystem();
-	public static FeederSubsystem feederSubsystem = new FeederSubsystem();
 	public CommandXboxController xboxController = new CommandXboxController(0);
-	ShootCommand shooterCommand;
 
 	public RobotContainer() {
 		DriverStation.silenceJoystickConnectionWarning(true);
@@ -32,13 +29,12 @@ public class RobotContainer {
 	}
 
 	private void configureBindings() {
-		//TODO: Fix hood, setAngle in yams library does not work currently
 		// Test hood movement
-		xboxController.a().whileTrue(hoodSubsystem.setAngle(Degrees.of(75))).whileFalse(hoodSubsystem.idle());
-		xboxController.b().whileTrue(hoodSubsystem.setAngle(Degrees.of(15))).whileFalse(hoodSubsystem.idle());
+		xboxController.a().whileTrue(m_shooterSubsystem.aimAt(Degrees.of(75)));
+		xboxController.b().whileTrue(m_shooterSubsystem.aimAt(Degrees.of(20)));
 
 		//test feeder
-		xboxController.x().whileTrue(Commands.run(()-> m_shooterSubsystem.runFeeder()));
+		xboxController.x().whileTrue(Commands.run(()-> m_shooterSubsystem.runFeeder())).whileFalse(Commands.run(()->m_shooterSubsystem.stopFeeder()));
 		//test Flywheel
 		xboxController.y().whileTrue(m_shooterSubsystem.runShooter(RotationsPerSecond.of(0.5))).whileFalse(m_shooterSubsystem.stopShooter());
 	}
