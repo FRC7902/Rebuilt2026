@@ -1,18 +1,14 @@
 package frc.robot.subsystems.shooter;
 
-import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
-import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
@@ -24,7 +20,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Constants.ShooterConstants;
 
-import static edu.wpi.first.hal.simulation.AnalogGyroDataJNI.getAngle;
 import static edu.wpi.first.units.Units.*;
 
 public class FeederSubsystem extends SubsystemBase {
@@ -36,9 +31,9 @@ public class FeederSubsystem extends SubsystemBase {
 			),
 			DCMotor.getKrakenX60Foc(1)
 	);
-	private Mechanism2d mech2d = new Mechanism2d(2,3);
-	private MechanismRoot2d root = mech2d.getRoot("feeder", 1, 1);
-	private MechanismLigament2d feederLig = root.append(new MechanismLigament2d("Feeder", ShooterConstants.FEEDER_LENGTH, 0));
+	private Mechanism2d mech2d = new Mechanism2d(1,1);
+	private MechanismRoot2d root = mech2d.getRoot("feeder", 0.5, 0.5);
+	private MechanismLigament2d feederLig = root.append(new MechanismLigament2d("Feeder", ShooterConstants.FEEDER_SIM_LENGTH, 0));
 	private static final Timer timer = new Timer();
 	private static boolean timerEnded = true;
 	private final PositionVoltage positionRequest;
@@ -51,7 +46,7 @@ public class FeederSubsystem extends SubsystemBase {
 	public FeederSubsystem() {
 		TalonFXConfiguration config = new TalonFXConfiguration();
 		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-		config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+		config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 		config.CurrentLimits.StatorCurrentLimit = ShooterConstants.FEEDER_STATOR;
 		config.CurrentLimits.StatorCurrentLimitEnable = true;
 		config.CurrentLimits.SupplyCurrentLimit = ShooterConstants.FEEDER_SUPPLY;
