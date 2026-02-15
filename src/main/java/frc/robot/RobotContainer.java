@@ -28,9 +28,10 @@ public class RobotContainer {
     
     m_operatorController.povDown().whileTrue(new Outtake(m_intakeSubsystem));
         // Unstuck bindings (Left bumper or X)
-    m_operatorController.leftBumper().whileTrue(new Unstuck(m_intakeSubsystem));
-    m_operatorController.x().whileTrue(new Unstuck(m_intakeSubsystem));
+    m_operatorController.x().whileTrue(Unstuck.halfOutHalfIn(m_intakeSubsystem));
+    m_operatorController.leftBumper().whileTrue(Unstuck.halfOutHalfIn(m_intakeSubsystem));
   }
+  
 
   public IntakeSubsystem getIntakeSubsystem() {
     return m_intakeSubsystem;

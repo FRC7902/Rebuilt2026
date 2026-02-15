@@ -17,7 +17,7 @@ public class Intake extends Command {
 
   @Override
   public void initialize() {
-    m_intakeSubsystem.setSpeed(IntakeConstants.FULL_SPEED);
+    m_intakeSubsystem.setRollerSpeed(IntakeConstants.FULL_SPEED);
   }
 
   @Override
@@ -25,7 +25,7 @@ public class Intake extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    m_intakeSubsystem.stopIntake();
+    m_intakeSubsystem.stopRoller();
   }
 
   @Override

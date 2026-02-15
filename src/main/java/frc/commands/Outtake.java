@@ -21,7 +21,7 @@ public class Outtake extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_intakeSubsystem.setSpeed(IntakeConstants.OUTTAKE_SPEED);
+    m_intakeSubsystem.setRollerSpeed(IntakeConstants.OUTTAKE_SPEED);
   }
   
   // Called every time the scheduler runs while the command is scheduled.
@@ -31,7 +31,7 @@ public class Outtake extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intakeSubsystem.stopIntake();
+    m_intakeSubsystem.stopRoller();
   }
 
   // Returns true when the command should end.
