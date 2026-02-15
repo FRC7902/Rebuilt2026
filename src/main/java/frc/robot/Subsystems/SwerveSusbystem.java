@@ -6,8 +6,12 @@ package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.Meter;
 
+import org.json.simple.parser.ParseException;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -16,6 +20,9 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.DriveFeedforwards;
+import com.pathplanner.lib.util.swerve.SwerveSetpoint;
+import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,8 +32,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants.SwerveConstants;
@@ -47,6 +56,12 @@ public class SwerveSusbystem extends SubsystemBase {
    * Swerve drive object.
    */
   private final SwerveDrive swerveDrive;
+
+  private boolean m_lowSpeedDriveMode;
+  private boolean m_rotationLock;
+  private int m_togglelock=1;
+
+
 
   /** Creates a new SwerveSusbystem. */
   public SwerveSusbystem(File directory) {
@@ -247,6 +262,18 @@ public class SwerveSusbystem extends SubsystemBase {
         });
     }
 
+  /**
+   * Returns a Command that tells the robot to drive forward until the command ends.
+   *
+   * @return a Command that tells the robot to drive forward until the command ends
+   */
+  public Command driveForward()
+  {
+    return run(() -> {
+      swerveDrive.drive(new Translation2d(1, 0), 0, false, false);
+    }).finallyDo(() -> swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
+  }
+
     /**
      * The primary method for controlling the drivebase. Takes a
      * {@link Translation2d} and a
@@ -272,7 +299,7 @@ public class SwerveSusbystem extends SubsystemBase {
      *                      robot-relative.
      */
     public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
-        swerveDrive.drive(translation, rotation, fieldRelative, false); // Open loop is disabled
+        swerveDrive.drive(translation, rotation * m_togglelock, fieldRelative, false); // Open loop is disabled
         // since it shouldn't be
         // used most of the time.
     }
@@ -498,6 +525,62 @@ public class SwerveSusbystem extends SubsystemBase {
     public SwerveDrive getSwerveDrive() {
         return swerveDrive;
     }
+    
+  /**
+   * Drive with {@link SwerveSetpointGenerator} from 254, implemented by PathPlanner.
+   *
+   * @param robotRelativeChassisSpeed Robot relative {@link ChassisSpeeds} to achieve.
+   * @return {@link Command} to run.
+   * @throws IOException    If the PathPlanner GUI settings is invalid
+   * @throws ParseException If PathPlanner GUI settings is nonexistent.
+   */
+  private Command driveWithSetpointGenerator(Supplier<ChassisSpeeds> robotRelativeChassisSpeed)
+  throws IOException, ParseException
+  {
+    SwerveSetpointGenerator setpointGenerator = new SwerveSetpointGenerator(RobotConfig.fromGUISettings(),
+                                                                            swerveDrive.getMaximumChassisAngularVelocity());
+    AtomicReference<SwerveSetpoint> prevSetpoint
+        = new AtomicReference<>(new SwerveSetpoint(swerveDrive.getRobotVelocity(),
+                                                   swerveDrive.getStates(),
+                                                   DriveFeedforwards.zeros(swerveDrive.getModules().length)));
+    AtomicReference<Double> previousTime = new AtomicReference<>();
+
+    return startRun(() -> previousTime.set(Timer.getFPGATimestamp()),
+                    () -> {
+                      double newTime = Timer.getFPGATimestamp();
+                      SwerveSetpoint newSetpoint = setpointGenerator.generateSetpoint(prevSetpoint.get(),
+                                                                                      robotRelativeChassisSpeed.get(),
+                                                                                      newTime - previousTime.get());
+                      swerveDrive.drive(newSetpoint.robotRelativeSpeeds(),
+                                        newSetpoint.moduleStates(),
+                                        newSetpoint.feedforwards().linearForces());
+                      prevSetpoint.set(newSetpoint);
+                      previousTime.set(newTime);
+
+                    });
+  }
+
+    /**
+   * Drive with 254's Setpoint generator; port written by PathPlanner.
+   *
+   * @param fieldRelativeSpeeds Field-Relative {@link ChassisSpeeds}
+   * @return Command to drive the robot using the setpoint generator.
+   */
+  public Command driveWithSetpointGeneratorFieldRelative(Supplier<ChassisSpeeds> fieldRelativeSpeeds)
+  {
+    try
+    {
+      return driveWithSetpointGenerator(() -> {
+        return ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelativeSpeeds.get(), getHeading());
+
+      });
+    } catch (Exception e)
+    {
+      DriverStation.reportError(e.toString(), true);
+    }
+    return Commands.none();
+
+  }
 
     public Command snapToAngle(double angleDegrees, double toleranceDegrees) {
         SwerveController controller = swerveDrive.getSwerveController();
@@ -517,10 +600,40 @@ public class SwerveSusbystem extends SubsystemBase {
                 && swerveDrive.getRobotVelocity().omegaRadiansPerSecond < 0.1);
     }
 
+    /**
+    * Lock the swerve drive to prevent it from moving.
+    */
+    public void lock()
+    {
+        swerveDrive.lockPose();
+    }
+
     public void strafe(double strafePower, double speedMultiplier) {
         swerveDrive.drive(
                 new Translation2d(0, strafePower * Math.abs(speedMultiplier) * swerveDrive.getMaximumChassisVelocity()),
                 0, false, false);
+    }
+
+    public void rotationLock(){
+        if(m_rotationLock){
+            m_togglelock=0;
+        } else {
+            m_togglelock=1;
+        }
+        m_rotationLock = !m_rotationLock;
+    }
+
+    public void toggleLowSpeedDriveMode(){
+        if(m_lowSpeedDriveMode){
+
+        } else {
+
+        }
+        m_lowSpeedDriveMode=!m_lowSpeedDriveMode;
+    }
+
+    public void toggleRampSpeedDriveMode(){
+
     }
 
     @Override

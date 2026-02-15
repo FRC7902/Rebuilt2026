@@ -9,6 +9,16 @@ import edu.wpi.first.math.util.Units;
 /** Add your docs here. */
 public class Constants {
 
+  public static class OperatorConstants
+  {
+
+    // Joystick Deadband
+    public static final double DEADBAND        = 0.1;
+    public static final double LEFT_Y_DEADBAND = 0.1;
+    public static final double RIGHT_X_DEADBAND = 0.1;
+    public static final double TURN_CONSTANT    = 6;
+  }
+
     public static class SwerveConstants {
         public static final double MAX_SPEED = Units.feetToMeters(30);
 
@@ -16,7 +26,8 @@ public class Constants {
         public static final double MIN_TRANSLATION_SPEED_SCALE = 0.175; // Minimum speed scaling factor for joystick input
         public static final double MIN_ROTATION_SPEED_SCALE = 0.25; // Minimum speed scaling factor for joystick input
 
-        public static final double FAST_DRIVE_RAMP_RATE = 0.15;
+        public static final double SLOW_SPEED_DRIVE_RATE = 0.25;
+        public static final double RAMP_SPEED_DRIVE_RATE = 0.25;
     }
 public static class PathPlanner {
         public static final double kPDrive = 1.95;
