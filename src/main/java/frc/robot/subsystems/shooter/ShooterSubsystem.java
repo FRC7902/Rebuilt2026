@@ -25,30 +25,32 @@ public class ShooterSubsystem extends SubsystemBase {
 			new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Rotation2d::interpolate);
 
 	static{
-		hoodAngleMap.put(35d, Rotation2d.fromDegrees(85));
-		hoodAngleMap.put(37d, Rotation2d.fromDegrees(84));
-		hoodAngleMap.put(39d, Rotation2d.fromDegrees(83.5));
-		hoodAngleMap.put(41d, Rotation2d.fromDegrees(82.5));
-		hoodAngleMap.put(43d, Rotation2d.fromDegrees(81));
-		hoodAngleMap.put(45d, Rotation2d.fromDegrees(80));
-		hoodAngleMap.put(47d, Rotation2d.fromDegrees(79));
-		hoodAngleMap.put(49d, Rotation2d.fromDegrees(78));
-		hoodAngleMap.put(51d, Rotation2d.fromDegrees(77));
-		hoodAngleMap.put(53d, Rotation2d.fromDegrees(75.5));
-		hoodAngleMap.put(55d, Rotation2d.fromDegrees(75.5));
-		hoodAngleMap.put(57d, Rotation2d.fromDegrees(77.3));
-		hoodAngleMap.put(76d, Rotation2d.fromDegrees(72));
-		hoodAngleMap.put(90d, Rotation2d.fromDegrees(66));
-		hoodAngleMap.put(60d, Rotation2d.fromDegrees(74.5));
-		hoodAngleMap.put(63d, Rotation2d.fromDegrees(73.5));
-		hoodAngleMap.put(66d, Rotation2d.fromDegrees(72.5));
-		hoodAngleMap.put(69d, Rotation2d.fromDegrees(71.5));
-		hoodAngleMap.put(72d, Rotation2d.fromDegrees(70));
-		hoodAngleMap.put(75d, Rotation2d.fromDegrees(69));
-		hoodAngleMap.put(78d, Rotation2d.fromDegrees(67.5));
-		hoodAngleMap.put(81d, Rotation2d.fromDegrees(66.5));
-		hoodAngleMap.put(84d, Rotation2d.fromDegrees(64.5));
-		hoodAngleMap.put(87d, Rotation2d.fromDegrees(62.5));
+		hoodAngleMap.put(35d, Rotation2d.fromDegrees(87));
+		hoodAngleMap.put(45d, Rotation2d.fromDegrees(86));
+		hoodAngleMap.put(55d, Rotation2d.fromDegrees(85));
+		hoodAngleMap.put(65d, Rotation2d.fromDegrees(84));
+		hoodAngleMap.put(75d, Rotation2d.fromDegrees(83));
+		hoodAngleMap.put(85d, Rotation2d.fromDegrees(82));
+		hoodAngleMap.put(95d, Rotation2d.fromDegrees(81));
+		hoodAngleMap.put(105d, Rotation2d.fromDegrees(80));
+		hoodAngleMap.put(115d, Rotation2d.fromDegrees(79));
+		hoodAngleMap.put(125d, Rotation2d.fromDegrees(78));
+		hoodAngleMap.put(135d, Rotation2d.fromDegrees(77));
+		hoodAngleMap.put(145d, Rotation2d.fromDegrees(76));
+		hoodAngleMap.put(155d, Rotation2d.fromDegrees(75));
+		hoodAngleMap.put(165d, Rotation2d.fromDegrees(73.5));
+		hoodAngleMap.put(175d, Rotation2d.fromDegrees(72.5));
+		hoodAngleMap.put(185d, Rotation2d.fromDegrees(71.5));
+		hoodAngleMap.put(195d, Rotation2d.fromDegrees(70));
+		hoodAngleMap.put(205d, Rotation2d.fromDegrees(69));
+		hoodAngleMap.put(215d, Rotation2d.fromDegrees(67.5));
+		hoodAngleMap.put(225d, Rotation2d.fromDegrees(65.5));
+		hoodAngleMap.put(235d, Rotation2d.fromDegrees(64));
+		hoodAngleMap.put(245d, Rotation2d.fromDegrees(62));
+		hoodAngleMap.put(255d, Rotation2d.fromDegrees(60));
+		hoodAngleMap.put(265d, Rotation2d.fromDegrees(57));
+		hoodAngleMap.put(275d, Rotation2d.fromDegrees(54));
+		hoodAngleMap.put(280d, Rotation2d.fromDegrees(50));
 	}
 
 	private static boolean shootContinuous = false;
