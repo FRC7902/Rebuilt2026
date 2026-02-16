@@ -7,14 +7,14 @@ public final class Constants {
     public static class ClimbConstants {
         
         // CAN IDs
-        public static final int CLIMBER_LEFT_MOTOR_CAN_ID = 20;
-        public static final int CLIMBER_RIGHT_MOTOR_CAN_ID = 21;
+        public static final int CLIMBER_LEFT_MOTOR_CAN_ID = 1; //TODO: Update this
+        public static final int CLIMBER_RIGHT_MOTOR_CAN_ID = 1; //TODO: Update this
         
         // Current Limits
-        public static final double LEFT_MOTOR_STATOR_CURRENT_LIMIT = 40.0;
-        public static final double LEFT_MOTOR_SUPPLY_CURRENT_LIMIT = 40.0;
-        public static final double RIGHT_MOTOR_STATOR_CURRENT_LIMIT = 40.0;
-        public static final double RIGHT_MOTOR_SUPPLY_CURRENT_LIMIT = 40.0;
+        public static final double LEFT_MOTOR_STATOR_CURRENT_LIMIT = 40.0; //TODO: Update this
+        public static final double LEFT_MOTOR_SUPPLY_CURRENT_LIMIT = 40.0; //TODO: Update this
+        public static final double RIGHT_MOTOR_STATOR_CURRENT_LIMIT = 40.0; //TODO: Update this
+        public static final double RIGHT_MOTOR_SUPPLY_CURRENT_LIMIT = 40.0; //TODO: Update this
         
         // Target Heights
         public static final double kLevel1Height = Units.inchesToMeters(27.0);
