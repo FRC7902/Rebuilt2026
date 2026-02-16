@@ -1,10 +1,8 @@
 package frc.robot;
 
 import edu.wpi.first.units.measure.*;
-import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
-import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 
 import static edu.wpi.first.units.Units.*;

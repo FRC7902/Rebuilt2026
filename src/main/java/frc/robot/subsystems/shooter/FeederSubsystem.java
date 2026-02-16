@@ -24,16 +24,10 @@ import static edu.wpi.first.units.Units.*;
 
 public class FeederSubsystem extends SubsystemBase {
 	private static final TalonFX feederMotor = new TalonFX(ShooterConstants.FEEDER_ID);
-	private final TalonFXSimState feederSim = feederMotor.getSimState();
-	private final DCMotorSim feederSimModel = new DCMotorSim(
-			LinearSystemId.createDCMotorSystem(
-					DCMotor.getKrakenX60Foc(1),ShooterConstants.FEEDER_KA, ShooterConstants.FEEDER_GEAR_RATIO
-			),
-			DCMotor.getKrakenX60Foc(1)
-	);
-	private Mechanism2d mech2d = new Mechanism2d(1,1);
-	private MechanismRoot2d root = mech2d.getRoot("feeder", 0.5, 0.5);
-	private MechanismLigament2d feederLig = root.append(new MechanismLigament2d("Feeder", ShooterConstants.FEEDER_SIM_LENGTH, 0));
+	private final TalonFXSimState feederSim;
+	private final DCMotorSim feederSimModel;
+	private final Mechanism2d mech2d;
+	private final MechanismLigament2d feederLig;
 	private static final Timer timer = new Timer();
 	private static boolean timerEnded = true;
 	private final PositionVoltage positionRequest;
@@ -44,6 +38,16 @@ public class FeederSubsystem extends SubsystemBase {
 	private static final DigitalInput BeamBreakTop = new DigitalInput(ShooterConstants.BEAM_BREAK_TOP_ID);
 
 	public FeederSubsystem() {
+		feederSim = feederMotor.getSimState();
+		feederSimModel = new DCMotorSim(
+				LinearSystemId.createDCMotorSystem(
+						DCMotor.getKrakenX60Foc(1),ShooterConstants.FEEDER_KA, ShooterConstants.FEEDER_GEAR_RATIO
+				),
+				DCMotor.getKrakenX60Foc(1)
+		);
+		mech2d = new Mechanism2d(1,1);
+		MechanismRoot2d root = mech2d.getRoot("feeder", 0.5, 0.5);
+		feederLig= root.append(new MechanismLigament2d("Feeder", ShooterConstants.FEEDER_SIM_LENGTH, 0));
 		TalonFXConfiguration config = new TalonFXConfiguration();
 		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 		config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -104,7 +108,7 @@ public class FeederSubsystem extends SubsystemBase {
 			timer.stop();
 		}
 	}
-	public static void StartTimer(){
+	public static void startTimer(){
 		timerEnded = false;
 		timer.stop();
 		timer.reset();
