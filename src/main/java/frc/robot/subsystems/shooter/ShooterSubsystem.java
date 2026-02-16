@@ -8,6 +8,8 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
 
+import frc.robot.Constants.ShooterConstants;
+
 import java.util.function.Supplier;
 
 import static edu.wpi.first.units.Units.Degrees;
@@ -52,7 +54,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	private static boolean shootContinuous = false;
 
 	//Necessary variables
-	private Supplier<AngularVelocity> flywheelVelocitySupplier = () -> DegreesPerSecond.of(1);
+	private Supplier<AngularVelocity> flywheelVelocitySupplier = () -> DegreesPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_SUPPLIER);
 	private static Angle defaultAngle = Degrees.of(90);
 
 	public ShooterSubsystem() {

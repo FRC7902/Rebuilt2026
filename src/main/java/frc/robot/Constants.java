@@ -27,6 +27,7 @@ public final class Constants {
 		public static final double FLYWHEEL_KV = 1;
 		public static final double FLYWHEEL_KA = 1;
 
+		public static double FLYWHEEL_VELOCITY_SUPPLIER = 1;
 		public static final Distance FLYWHEEL_DIAMETER = Inches.of(2.943);
 		public static final Mass FLYWHEEL_MASS = Pounds.of(0.14);
 		public static final AngularVelocity FLYWHEEL_LIMIT_LOW = RPM.of(6500);
