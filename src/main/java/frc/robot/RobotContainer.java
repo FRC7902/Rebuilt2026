@@ -29,9 +29,6 @@ public class RobotContainer {
 	}
 
 	private void configureBindings() {
-		// Test hood movement
-		xboxController.a().whileTrue(m_shooterSubsystem.aimAt(Degrees.of(75)));
-		xboxController.b().whileTrue(m_shooterSubsystem.aimAt(Degrees.of(20)));
 
 		//test feeder
 		xboxController.x().whileTrue(Commands.run(()-> m_shooterSubsystem.runFeeder())).whileFalse(Commands.run(()->m_shooterSubsystem.stopFeeder()));
