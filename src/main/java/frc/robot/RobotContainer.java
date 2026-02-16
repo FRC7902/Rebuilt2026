@@ -6,14 +6,24 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Meters;
 
+import javax.naming.PartialResultException;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.ClimbConstants;
 import frc.robot.subsystems.ClimberSubsystem;
 
 public class RobotContainer {
   public final static ClimberSubsystem m_climber = new ClimberSubsystem();
   private final CommandXboxController m_driverController = new CommandXboxController(0);
+
+  Command l1Command = new SequentialCommandGroup(
+    m_climber.setHeight(Meters.of(ClimbConstants.TRAVEL_DISTANCE)),
+    m_climber.setHeight(Meters.of(0))
+  );
+  
   public RobotContainer() {
     configureBindings();
     // Set the default command to force the elevator to go to 0.

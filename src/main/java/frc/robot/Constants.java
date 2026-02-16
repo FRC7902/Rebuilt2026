@@ -14,5 +14,8 @@ public class Constants {
         public static double kLEVEl3 = Units.inchesToMeters(63);
         public static double TRAVEL_DISTANCE = Units.inchesToMeters(13);
         public static double TONGUE_DISTANCE = Units.inchesToMeters(9.5);
+
+        public static int LEADER_MOTOR_CAN_ID = 4;
+        public static int FOLLOWER_MOTOR_CAN_ID = 4;
     }
 }
