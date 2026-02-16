@@ -41,6 +41,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   // Vendor motor controller object
   private TalonFX m_elevatorLeaderMotor = new TalonFX(ClimbConstants.LEADER_MOTOR_CAN_ID);
   private TalonFX m_elevatorFollowerMotor = new TalonFX(ClimbConstants.FOLLOWER_MOTOR_CAN_ID);
+  private Distance heightSetpoint;
 
   // Motor configs for both elevator motors (they do the same thing)
   private SmartMotorControllerConfig climbConfig = new SmartMotorControllerConfig(this)
@@ -80,6 +81,9 @@ public class ElevatorSubsystem extends SubsystemBase {
   // Elevator Mechanism
   private Elevator climb = new Elevator(elevLeaderconfig);
 
+  public boolean isAtTargetHeight(){
+    return climb.getHeight() == heightSetpoint;
+  }
   //private Elevator tongue = new Elevator(tongConfig);
   /**
    * Set the height of the elevator and does not end the command when reached.
@@ -87,6 +91,7 @@ public class ElevatorSubsystem extends SubsystemBase {
    * @return a Command
    */
   public Command setHeight(Distance height) { 
+    // default is 0 and it keeps resetting
     return climb.run(height);
   }
   

@@ -38,6 +38,7 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 public class TongueSubsystem extends SubsystemBase {
   // Vendor motor controller object
   private TalonFX m_tongueMotor = new TalonFX(ClimbConstants.LEADER_MOTOR_CAN_ID);
+  private Distance m_Length;
 
   // Motor configs for both elevator motors (they do the same thing)
   private SmartMotorControllerConfig tongueSmartControllerConfig = new SmartMotorControllerConfig(this)
@@ -84,9 +85,13 @@ public class TongueSubsystem extends SubsystemBase {
    * @return a Command
    */
   public Command setLength(Distance length) { 
+    m_Length = length;
+    System.out.println(length);
     return tongue.run(length);
   }
-  
+  public boolean isAtTargetLength() {
+    return m_Length == tongue.getHeight();
+  }
   /**
    * Set the elevators closed loop controller setpoint.
    * @param angle Distance to go to.

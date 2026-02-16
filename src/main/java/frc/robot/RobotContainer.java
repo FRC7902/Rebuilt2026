@@ -19,11 +19,6 @@ public class RobotContainer {
   
   private final CommandXboxController m_driverController = new CommandXboxController(0);
   ClimberSubsystem m_climber = new ClimberSubsystem();
-
-  Command l1Command = new SequentialCommandGroup(
-    m_climber.getElevatorSubsystem().setHeight(Meters.of(ClimbConstants.TRAVEL_DISTANCE)),
-    m_climber.getTongueSubsystem().setLength(Meters.of(0))
-  );
   
   public RobotContainer() {
     configureBindings();
@@ -36,12 +31,7 @@ public class RobotContainer {
     // Schedule `setHeight` when the button 1 or 2 is pressed,
     // cancelling on release.
     // sim stuff
-    m_driverController.button(1).whileTrue(m_climber.getElevatorSubsystem().setHeight(Meters.of(0.5)));
-    m_driverController.button(2).whileTrue(m_climber.getElevatorSubsystem().setHeight(Meters.of(1)));
-    // Schedule `set` when button 3 is pressed,
-    // cancelling on release.
-    m_driverController.button(3).whileTrue(m_climber.getElevatorSubsystem().set(0.3));
-    m_driverController.button(4).whileTrue(m_climber.getElevatorSubsystem().set(-0.3));
+    m_driverController.button(1).whileTrue(m_climber.getL1Command());
 
     m_driverController.button(5).whileTrue(m_climber.getTongueSubsystem().setLength(Meters.of(0.5)));
     m_driverController.button(6).whileTrue(m_climber.getTongueSubsystem().setLength(Meters.of(1)));

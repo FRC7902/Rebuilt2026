@@ -25,8 +25,18 @@ public class ClimberSubsystem extends SubsystemBase {
     return m_tongue;
   }
   Command l1Command = new SequentialCommandGroup(
-   m_elevator.setHeight(Meters.of(ClimbConstants.TONGUE_DISTANCE)),
-   m_tongue.setLength(Meters.of(0))
+   m_elevator.setHeight(Meters.of(ClimbConstants.TRAVEL_DISTANCE)).until(() -> m_elevator.isAtTargetHeight()),
+   m_elevator.setHeight(Meters.of(ClimbConstants.ELEVATOR_BOTTOM)).until(() -> m_elevator.isAtTargetHeight())
+  );
+
+  public Command getL1Command(){
+    return l1Command;
+  }
+  
+  Command l3Command = new SequentialCommandGroup(
+    l1Command,
+   m_elevator.setHeight(Meters.of(ClimbConstants.DISTANCE_BEFORE_TONGUE_EXTENDS)),
+   m_elevator.setHeight(Meters.of(ClimbConstants.ELEVATOR_BOTTOM))
   );
 
   @Override
