@@ -41,7 +41,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   // Vendor motor controller object
   private TalonFX m_elevatorLeaderMotor = new TalonFX(ClimbConstants.LEADER_MOTOR_CAN_ID);
   private TalonFX m_elevatorFollowerMotor = new TalonFX(ClimbConstants.FOLLOWER_MOTOR_CAN_ID);
-  private Distance heightSetpoint;
+  private Distance m_heightSetpoint;
 
   // Motor configs for both elevator motors (they do the same thing)
   private SmartMotorControllerConfig climbConfig = new SmartMotorControllerConfig(this)
@@ -79,12 +79,11 @@ public class ElevatorSubsystem extends SubsystemBase {
       .withTelemetry("Elevator", TelemetryVerbosity.HIGH)
       .withMass(Pounds.of(16));
   // Elevator Mechanism
-  private Elevator climb = new Elevator(elevLeaderconfig);
+  private Elevator elevator = new Elevator(elevLeaderconfig);
 
   public boolean isAtTargetHeight(){
-    return climb.getHeight() == heightSetpoint;
+    return m_heightSetpoint.isNear(elevator.getHeight(), Meters.of(ClimbConstants.ELEVATOR_TOLERANCE));
   }
-  //private Elevator tongue = new Elevator(tongConfig);
   /**
    * Set the height of the elevator and does not end the command when reached.
    * @param angle Distance to go to.
@@ -92,7 +91,8 @@ public class ElevatorSubsystem extends SubsystemBase {
    */
   public Command setHeight(Distance height) { 
     // default is 0 and it keeps resetting
-    return climb.run(height);
+    m_heightSetpoint = height;
+    return elevator.run(height);
   }
   
   /**
@@ -100,20 +100,20 @@ public class ElevatorSubsystem extends SubsystemBase {
    * @param angle Distance to go to.
    */
   public void setHeightSetpoint(Distance height) { 
-    climb.setMeasurementPositionSetpoint(height);
+    elevator.setMeasurementPositionSetpoint(height);
   }
 
   /**
    * Move the elevator up and down.
    * @param dutycycle [-1, 1] speed to set the elevator too.
    */
-  public Command set(double dutycycle) { return climb.set(dutycycle);}
+  public Command set(double dutycycle) { return elevator.set(dutycycle);}
 
   /**
    * Run sysId on the {@link Elevator}
    */
   public Command sysId() { return 
-    climb.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
+    elevator.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
   }
 
   /** Creates a new Climber. */
@@ -124,9 +124,13 @@ public class ElevatorSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    climb.updateTelemetry();
+    elevator.updateTelemetry();
+    // System.out.println("Elevator: " + isAtTargetHeight());
+    // System.out.println("Elevator Setpoint: " + m_heightSetpoint);
+    // System.out.println("Current Height: " + elevator.getHeight());
+    // System.out.println("Elevator Compare" + elevator.getHeight().minus(m_heightSetpoint));
   }
   public void simulationPeriodic() {
-    climb.simIterate();
+    elevator.simIterate();
   }
 }

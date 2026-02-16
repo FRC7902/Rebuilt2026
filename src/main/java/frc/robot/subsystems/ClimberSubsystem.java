@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Meters;
 
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,12 +19,13 @@ public class ClimberSubsystem extends SubsystemBase {
   public ClimberSubsystem() {
     
   }
-  public ElevatorSubsystem getElevatorSubsystem(){
-    return m_elevator;
+  public Command setElevatorHeight(Distance d){
+    return m_elevator.setHeight(d);
   }
-  public TongueSubsystem getTongueSubsystem(){
-    return m_tongue;
+  public Command setTongueLength(Distance d){
+    return m_tongue.setLength(d);
   }
+
   Command l1Command = new SequentialCommandGroup(
    m_elevator.setHeight(Meters.of(ClimbConstants.TRAVEL_DISTANCE)).until(() -> m_elevator.isAtTargetHeight()),
    m_elevator.setHeight(Meters.of(ClimbConstants.ELEVATOR_BOTTOM)).until(() -> m_elevator.isAtTargetHeight())
@@ -36,6 +38,7 @@ public class ClimberSubsystem extends SubsystemBase {
   Command l3Command = new SequentialCommandGroup(
     l1Command,
    m_elevator.setHeight(Meters.of(ClimbConstants.DISTANCE_BEFORE_TONGUE_EXTENDS)),
+
    m_elevator.setHeight(Meters.of(ClimbConstants.ELEVATOR_BOTTOM))
   );
 

@@ -23,18 +23,19 @@ public class RobotContainer {
   public RobotContainer() {
     configureBindings();
     // Set the default command to force the elevator to go to 0.
-    m_climber.getElevatorSubsystem().setDefaultCommand(m_climber.getElevatorSubsystem().setHeight(Meters.of(0)));
-    m_climber.getTongueSubsystem().setDefaultCommand(m_climber.getTongueSubsystem().setLength(Meters.of(0)));
+    // m_climber.getElevatorSubsystem().setDefaultCommand(m_climber.getElevatorSubsystem().setHeight(Meters.of(0)));
+    // m_climber.getTongueSubsystem().setDefaultCommand(m_climber.getTongueSubsystem().setLength(Meters.of(0)));
   }
 
   private void configureBindings() {
     // Schedule `setHeight` when the button 1 or 2 is pressed,
     // cancelling on release.
     // sim stuff
-    m_driverController.button(1).whileTrue(m_climber.getL1Command());
+    m_driverController.button(1).onTrue(m_climber.setElevatorHeight(Meters.of(0.5)));
+    m_driverController.button(2).onTrue(m_climber.setElevatorHeight(Meters.of(1)));
 
-    m_driverController.button(5).whileTrue(m_climber.getTongueSubsystem().setLength(Meters.of(0.5)));
-    m_driverController.button(6).whileTrue(m_climber.getTongueSubsystem().setLength(Meters.of(1)));
+    m_driverController.button(5).onTrue(m_climber.setTongueLength(Meters.of(0.5)));
+    m_driverController.button(6).onTrue(m_climber.setTongueLength(Meters.of(1)));
   }
 
   public Command getAutonomousCommand() {

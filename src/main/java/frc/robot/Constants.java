@@ -16,6 +16,8 @@ public class Constants {
         public static double DISTANCE_BEFORE_TONGUE_EXTENDS = Units.inchesToMeters(9.5); //also known as DTBE
         public static double FROM_DBTE_TO_TRAVEL_DISTANCE  = TRAVEL_DISTANCE - DISTANCE_BEFORE_TONGUE_EXTENDS;
         public static double TONGUE_FULL_EXTENSION = Units.inchesToMeters(12);
+        public static double ELEVATOR_TOLERANCE = 0.1;
+        public static double TONGUE_TOLERANCE = 0.1;
 
         public static double ELEVATOR_BOTTOM = Units.inchesToMeters(0);
         public static double TONGUE_INITIAL = Units.inchesToMeters(0);
@@ -23,5 +25,7 @@ public class Constants {
         public static int LEADER_MOTOR_CAN_ID = 4;
         public static int FOLLOWER_MOTOR_CAN_ID = 5;
         public static int TONGUE_MOTOR_CAN_ID = 8;
+
+
     }
 }

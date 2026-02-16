@@ -21,6 +21,7 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimbConstants;
@@ -38,7 +39,7 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 public class TongueSubsystem extends SubsystemBase {
   // Vendor motor controller object
   private TalonFX m_tongueMotor = new TalonFX(ClimbConstants.LEADER_MOTOR_CAN_ID);
-  private Distance m_Length;
+  private Distance m_lengthSetpoint;
 
   // Motor configs for both elevator motors (they do the same thing)
   private SmartMotorControllerConfig tongueSmartControllerConfig = new SmartMotorControllerConfig(this)
@@ -85,12 +86,11 @@ public class TongueSubsystem extends SubsystemBase {
    * @return a Command
    */
   public Command setLength(Distance length) { 
-    m_Length = length;
-    System.out.println(length);
+    m_lengthSetpoint = length;
     return tongue.run(length);
   }
   public boolean isAtTargetLength() {
-    return m_Length == tongue.getHeight();
+    return m_lengthSetpoint.isNear(tongue.getHeight(), Meters.of(ClimbConstants.TONGUE_TOLERANCE));
   }
   /**
    * Set the elevators closed loop controller setpoint.
@@ -122,6 +122,17 @@ public class TongueSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     tongue.updateTelemetry();
+    // System.out.println("Tongue Compare: " + m_lengthSetpoint.minus(tongue.getHeight()));
+    // System.out.println("Tongue Setpoint: " + m_lengthSetpoint);
+    // System.out.println("Current Lenght: " + tongue.getHeight());
+    // System.out.println("Tongue: " + isAtTargetLength());
+
+    SmartDashboard.putNumber("Tongue Compare", m_lengthSetpoint.minus(tongue.getHeight()).in(Meters));
+    SmartDashboard.putNumber("Tongue Setpoint", m_lengthSetpoint.in(Meters));
+    SmartDashboard.putNumber("Current Length", tongue.getHeight().in(Meters));
+    SmartDashboard.putBoolean("IsAtTargetLength", isAtTargetLength());
+
+
   }
   public void simulationPeriodic() {
     tongue.simIterate();
