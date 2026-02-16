@@ -2,7 +2,6 @@ package frc.robot;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.Constants.IndexerConstants;
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
 
 public class Indexer {
     private final TalonFX m_indexerMotor;
