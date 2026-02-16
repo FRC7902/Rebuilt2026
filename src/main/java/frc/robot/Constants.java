@@ -16,6 +16,7 @@ public class Constants {
         public static double TONGUE_DISTANCE = Units.inchesToMeters(9.5);
 
         public static int LEADER_MOTOR_CAN_ID = 4;
-        public static int FOLLOWER_MOTOR_CAN_ID = 4;
+        public static int FOLLOWER_MOTOR_CAN_ID = 5;
+        public static int TONGUE_MOTOR_CAN_ID = 8;
     }
 }
