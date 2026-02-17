@@ -92,7 +92,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   public Command setHeight(Distance height) { 
     // default is 0 and it keeps resetting
     m_heightSetpoint = height;
-    return elevator.run(height);
+    return elevator.runTo(height,Meters.of(ClimbConstants.ELEVATOR_TOLERANCE));
   }
   
   /**

@@ -31,11 +31,14 @@ public class RobotContainer {
     // Schedule `setHeight` when the button 1 or 2 is pressed,
     // cancelling on release.
     // sim stuff
-    m_driverController.button(1).onTrue(m_climber.setElevatorHeight(Meters.of(0.5)));
-    m_driverController.button(2).onTrue(m_climber.setElevatorHeight(Meters.of(1)));
+    m_driverController.button(1).onTrue(m_climber.getL1Command());
+    m_driverController.button(2).onTrue(m_climber.getL2Command());
+    m_driverController.button(3).onTrue(m_climber.getL3Command());
 
-    m_driverController.button(5).onTrue(m_climber.setTongueLength(Meters.of(0.5)));
-    m_driverController.button(6).onTrue(m_climber.setTongueLength(Meters.of(1)));
+    // TODO: Doesn't stop; must fix
+    // m_driverController.button(4).whileTrue(m_climber.setElevator(ClimbConstants.DUTY_CYCLE_ELV));
+    // m_driverController.button(5).whileTrue(m_climber.setTongue(ClimbConstants.DUTY_CYCLE_TONGUE));
+
   }
 
   public Command getAutonomousCommand() {

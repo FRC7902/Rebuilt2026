@@ -10,6 +10,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ClimbConstants;
 
 public class ClimberSubsystem extends SubsystemBase {
@@ -26,21 +27,41 @@ public class ClimberSubsystem extends SubsystemBase {
     return m_tongue.setLength(d);
   }
 
-  Command l1Command = new SequentialCommandGroup(
-   m_elevator.setHeight(Meters.of(ClimbConstants.TRAVEL_DISTANCE)).until(() -> m_elevator.isAtTargetHeight()),
-   m_elevator.setHeight(Meters.of(ClimbConstants.ELEVATOR_BOTTOM)).until(() -> m_elevator.isAtTargetHeight())
-  );
-
   public Command getL1Command(){
-    return l1Command;
+    return new SequentialCommandGroup(
+      m_elevator.setHeight(Meters.of(ClimbConstants.MAX_HEIGHT)), 
+      m_elevator.setHeight(Meters.of(ClimbConstants.SETPOINT_3))
+    );
   }
   
-  Command l3Command = new SequentialCommandGroup(
-    l1Command,
-   m_elevator.setHeight(Meters.of(ClimbConstants.DISTANCE_BEFORE_TONGUE_EXTENDS)),
+  public Command getL2Command(){
+    return new SequentialCommandGroup(
+      getL1Command(),
+      m_elevator.setHeight(Meters.of(ClimbConstants.SETPOINT_1)),
+      m_elevator.setHeight(Meters.of(ClimbConstants.MAX_HEIGHT)),
+      m_tongue.setLength(Meters.of(ClimbConstants.TONGUE_FULL_EXTENSION)),
+      m_elevator.setHeight(Meters.of(ClimbConstants.SETPOINT_2)),
+      m_tongue.setLength(Meters.of(ClimbConstants.TONGUE_INITIAL))
+    );
+  }
 
-   m_elevator.setHeight(Meters.of(ClimbConstants.ELEVATOR_BOTTOM))
-  );
+  public Command getL3Command(){
+    return new SequentialCommandGroup(
+      getL2Command(),
+      m_elevator.setHeight(Meters.of(ClimbConstants.SETPOINT_1)),
+      m_elevator.setHeight(Meters.of(ClimbConstants.MAX_HEIGHT)),
+      m_tongue.setLength(Meters.of(ClimbConstants.TONGUE_FULL_EXTENSION)),
+      m_elevator.setHeight(Meters.of(ClimbConstants.SETPOINT_2)),
+      m_tongue.setLength(Meters.of(ClimbConstants.TONGUE_INITIAL))
+    );
+  }
+
+  public Command setElevator(double dutycycle) {
+    return m_elevator.set(dutycycle);
+  }
+  public Command setTongue(double dutycycle) {
+    return m_tongue.set(dutycycle);
+  }
 
   @Override
   public void periodic() {
