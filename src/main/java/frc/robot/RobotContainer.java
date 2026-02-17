@@ -17,7 +17,9 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    m_driverController.a().onTrue(m_hopper.expand());
+    m_driverController.a().onTrue(m_hopper.expandHopper());
+    m_driverController.b().onTrue(m_hopper.retractHopper());
+
   }
 
   public Command getAutonomousCommand() {

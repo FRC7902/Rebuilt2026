@@ -4,9 +4,12 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.HopperConstants;
 
@@ -15,22 +18,23 @@ public class HopperSubsystem extends SubsystemBase {
   Servo rightServo;
   /** Creates a new HopperSubsystem. */
   public HopperSubsystem() {
-    leftServo = new Servo(HopperConstants.LEFT_SERVO);
-    rightServo = new Servo(HopperConstants.RIGHT_SERVO);
+    leftServo = new Servo(HopperConstants.LEFT_SERVO_PWM_ID);
+    rightServo = new Servo(HopperConstants.RIGHT_SERVO_PWM_ID);
   }
 
-  public void expandHopper() {
-    leftServo.setAngle(HopperConstants.HOPPER_EXPANSION_VALUE); // TODO: Assumes a value of 180 deg would expand the hopper
-    rightServo.setAngle(HopperConstants.HOPPER_EXPANSION_VALUE); // TODO: Assumes a value of 180 deg would expand the hopper
+  public Command expandHopper() {
+    return runOnce(() -> {
+      leftServo.setAngle(HopperConstants.SERVO_LEFT_OPEN_DEG.in(Degrees));
+      rightServo.setAngle(HopperConstants.SERVO_RIGHT_OPEN_DEG.in(Degrees));
+    });
   }
-  public void shrinkHopper(){
-    leftServo.setAngle(HopperConstants.HOPPER_SHRINK_VALUE); // TODO: Assumes a value of 0 deg would expand the hopper
-    rightServo.setAngle(HopperConstants.HOPPER_SHRINK_VALUE); // TODO: Assumes a value of 0 deg would expand the hopper
+  public Command retractHopper(){
+    return runOnce(() -> {
+      leftServo.setAngle(HopperConstants.SERVO_LEFT_RETRACT_DEG.in(Degrees)); // TODO: Assumes a value of 0 deg would expand the hopper
+      rightServo.setAngle(HopperConstants.SERVO_RIGHT_RETRACT_DEG.in(Degrees)); // TODO: Assumes a value of 0 deg would expand the hopper
+    });
   }
 
-  public Command expand(){
-    return new InstantCommand(() -> expandHopper());
-  }
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
