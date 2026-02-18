@@ -25,6 +25,7 @@ public final class Constants {
         public static final double DEADBAND = 0.15;
     }
 
+    // TODO: Change these as well
     public static class SwerveConstants {
         public static final double MAX_SPEED = Units.feetToMeters(30);
 

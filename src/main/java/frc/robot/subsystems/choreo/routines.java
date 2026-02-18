@@ -6,157 +6,280 @@ import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
 
-public class routines {
-  // All routines for autonomous period are made here
-
+public class Routines {
   public static final AutoFactory autoFactory = RobotContainer.autoFactory;
 
-  // Performs two cycles then does an L3 climb on driver-relative right side
-  public static AutoRoutine rightCycleClimb() {
-    AutoRoutine routine = autoFactory.newRoutine("rightCycleClimb");
-
-    AutoTrajectory[] trajs = {
-      routine.trajectory("Right_Trench_Neutral1"),
-      routine.trajectory("Right_Trench_Shoot1"),
-      routine.trajectory("Right_Trench_Neutral2"),
-      routine.trajectory("Right_Trench_Shoot2"),
-      routine.trajectory("Climb_Right_Front")
-    };
-
+  // Utility method to run multiple trajectories
+  // TODO: Check if the for loop is okay to use
+  public static void runTrajectories(AutoRoutine routine, AutoTrajectory[] trajs) {
     routine.active().onTrue(
       Commands.sequence(
         trajs[0].resetOdometry(),
         trajs[0].cmd()
       )
     );
-    trajs[0].done().onTrue(
-      trajs[1].cmd()
-    );
-    trajs[1].done().onTrue(
-      trajs[2].cmd()
-    );
-    trajs[2].done().onTrue(
-      trajs[3].cmd()
-    );
-    trajs[3].done().onTrue(
-      trajs[4].cmd()
-    );
+
+    for (int i = 1; i < trajs.length; i++) {
+      trajs[i - 1].chain(trajs[i]);
+    }
+  }
+
+  // All routines for autonomous period are made here
+
+  public static AutoRoutine twoCycleRightClimb() {
+    AutoRoutine routine = autoFactory.newRoutine("twoCycleRightClimb");
+
+    AutoTrajectory[] trajs = {
+      routine.trajectory("RightTrenchNeutral1"),
+      routine.trajectory("RightTrenchShoot1"),
+      routine.trajectory("RightTrenchNeutral2"),
+      routine.trajectory("RightTrenchShoot2"),
+      routine.trajectory("ClimbRightSide1")
+    };
+
+    runTrajectories(routine, trajs);
 
     return routine;
   }
 
-  // Performs two cycles then climbs L3 on driver-relative left side
-  public static AutoRoutine leftCycleClimb() {
-    AutoRoutine routine = autoFactory.newRoutine("leftCycleClimb");
+
+  public static AutoRoutine twoCycleLeftClimb() {
+    AutoRoutine routine = autoFactory.newRoutine("twoCycleLeftClimb");
 
     AutoTrajectory[] trajs = {
-      routine.trajectory("Left_Trench_Neutral1"),
-      routine.trajectory("Left_Trench_Shoot1"),
-      routine.trajectory("Left_Trench_Neutral2"),
-      routine.trajectory("Left_Trench_Shoot2"),
-      routine.trajectory("Climb_Left_Front")
+      routine.trajectory("LeftTrenchNeutral1"),
+      routine.trajectory("LeftTrenchShoot1"),
+      routine.trajectory("LeftTrenchNeutral2"),
+      routine.trajectory("LeftTrenchShoot2"),
+      routine.trajectory("ClimbLeftSide1")
     };
+
+    runTrajectories(routine, trajs);
+
+    return routine;
+  }
+
+  public static AutoRoutine twoCycleRight() {
+    AutoRoutine routine = autoFactory.newRoutine("twoCycleRight");
+
+    AutoTrajectory[] trajs = {
+      routine.trajectory("RightTrenchNeutral1"),
+      routine.trajectory("RightTrenchShoot1"),
+      routine.trajectory("RightTrenchNeutral2"),
+      routine.trajectory("RightTrenchShoot2"),
+    };
+
+    runTrajectories(routine, trajs);
+
+    return routine;
+  }
+
+
+  public static AutoRoutine twoCycleLeft() {
+    AutoRoutine routine = autoFactory.newRoutine("twoCycleLeft");
+
+    AutoTrajectory[] trajs = {
+      routine.trajectory("LeftTrenchNeutral1"),
+      routine.trajectory("LeftTrenchShoot1"),
+      routine.trajectory("LeftTrenchNeutral2"),
+      routine.trajectory("LeftTrenchShoot2"),
+    };
+
+    runTrajectories(routine, trajs);
+
+    return routine;
+  }
+
+
+  public static AutoRoutine oneCycleRightClimb() {
+    AutoRoutine routine = autoFactory.newRoutine("oneCycleRightClimb");
+
+    AutoTrajectory[] trajs = {
+      routine.trajectory("RightTrenchNeutral1"),
+      routine.trajectory("RightTrenchShoot1"),
+      routine.trajectory("ClimbRightSide2")
+    };
+
+    runTrajectories(routine, trajs);
+
+    return routine;
+  }
+
+  public static AutoRoutine oneCycleLeftClimb() {
+    AutoRoutine routine = autoFactory.newRoutine("oneCycleLeftClimb");
+
+    AutoTrajectory[] trajs = {
+      routine.trajectory("LeftTrenchNeutral1"),
+      routine.trajectory("LeftTrenchShoot1"),
+      routine.trajectory("ClimbLeftSide2")
+    };
+
+    runTrajectories(routine, trajs);
+
+    return routine;
+  }
+
+
+  public static AutoRoutine twoDepotCycleLeftClimb() {
+    AutoRoutine routine = autoFactory.newRoutine("twoDepotCycleLeftClimb");
+
+    AutoTrajectory[] trajs = {
+      routine.trajectory("MidDepot"),
+      routine.trajectory("DepotCycle"),
+      routine.trajectory("DepotCycle"),
+      routine.trajectory("ClimbLeftSide3"),
+    };
+
+    runTrajectories(routine, trajs);
+
+    return routine;
+  }
+
+
+  public static AutoRoutine twoDepotCycleRightClimb() {
+    AutoRoutine routine = autoFactory.newRoutine("twoDepotCycleRightClimb");
+
+    AutoTrajectory[] trajs = {
+      routine.trajectory("MidDepot"),
+      routine.trajectory("DepotCycle"),
+      routine.trajectory("DepotCycle"),
+      routine.trajectory("ClimbRightSide4"),
+    };
+
+    runTrajectories(routine, trajs);
+
+    return routine;
+  }
+
+
+  public static AutoRoutine twoDepotCycle() {
+    AutoRoutine routine = autoFactory.newRoutine("twoDepotCycle");
+
+    AutoTrajectory[] trajs = {
+      routine.trajectory("MidDepot"),
+      routine.trajectory("DepotCycle"),
+      routine.trajectory("DepotCycle")
+    };
+
+    runTrajectories(routine, trajs);
+
+    return routine;
+  }
+
+
+  public static AutoRoutine twoDepotOneOutpostCycleRightClimb() {
+    AutoRoutine routine = autoFactory.newRoutine("twoDepotOneOutpostCycleRightClimb");
+
+    AutoTrajectory[] trajs = {
+      routine.trajectory("MidDepot"),
+      routine.trajectory("DepotCycle"),
+      routine.trajectory("DepotCycle"),
+      routine.trajectory("DepotSwitchOutpost"),
+      routine.trajectory("OutpostCycle"),
+      routine.trajectory("ClimbRightSide3")
+    };
+
+    runTrajectories(routine, trajs);
+
+    return routine;
+  }
+
+
+  public static AutoRoutine twoDepotOneOutpostCycleLeftClimb() {
+    AutoRoutine routine = autoFactory.newRoutine("twoDepotOneOutpostCycleLeftClimb");
+
+    AutoTrajectory[] trajs = {
+      routine.trajectory("MidDepot"),
+      routine.trajectory("DepotCycle"),
+      routine.trajectory("DepotCycle"),
+      routine.trajectory("DepotSwitchOutpost"),
+      routine.trajectory("OutpostCycle"),
+      routine.trajectory("ClimbLeftSide4")
+    };
+
+    runTrajectories(routine, trajs);
+
+    return routine;
+  }
+
+
+  public static AutoRoutine twoDepotOneOutpostCycle() {
+    AutoRoutine routine = autoFactory.newRoutine("twoDepotOneOutpostCycle");
+
+    AutoTrajectory[] trajs = {
+      routine.trajectory("MidDepot"),
+      routine.trajectory("DepotCycle"),
+      routine.trajectory("DepotCycle"),
+      routine.trajectory("DepotSwitchOutpost"),
+      routine.trajectory("OutpostCycle")
+    };
+
+    runTrajectories(routine, trajs);
+
+    return routine;
+  }
+
+  public static AutoRoutine oneDepotOutpostCycleRightClimb() {
+    AutoRoutine routine = autoFactory.newRoutine("oneDepotOutpostCycleRightClimb");
+
+    AutoTrajectory[] trajs = {
+      routine.trajectory("MidDepot"),
+      routine.trajectory("DepotCycle"),
+      routine.trajectory("DepotSwitchOutpost"),
+      routine.trajectory("OutpostCycle"),
+      routine.trajectory("ClimbRightSide3")
+    };
+
+    runTrajectories(routine, trajs);
+
+    return routine;
+  }
+
+
+  public static AutoRoutine oneDepotOutpostCycleLeftClimb() {
+    AutoRoutine routine = autoFactory.newRoutine("oneDepotOutpostCycleLeftClimb");
+
+    AutoTrajectory[] trajs = {
+      routine.trajectory("MidDepot"),
+      routine.trajectory("DepotCycle"),
+      routine.trajectory("DepotSwitchOutpost"),
+      routine.trajectory("OutpostCycle"),
+      routine.trajectory("ClimbLeftSide4")
+    };
+
+    runTrajectories(routine, trajs);
+
+    return routine;
+  }
+
+
+  public static AutoRoutine oneDepotOutpostCycle() {
+    AutoRoutine routine = autoFactory.newRoutine("oneDepotOutpostCycle");
+
+    AutoTrajectory[] trajs = {
+      routine.trajectory("MidDepot"),
+      routine.trajectory("DepotCycle"),
+      routine.trajectory("DepotSwitchOutpost"),
+      routine.trajectory("OutpostCycle")
+    };
+
+    runTrajectories(routine, trajs);
+
+    return routine;
+  }
+
+
+  public static AutoRoutine preloadOnly() {
+    AutoRoutine routine = autoFactory.newRoutine("preloadOnly");
+
+    AutoTrajectory traj = routine.trajectory("MidNothing");
 
     routine.active().onTrue(
       Commands.sequence(
-        trajs[0].resetOdometry(),
-        trajs[0].cmd()
+        traj.resetOdometry(),
+        traj.cmd()
       )
     );
-    trajs[0].done().onTrue(
-      trajs[1].cmd()
-    );
-    trajs[1].done().onTrue(
-      trajs[2].cmd()
-    );
-    trajs[2].done().onTrue(
-      trajs[3].cmd()
-    );
-    trajs[3].done().onTrue(
-      trajs[4].cmd()
-    );
-
-    return routine;
-  }
-
-  // Performs two cycles then goes to outpost on driver-relative right side
-  public static AutoRoutine rightCycleOutpost() {
-    AutoRoutine routine = autoFactory.newRoutine("rightCycleOutpost");
-
-    AutoTrajectory[] trajs = {
-      routine.trajectory("Right_Trench_Neutral1"),
-      routine.trajectory("Right_Trench_Shoot1"),
-      routine.trajectory("Right_Trench_Neutral2"),
-      routine.trajectory("Right_Trench_Outpost"),
-      routine.trajectory("Right_Outpost")
-    };
-
-    routine.active().onTrue(
-      Commands.sequence(
-        trajs[0].resetOdometry(),
-        trajs[0].cmd()
-      )
-    );
-    trajs[0].done().onTrue(
-      trajs[1].cmd()
-    );
-    trajs[1].done().onTrue(
-      trajs[2].cmd()
-    );
-    trajs[2].done().onTrue(
-      trajs[3].cmd()
-    );
-    trajs[3].done().onTrue(
-      trajs[4].cmd()
-    );
-
-    return routine;
-  }
-
-  // Performs two cycles then goes to depot on driver-relative left side
-  public static AutoRoutine leftCycleDepot() {
-    AutoRoutine routine = autoFactory.newRoutine("leftCycleDepot");
-
-    AutoTrajectory[] trajs = {
-      routine.trajectory("Left_Trench_Neutral1"),
-      routine.trajectory("Left_Trench_Shoot1"),
-      routine.trajectory("Left_Trench_Neutral2"),
-      routine.trajectory("Left_Trench_Depot"),
-      routine.trajectory("Left_Depot")
-    };
-
-    routine.active().onTrue(
-      Commands.sequence(
-        trajs[0].resetOdometry(),
-        trajs[0].cmd()
-      )
-    );
-    trajs[0].done().onTrue(
-      trajs[1].cmd()
-    );
-    trajs[1].done().onTrue(
-      trajs[2].cmd()
-    );
-    trajs[2].done().onTrue(
-      trajs[3].cmd()
-    );
-    trajs[3].done().onTrue(
-      trajs[4].cmd()
-    );
-
-    return routine;
-  }
-
-  // Goes to depot from mid
-  public static AutoRoutine midDepot() {
-    AutoRoutine routine = autoFactory.newRoutine("midDepot");
-
-    return routine;
-  }
-
-  // Goes to outpost from mid
-  public static AutoRoutine midOutpost() {
-    AutoRoutine routine = autoFactory.newRoutine("midOutpost");
 
     return routine;
   }

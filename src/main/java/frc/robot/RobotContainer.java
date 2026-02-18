@@ -12,12 +12,14 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
-import frc.robot.subsystems.choreo.routines;
+import frc.robot.subsystems.choreo.ChoreoVars;
+import frc.robot.subsystems.choreo.Routines;
 
 public class RobotContainer {
   private final static SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(
@@ -40,13 +42,10 @@ public class RobotContainer {
   // private static boolean isHopperEmpty = false;
 
   public RobotContainer() {
-    // setupAutonomous();
-
     autoChooser = new AutoChooser();
-    autoChooser.addRoutine("rightCycleClimb", routines::leftCycleClimb);
-    autoChooser.addRoutine("leftCycleClimb", routines::rightCycleClimb);
-    autoChooser.addRoutine("leftCycleDepot", routines::leftCycleDepot);
-    autoChooser.addRoutine("rightCycleOutpost", routines::rightCycleOutpost);
+
+    setupAutonomous();
+    
     SmartDashboard.putData("autoChooser", autoChooser);
 
     RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
@@ -68,23 +67,55 @@ public class RobotContainer {
 
     m_operatorController.start().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
+    // Performs distance checks to determine which path is closer to the robot's location & should be ran
     // x is a substitute keybind for the auto trench teleop
     // TODO: Get the actual keybind when confirmed what it will be
-    m_driverController.x().onTrue(
-      autoFactory.trajectoryCmd("Teleop_Trench")
+    m_driverController.x().whileTrue(
+      m_swerveSubsystem.getPose().getTranslation().getDistance(ChoreoVars.Poses.teleopNeutral.getTranslation()) <
+      m_swerveSubsystem.getPose().getTranslation().getDistance(ChoreoVars.Poses.teleopAlliance.getTranslation()) ?
+      new ConditionalCommand(
+        autoFactory.trajectoryCmd("TeleopNeutralLeft"),
+        autoFactory.trajectoryCmd("TeleopNeutralRight"),
+        () -> m_swerveSubsystem.getPose().getTranslation()
+        .getDistance(ChoreoVars.Poses.teleopLeftNeutralEnd.getTranslation()) < 
+        m_swerveSubsystem.getPose().getTranslation()
+        .getDistance(ChoreoVars.Poses.teleopRightNeutralEnd.getTranslation())
+      ) :
+      new ConditionalCommand(
+        autoFactory.trajectoryCmd("TeleopAllianceLeft"),
+        autoFactory.trajectoryCmd("TeleopAllianceRight"),
+        () -> m_swerveSubsystem.getPose().getTranslation()
+        .getDistance(ChoreoVars.Poses.teleopLeftAllianceEnd.getTranslation()) < 
+        m_swerveSubsystem.getPose().getTranslation()
+        .getDistance(ChoreoVars.Poses.teleopRightAllianceEnd.getTranslation())
+      )
     );
   }
 
-  /*
-  // InstantCommands are in place for the other subsystem commands
   private void setupAutonomous() {
-    autoFactory
-      .bind("Shoot", new InstantCommand())  // Consider hood adjustment later
-      .bind("Intake", new InstantCommand())
-      .bind("ClimbL1", new InstantCommand())
-      .bind("ClimbL3", new InstantCommand());
+    autoChooser.addRoutine("twoCycleRightClimb", Routines::twoCycleRightClimb)
+    .addRoutine("twoCycleLeftClimb", Routines::twoCycleLeftClimb)
+    .addRoutine("oneCycleRightClimb", Routines::oneCycleRightClimb)
+    .addRoutine("twoCycleRight", Routines::twoCycleRight)
+    .addRoutine("twoCycleLeft", Routines::twoCycleLeft)
+    .addRoutine("oneCycleLeftClimb", Routines::oneCycleLeftClimb)
+    .addRoutine("twoDepotCycleLeftClimb", Routines::twoDepotCycleLeftClimb)
+    .addRoutine("twoDepotCycleRightClimb", Routines::twoDepotCycleRightClimb)
+    .addRoutine("twoDepotCycle", Routines::twoDepotCycle)
+    .addRoutine("twoDepotOneOutpostCycleRightClimb", Routines::twoDepotOneOutpostCycleRightClimb)
+    .addRoutine("twoDepotOneOutpostCycleLeftClimb", Routines::twoDepotOneOutpostCycleLeftClimb)
+    .addRoutine("twoDepotOneOutpostCycle", Routines::twoDepotOneOutpostCycle)
+    .addRoutine("oneDepotOutpostCycleRightClimb", Routines::oneDepotOutpostCycleRightClimb)
+    .addRoutine("oneDepotOutpostCycleRightClimb", Routines::oneDepotOutpostCycleLeftClimb)
+    .addRoutine("oneDepotOutpostCycle", Routines::oneDepotOutpostCycle)
+    .addRoutine("preloadOnly", Routines::preloadOnly);
+
+    // autoFactory
+    //   .bind("Shoot", m_shooterSubsystem.ShootCommand())  // Consider hood adjustment later
+    //   .bind("Intake", m_intakeSubsystem.intake())  // Might need a whileTrue instead + check if hopper is full
+    //   .bind("Climb", m_climber.ClimbToLevel())  // Needs level parameter (has to be L1)
   }
-  */
+
 
   /*
   @Override
