@@ -7,8 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.subsystems.ClimbSubsystem;
-
+import frc.robot.subsystems.ClimbSubsystem;
 public class RobotContainer {
 
   private final CommandXboxController m_driverController = new CommandXboxController(0);
@@ -20,10 +19,9 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    m_driverController.button(1).onTrue(m_climber.climbL1());
-    m_driverController.button(2).onTrue(m_climber.climbL2());
-    m_driverController.button(3).onTrue(m_climber.climbL3());
-
+    m_driverController.button(1).onTrue(m_climber.setHeight2());
+    m_driverController.button(2).onTrue(m_climber.setHeight3());
+    // m_driverController.button(3).onTrue(m_climber.climbL3());
 
   }
 
