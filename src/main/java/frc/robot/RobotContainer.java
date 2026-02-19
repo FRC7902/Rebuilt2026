@@ -4,15 +4,43 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.ClimbConstants;
+import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.TongueSubsystem;
 
 public class RobotContainer {
+  
+  private final CommandXboxController m_driverController = new CommandXboxController(0);
+  ClimberSubsystem m_climber = new ClimberSubsystem();
+  
   public RobotContainer() {
     configureBindings();
+    // Set the default command to force the elevator to go to 0.
+    // m_climber.getElevatorSubsystem().setDefaultCommand(m_climber.getElevatorSubsystem().setHeight(Meters.of(0)));
+    // m_climber.getTongueSubsystem().setDefaultCommand(m_climber.getTongueSubsystem().setLength(Meters.of(0)));
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    // Schedule `setHeight` when the button 1 or 2 is pressed,
+    // cancelling on release.
+    // sim stuff
+    m_driverController.button(1).onTrue(m_climber.getL1Command());
+    m_driverController.button(2).onTrue(m_climber.getL2Command());
+    m_driverController.button(3).onTrue(m_climber.getL3Command());
+    m_driverController.button(4).onTrue(m_climber.climbDown());
+
+    // TODO: Doesn't stop; must fix
+    // m_driverController.button(4).whileTrue(m_climber.setElevator(ClimbConstants.DUTY_CYCLE_ELV));
+    // m_driverController.button(5).whileTrue(m_climber.setTongue(ClimbConstants.DUTY_CYCLE_TONGUE));
+
+  }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
