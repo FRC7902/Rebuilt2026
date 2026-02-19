@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -33,6 +34,10 @@ public class ClimberSubsystem extends SubsystemBase {
       m_elevator.setHeight(Meters.of(ClimbConstants.SETPOINT_3))
     );
   }
+
+  public Command climbDown(){
+    return m_elevator.setHeight(Meters.of(ClimbConstants.MAX_HEIGHT));
+  }
   
   public Command getL2Command(){
     return new SequentialCommandGroup(
@@ -55,6 +60,7 @@ public class ClimberSubsystem extends SubsystemBase {
       m_tongue.setLength(Meters.of(ClimbConstants.TONGUE_INITIAL))
     );
   }
+
 
   public Command setElevator(double dutycycle) {
     return m_elevator.set(dutycycle);

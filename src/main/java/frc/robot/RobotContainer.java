@@ -34,6 +34,7 @@ public class RobotContainer {
     m_driverController.button(1).onTrue(m_climber.getL1Command());
     m_driverController.button(2).onTrue(m_climber.getL2Command());
     m_driverController.button(3).onTrue(m_climber.getL3Command());
+    m_driverController.button(4).onTrue(m_climber.climbDown());
 
     // TODO: Doesn't stop; must fix
     // m_driverController.button(4).whileTrue(m_climber.setElevator(ClimbConstants.DUTY_CYCLE_ELV));
