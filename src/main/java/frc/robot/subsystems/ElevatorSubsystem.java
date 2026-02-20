@@ -15,6 +15,8 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.Optional;
+
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -22,10 +24,11 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.ClimbConstants;
+import frc.robot.Constants.IntakeConstants;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ElevatorConfig;
@@ -39,21 +42,19 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class ElevatorSubsystem extends SubsystemBase {
   // Vendor motor controller object
-  private TalonFX m_elevatorLeaderMotor = new TalonFX(ClimbConstants.LEADER_MOTOR_CAN_ID);
-  private TalonFX m_elevatorFollowerMotor = new TalonFX(ClimbConstants.FOLLOWER_MOTOR_CAN_ID);
-  private Distance m_heightSetpoint;
+  private TalonFX m_linearMotor = new TalonFX(IntakeConstants.LINEAR_MOTOR_CAN_ID);
 
   // Motor configs for both elevator motors (they do the same thing)
-  private SmartMotorControllerConfig climbConfig = new SmartMotorControllerConfig(this)
+  private SmartMotorControllerConfig linearConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
   // Mechanism Circumference is the distance traveled by each mechanism rotation converting rotations to meters.
   .withMechanismCircumference(Meters.of(Inches.of(0.25).in(Meters) * 22))
   // Feedback Constants (PID Constants)
-  .withClosedLoopController(ClimbConstants.Elevator_kP, ClimbConstants.Elevator_kI, ClimbConstants.Elevator_kD, MetersPerSecond.of(0.5), MetersPerSecondPerSecond.of(0.5))
-  .withSimClosedLoopController(ClimbConstants.Elevator_kP, ClimbConstants.Elevator_kI, ClimbConstants.Elevator_kD, MetersPerSecond.of(0.5), MetersPerSecondPerSecond.of(0.5))
+  .withClosedLoopController(IntakeConstants.Linear_kP, IntakeConstants.Linear_kI, IntakeConstants.Linear_kD, MetersPerSecond.of(0.5), MetersPerSecondPerSecond.of(0.5))
+  .withSimClosedLoopController(IntakeConstants.Linear_kP, IntakeConstants.Linear_kI, IntakeConstants.Linear_kD, MetersPerSecond.of(0.5), MetersPerSecondPerSecond.of(0.5))
   // Feedforward Constants
-  .withFeedforward(new ElevatorFeedforward(0, 0, 0))
-  .withSimFeedforward(new ElevatorFeedforward(0, 0, 0))
+  .withFeedforward(new ElevatorFeedforward(IntakeConstants.Linear_kS, IntakeConstants.Linear_kG,IntakeConstants.Linear_kV))
+  .withSimFeedforward(new ElevatorFeedforward(IntakeConstants.Linear_kS, IntakeConstants.Linear_kG, IntakeConstants.Linear_kV))
   // Telemetry name and verbosity level
   .withTelemetry("ElevatorMotor", TelemetryVerbosity.HIGH)
   // Gearing from the motor rotor to final shaft.
@@ -65,25 +66,21 @@ public class ElevatorSubsystem extends SubsystemBase {
   .withIdleMode(MotorMode.BRAKE)
   .withStatorCurrentLimit(Amps.of(40))
   .withClosedLoopRampRate(Seconds.of(0.25))
-  .withOpenLoopRampRate(Seconds.of(0.25))
-  .withFollowers(Pair.of(m_elevatorFollowerMotor,false));
+  .withOpenLoopRampRate(Seconds.of(0.25));
 
 
   // SmartMotorController using TalonFX Wrapper
-  private SmartMotorController elvLeaderMotorController = new TalonFXWrapper(m_elevatorLeaderMotor, DCMotor.getFalcon500Foc(2), climbConfig);
+  private SmartMotorController linearMotorController = new TalonFXWrapper(m_linearMotor, DCMotor.getFalcon500Foc(2), linearConfig);
  
 
-  private ElevatorConfig elevLeaderconfig = new ElevatorConfig(elvLeaderMotorController)
+  private ElevatorConfig linearMotorconfig = new ElevatorConfig(linearMotorController)
       .withStartingHeight(Meters.of(0.5))
       .withHardLimits(Meters.of(0), Meters.of(3))
       .withTelemetry("Elevator", TelemetryVerbosity.HIGH)
-      .withMass(Pounds.of(16));
+      .withMass(Pounds.of(16))
+      .withAngle(Degrees.of(360 -24.16));
   // Elevator Mechanism
-  private Elevator elevator = new Elevator(elevLeaderconfig);
-
-  public boolean isAtTargetHeight(){
-    return m_heightSetpoint.isNear(elevator.getHeight(), Meters.of(ClimbConstants.ELEVATOR_TOLERANCE));
-  }
+  private Elevator elevator = new Elevator(linearMotorconfig);
   /**
    * Set the height of the elevator and does not end the command when reached.
    * @param angle Distance to go to.
@@ -91,8 +88,7 @@ public class ElevatorSubsystem extends SubsystemBase {
    */
   public Command setHeight(Distance height) { 
     // default is 0 and it keeps resetting
-    m_heightSetpoint = height;
-    return elevator.runTo(height,Meters.of(ClimbConstants.ELEVATOR_TOLERANCE));
+    return elevator.runTo(height,Meters.of(IntakeConstants.LINEAR_TOLERANCE));
   }
   
   /**
@@ -114,6 +110,20 @@ public class ElevatorSubsystem extends SubsystemBase {
    */
   public Command sysId() { return 
     elevator.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
+  }
+
+  //Gets the elevator's setpoint as a distance
+  public Distance getElevatorSetpoint(){
+    Optional<Angle> angle_position = elevator.getMechanismSetpoint();
+    if (!angle_position.isPresent()){
+      return null;
+    }
+    return linearConfig.convertFromMechanism(angle_position.get());
+  }
+  //Sets the elevator position
+  public void setElevatorPosition(Distance actualPosition){
+    Angle encoderPosition = linearConfig.convertToMechanism(actualPosition);
+    linearMotorController.setEncoderPosition(encoderPosition);
   }
 
   /** Creates a new Climber. */

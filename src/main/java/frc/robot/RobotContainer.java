@@ -6,19 +6,19 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Meters;
 
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.ClimbConstants;
-import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.Constants.IntakeConstants;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.TongueSubsystem;
 
 public class RobotContainer {
   
   private final CommandXboxController m_driverController = new CommandXboxController(0);
-  ClimberSubsystem m_climber = new ClimberSubsystem();
+  IntakeSubsystem m_intake = new IntakeSubsystem();
   
   public RobotContainer() {
     configureBindings();
@@ -31,14 +31,8 @@ public class RobotContainer {
     // Schedule `setHeight` when the button 1 or 2 is pressed,
     // cancelling on release.
     // sim stuff
-    m_driverController.button(1).onTrue(m_climber.getL1Command());
-    m_driverController.button(2).onTrue(m_climber.getL2Command());
-    m_driverController.button(3).onTrue(m_climber.getL3Command());
-    m_driverController.button(4).onTrue(m_climber.climbDown());
-
-    // TODO: Doesn't stop; must fix
-    // m_driverController.button(4).whileTrue(m_climber.setElevator(ClimbConstants.DUTY_CYCLE_ELV));
-    // m_driverController.button(5).whileTrue(m_climber.setTongue(ClimbConstants.DUTY_CYCLE_TONGUE));
+    m_driverController.button(1).onTrue(m_intake.setElevatorHeight(IntakeConstants.EXTEND_SETPOINT));
+    m_driverController.button(2).onTrue(m_intake.setElevatorHeight(IntakeConstants.RETRACT_SETPOINT));
 
   }
 
