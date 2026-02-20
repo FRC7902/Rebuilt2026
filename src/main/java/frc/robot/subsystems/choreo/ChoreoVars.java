@@ -14,11 +14,11 @@ public final class ChoreoVars {
 
     public static final class Poses {
         public static final Pose2d allianceEndLeft1 = new Pose2d(13.038, 0.639, Rotation2d.fromRadians(-1.297));
-        public static final Pose2d allianceEndLeft2 = new Pose2d(15.467, 3.217, Rotation2d.fromRadians(-0.197));
+        public static final Pose2d allianceEndLeft2 = new Pose2d(14.858, 3.859, Rotation2d.kZero);
         public static final Pose2d allianceEndRight1 = new Pose2d(13.007, 7.484, Rotation2d.fromRadians(1.267));
-        public static final Pose2d allianceEndRight2 = new Pose2d(15.472, 5.604, Rotation2d.fromRadians(0.44));
-        public static final Pose2d climbLeft = new Pose2d(15.482, 3.217, Rotation2d.fromRadians(-1.571));
-        public static final Pose2d climbRight = new Pose2d(15.509, 5.409, Rotation2d.fromRadians(1.571));
+        public static final Pose2d allianceEndRight2 = new Pose2d(14.78, 4.639, Rotation2d.fromRadians(0.229));
+        public static final Pose2d climbLeft = new Pose2d(14.936, 4.054, Rotation2d.fromRadians(3.142));
+        public static final Pose2d climbRight = new Pose2d(14.917, 4.522, Rotation2d.fromRadians(3.142));
         public static final Pose2d cycleDepotEnd = new Pose2d(15.156, 2.051, Rotation2d.fromRadians(-0.6));
         public static final Pose2d cycleOutpostEnd = new Pose2d(15.658, 7.378, Rotation2d.fromRadians(0.835));
         public static final Pose2d neutralEndLeft1 = new Pose2d(8.719, 2.631, Rotation2d.fromRadians(1.571));

@@ -59,6 +59,8 @@ public class Routines {
     return routine;
   }
 
+
+  // TODO: Make the last path NOT go to tower
   public static AutoRoutine twoCycleRight() {
     AutoRoutine routine = autoFactory.newRoutine("twoCycleRight");
 
@@ -66,7 +68,7 @@ public class Routines {
       routine.trajectory("RightTrenchNeutral1"),
       routine.trajectory("RightTrenchShoot1"),
       routine.trajectory("RightTrenchNeutral2"),
-      routine.trajectory("RightTrenchShoot2"),
+      routine.trajectory("RightTrenchShootAlt2"),
     };
 
     runTrajectories(routine, trajs);
@@ -75,6 +77,7 @@ public class Routines {
   }
 
 
+  // TODO: Make the last path NOT go to tower
   public static AutoRoutine twoCycleLeft() {
     AutoRoutine routine = autoFactory.newRoutine("twoCycleLeft");
 
@@ -82,7 +85,7 @@ public class Routines {
       routine.trajectory("LeftTrenchNeutral1"),
       routine.trajectory("LeftTrenchShoot1"),
       routine.trajectory("LeftTrenchNeutral2"),
-      routine.trajectory("LeftTrenchShoot2"),
+      routine.trajectory("LeftTrenchShootAlt2"),
     };
 
     runTrajectories(routine, trajs);
