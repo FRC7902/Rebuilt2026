@@ -64,6 +64,9 @@ public class IntakeSubsystem extends SubsystemBase {
   public Command setElevator(double dutycycle) {
     return m_elevator.set(dutycycle);
   }
+  public Distance getElevatorSetpoint() {
+    return m_elevator.getElevatorSetpoint();
+  }
 
   @Override
   public void periodic() {

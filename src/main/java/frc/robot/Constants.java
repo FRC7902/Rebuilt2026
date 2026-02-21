@@ -24,7 +24,6 @@ public class Constants {
         public static double OUTAKE_SPEED = -1;
         // tolerances
         public static double LINEAR_TOLERANCE = 0.01;
-        public static double TONGUE_TOLERANCE = 0.03;
         // dutycycle constants
         public static double DUTY_CYCLE_ELV = 0.1;
         // CAN ids

@@ -24,7 +24,8 @@ public class retractIntake extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (!RobotContainer.m_intake.extendedLimitSwitchTouched() && RobotContainer.m_intake.getIsExtended()){
+    if (!RobotContainer.m_intake.extendedLimitSwitchTouched() 
+    && RobotContainer.m_intake.getElevatorSetpoint().equals(IntakeConstants.EXTEND_SETPOINT)){
       RobotContainer.m_intake.setElevatorHeight(IntakeConstants.RETRACT_SETPOINT);
       RobotContainer.m_intake.setIsExtended(false);
     } 
