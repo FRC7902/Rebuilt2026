@@ -23,11 +23,18 @@ public class IntakeSubsystem extends SubsystemBase {
   private final TalonFX m_rollerMotor;
   private final DigitalInput m_fullyRetractedLimitSwitch;
   private final DigitalInput m_fullyExtendedLimitSwitch;
+  private boolean m_isExtendedSetpoint;
 
   public IntakeSubsystem() {
     m_rollerMotor = new TalonFX(IntakeConstants.ROLLER_MOTOR_CAN_ID);
     m_fullyExtendedLimitSwitch = new DigitalInput(IntakeConstants.DEEP_BUTTON_BREAK_DIO);
     m_fullyRetractedLimitSwitch = new DigitalInput(IntakeConstants.SHALLOW_BUTTON_BREAK_DIO);
+  }
+  public boolean getIsExtended(){
+    return m_isExtendedSetpoint;
+  }
+  public void setIsExtended(boolean state){
+    m_isExtendedSetpoint = state;
   }
   public boolean extendedLimitSwitchTouched(){
     return !m_fullyExtendedLimitSwitch.get();
@@ -36,6 +43,7 @@ public class IntakeSubsystem extends SubsystemBase {
     return !m_fullyRetractedLimitSwitch.get();
   }
   public Command intake() {
+    
     return runOnce(() -> m_rollerMotor.set(IntakeConstants.INTAKE_SPEED));
   }
   public Command outtake() {
@@ -48,7 +56,10 @@ public class IntakeSubsystem extends SubsystemBase {
     return m_elevator.setHeight(d);
   }
   public Command intakeSequence() {
-    return new SequentialCommandGroup(setElevatorHeight(Meters.of(2)));
+    m_isExtendedSetpoint = true;
+    return new SequentialCommandGroup(
+      setElevatorHeight(IntakeConstants.EXTEND_SETPOINT),
+      intake());
   }
   public Command setElevator(double dutycycle) {
     return m_elevator.set(dutycycle);
