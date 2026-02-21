@@ -10,7 +10,7 @@ public class Routines {
   public static final AutoFactory autoFactory = RobotContainer.autoFactory;
 
   // Utility method to run multiple trajectories
-  // TODO: Check if the for loop is okay to use
+  // TODO: Remove later to accomodate for commands (or check if bind method works in sim/real life)
   public static void runTrajectories(AutoRoutine routine, AutoTrajectory[] trajs) {
     routine.active().onTrue(
       Commands.sequence(
