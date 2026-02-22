@@ -33,8 +33,7 @@ public class FeederSubsystem extends SubsystemBase {
 	private final PositionVoltage positionRequest;
 	private final VelocityVoltage velocityRequest;
 
-	private static final DigitalInput BeamBreakLeftFeeder = new DigitalInput(ShooterConstants.BEAM_BREAK_LEFT_ID);
-	private static final DigitalInput BeamBreakRightFeeder = new DigitalInput(ShooterConstants.BEAM_BREAK_RIGHT_ID);
+	private static final DigitalInput BeamBreakBottomFeeder = new DigitalInput(ShooterConstants.BEAM_BREAK_BOTTOM_ID);
 	private static final DigitalInput BeamBreakTop = new DigitalInput(ShooterConstants.BEAM_BREAK_TOP_ID);
 
 	public FeederSubsystem() {
@@ -80,25 +79,21 @@ public class FeederSubsystem extends SubsystemBase {
 		feederMotor.stopMotor();
 	}
 
-	public static boolean getBeamBreakLeftFeeder(){
-		return BeamBreakLeftFeeder.get();
-	}
-	public static boolean getBeamBreakRightFeeder(){
-		return BeamBreakRightFeeder.get();
+	public static boolean getBeamBreakBottomFeeder(){
+		return BeamBreakBottomFeeder.get();
 	}
 	public static boolean getBeamBreakTop(){
 		return BeamBreakTop.get();
 	}
 	public void periodic() {
 		SmartDashboard.putData("Feeder/Mech2d", mech2d);
-		SmartDashboard.putBoolean("Feeder/Beam Break left: ", getBeamBreakLeftFeeder());
-		SmartDashboard.putBoolean("Feeder/Beam Break right: ", getBeamBreakRightFeeder());
+		SmartDashboard.putBoolean("Feeder/Beam Break bottom: ", getBeamBreakBottomFeeder());
 		SmartDashboard.putBoolean("Feeder/Beam Break top: ", getBeamBreakTop());
 		SmartDashboard.putNumber("Feeder/MotorSupplyCurrent: ", feederMotor.getSupplyCurrent().getValueAsDouble());
 		SmartDashboard.putNumber("Feeder/MotorVelocity: ", feederMotor.getVelocity().getValueAsDouble());
 		SmartDashboard.putNumber("Feeder/Position: ",feederMotor.getPosition().getValueAsDouble());
 		feederLig.setAngle(feederMotor.getPosition().getValueAsDouble());
-		if(BeamBreakLeftFeeder.get() || BeamBreakRightFeeder.get()){
+		if(getBeamBreakBottomFeeder()){
 			timer.reset();
 		}
 		if(timer.hasElapsed(ShooterConstants.FEEDER_TIME_PERIOD)){
