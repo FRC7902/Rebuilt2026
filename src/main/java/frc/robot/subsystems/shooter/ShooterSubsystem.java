@@ -74,8 +74,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
 
 	//Hood aiming
-	public Command aimAt(double distanceInches){
+	public Command aimAtDistance(double distanceInches){
 		return hoodSubsystem.setAngle(hoodAngleMap.get(distanceInches).getMeasure());
+	}
+	public Command aimAt(Angle angle){
+		return hoodSubsystem.setAngle(angle);
 	}
 
 	//Shooter Commands
