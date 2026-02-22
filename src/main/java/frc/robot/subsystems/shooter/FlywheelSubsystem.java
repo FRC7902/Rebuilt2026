@@ -1,5 +1,8 @@
 package frc.robot.subsystems.shooter;
 
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -20,7 +23,8 @@ import java.util.function.Supplier;
 import static edu.wpi.first.units.Units.*;
 
 public class FlywheelSubsystem extends SubsystemBase {
-	private final TalonFX flywheelMotor = new TalonFX(ShooterConstants.FLYWHEEL_ID);
+	private final TalonFX flywheelMotorLeft = new TalonFX(ShooterConstants.FLYWHEEL_LEFT_ID);
+	private final TalonFX flywheelMotorRight = new TalonFX(ShooterConstants.FLYWHEEL_RIGHT_ID);
 
 	private final SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
 			.withClosedLoopController(ShooterConstants.FLYWHEEL_KP, ShooterConstants.FLYWHEEL_KI, ShooterConstants.FLYWHEEL_KD, ShooterConstants.FLYWHEEL_MAX_VELOCITY, ShooterConstants.FLYWHEEL_MAX_ACCELERATION)
@@ -33,9 +37,10 @@ public class FlywheelSubsystem extends SubsystemBase {
 			.withOpenLoopRampRate(ShooterConstants.FLYWHEEL_OPEN_RATE)
 			.withFeedforward(new SimpleMotorFeedforward(ShooterConstants.FLYWHEEL_KS, ShooterConstants.FLYWHEEL_KV, ShooterConstants.FLYWHEEL_KA))
 			.withSimFeedforward(new SimpleMotorFeedforward(ShooterConstants.FLYWHEEL_KS, ShooterConstants.FLYWHEEL_KV, ShooterConstants.FLYWHEEL_KA))
-			.withControlMode(SmartMotorControllerConfig.ControlMode.CLOSED_LOOP);
+			.withControlMode(SmartMotorControllerConfig.ControlMode.CLOSED_LOOP)
+			.withFollowers(Pair.of(flywheelMotorRight, false));
 
-	private final SmartMotorController motor = new TalonFXWrapper(flywheelMotor, DCMotor.getKrakenX60Foc(2), motorConfig);
+	private final SmartMotorController motor = new TalonFXWrapper(flywheelMotorLeft, DCMotor.getKrakenX60Foc(2), motorConfig);
 
 	private final FlyWheelConfig flywheelConfig = new FlyWheelConfig(motor)
 			.withDiameter(ShooterConstants.FLYWHEEL_DIAMETER)

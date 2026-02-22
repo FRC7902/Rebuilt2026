@@ -20,7 +20,7 @@ public class ShootCommand extends Command {
 	}
 	@Override
 	public void execute(){
-		m_shooterSubsystem.runFeeder();
+		m_shooterSubsystem.runFeeder(100);
 	}
 	@Override
 	public void end(boolean interrupted){}

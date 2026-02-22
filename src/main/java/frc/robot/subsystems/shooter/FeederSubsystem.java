@@ -73,9 +73,8 @@ public class FeederSubsystem extends SubsystemBase {
 		feederMotor.getConfigurator().apply(config);
 	}
 
-	public void run(){
-		feederMotor.setVoltage(ShooterConstants.FEEDER_VOLTAGE);
-		System.out.println(feederMotor.getMotorVoltage());
+	public void run(double speed){
+		feederMotor.set(speed);
 	}
 	public void stop(){
 		feederMotor.stopMotor();

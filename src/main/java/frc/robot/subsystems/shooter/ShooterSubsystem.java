@@ -65,8 +65,8 @@ public class ShooterSubsystem extends SubsystemBase {
 		feederSubsystem = new FeederSubsystem();
 	}
 
-	public void runFeeder(){
-		feederSubsystem.run();
+	public void runFeeder(double speed){
+		feederSubsystem.run(speed);
 	}
 	public void stopFeeder(){
 		feederSubsystem.stop();
