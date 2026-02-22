@@ -6,17 +6,17 @@
   "absoluteEncoderOffset": 0,
   "drive": {
     "type": "krakenx60foc",
-    "id": 14,
+    "id": 15,
     "canbus": null
   },
   "angle": {
     "type": "falcon500foc",
-    "id": 6,
+    "id": 11,
     "canbus": null
   },
   "encoder": {
     "type": "thrifty",
-    "id": 12,
+    "id": 2,
     "canbus": null
   },
   "inverted": {
