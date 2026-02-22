@@ -7,6 +7,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.LEDConstants;
+import frc.robot.subsystems.LEDSubsystem;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -15,6 +17,11 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     m_robotContainer = new RobotContainer();
+    addPeriodic(() -> {
+      LEDSubsystem.getInstance().checkForLEDUpdates();
+      }
+      , LEDConstants.PERIOD,LEDConstants.PERIODIC_OFFSET);
+      // checkForLEDUpdates is called every second with an offset of 0.005 seconds from periodic
   }
 
   @Override
@@ -51,6 +58,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    LEDSubsystem.getInstance().teleopInit(); // I believe this is where i need to call telopInit for it to actually override teleopInit
   }
 
   @Override
