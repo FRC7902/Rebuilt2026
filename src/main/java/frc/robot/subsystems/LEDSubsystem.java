@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -103,5 +104,11 @@ public class LEDSubsystem extends SubsystemBase {
             m_led.setData(m_ledBuffer);
             m_currentPattern.applyTo(m_ledBuffer);
         }
+    }
+    public Command setLedPattern(LEDPattern pattern){
+        return runOnce(() -> {
+            pattern.applyTo(m_ledBuffer);
+            m_led.setData(m_ledBuffer);
+        });
     }
 }
