@@ -48,7 +48,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   private SmartMotorControllerConfig linearConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
   // Mechanism Circumference is the distance traveled by each mechanism rotation converting rotations to meters.
-  .withMechanismCircumference(Meters.of(Inches.of(0.25).in(Meters) * 22))
+  .withMechanismCircumference(IntakeConstants.MECH_CIRCUMFERENCE)
   // Feedback Constants (PID Constants)
   .withClosedLoopController(IntakeConstants.Linear_kP, IntakeConstants.Linear_kI, IntakeConstants.Linear_kD, MetersPerSecond.of(0.5), MetersPerSecondPerSecond.of(0.5))
   .withSimClosedLoopController(IntakeConstants.Linear_kP, IntakeConstants.Linear_kI, IntakeConstants.Linear_kD, MetersPerSecond.of(0.5), MetersPerSecondPerSecond.of(0.5))
@@ -60,25 +60,25 @@ public class ElevatorSubsystem extends SubsystemBase {
   // Gearing from the motor rotor to final shaft.
   // In this example GearBox.fromReductionStages(3,4) is the same as GearBox.fromStages("3:1","4:1") which corresponds to the gearbox attached to your motor.
   // You could also use .withGearing(12) which does the same thing.
-  .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
+  .withGearing(new MechanismGearing(GearBox.fromReductionStages(IntakeConstants.GEAR_REDUC_1, IntakeConstants.GEAR_REDUC_2,IntakeConstants.GEAR_REDUC_3)))
   // Motor properties to prevent over currenting.
   .withMotorInverted(false)
   .withIdleMode(MotorMode.BRAKE)
-  .withStatorCurrentLimit(Amps.of(40))
-  .withClosedLoopRampRate(Seconds.of(0.25))
-  .withOpenLoopRampRate(Seconds.of(0.25));
+  .withStatorCurrentLimit(IntakeConstants.STATOR_CURRENT_LIMIT)
+  .withClosedLoopRampRate(IntakeConstants.CLOSED_LOOP_RAMP_RATE)
+  .withOpenLoopRampRate(IntakeConstants.OPEN_LOOP_RAMP_RATE);
 
 
   // SmartMotorController using TalonFX Wrapper
-  private SmartMotorController linearMotorController = new TalonFXWrapper(m_linearMotor, DCMotor.getFalcon500Foc(2), linearConfig);
+  private SmartMotorController linearMotorController = new TalonFXWrapper(m_linearMotor, DCMotor.getFalcon500Foc(1), linearConfig);
  
 
   private ElevatorConfig linearMotorconfig = new ElevatorConfig(linearMotorController)
-      .withStartingHeight(Meters.of(0.5))
-      .withHardLimits(Meters.of(0), Meters.of(3))
+      .withStartingHeight(IntakeConstants.STARTING_HEIGHT)
+      .withHardLimits(IntakeConstants.MIN_HARD_LIMIT, IntakeConstants.MAX_HARD_LIMIT)
       .withTelemetry("Elevator", TelemetryVerbosity.HIGH)
-      .withMass(Pounds.of(16))
-      .withAngle(Degrees.of(360 -24.16));
+      .withMass(IntakeConstants.DLI_MASS)
+      .withAngle(IntakeConstants.DLI_ANGLE);
   // Elevator Mechanism
   private Elevator elevator = new Elevator(linearMotorconfig);
   /**
