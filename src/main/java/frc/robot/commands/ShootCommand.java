@@ -15,7 +15,6 @@ public class ShootCommand extends Command {
 
 	@Override
 	public void initialize(){
-		m_shooterSubsystem.setDefaultAngle(Degrees.of(67));
 		m_shooterSubsystem.setVelocitySupplier(() -> RPM.of(200));
 	}
 	@Override
