@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
@@ -28,20 +29,15 @@ public class Constants {
         // elevator setpoints
         public static Distance RETRACT_SETPOINT = Meters.of(Units.inchesToMeters(0));
         public static Distance EXTEND_SETPOINT = Meters.of(Units.inchesToMeters(16.325));
-        public static double DEFAULT_POSITION = Units.inchesToMeters(0); //TODO: Must change this value perhaps
         // limit switch constants
         public static int SHALLOW_BUTTON_BREAK_DIO = 1;
         public static int DEEP_BUTTON_BREAK_DIO = 2;
-        // roller constants
-        public static double INTAKE_SPEED = 1;
-        public static double OUTAKE_SPEED = -1;
         // tolerances
         public static double LINEAR_TOLERANCE = 0.01;
         // dutycycle constants
         public static double DUTY_CYCLE_ELV = 0.1;
         // CAN ids
         public static int LINEAR_MOTOR_CAN_ID = 18;
-        public static int ROLLER_MOTOR_CAN_ID = 8;
         // PID Constants Linear Actuator
         public static double Linear_kP = 34.935;
         public static double Linear_kI = 0;
@@ -55,6 +51,7 @@ public class Constants {
         public static double Linear_kS = 0;
         public static double Linear_kG = 0;
         public static double Linear_kV = 0;
+        public static ElevatorFeedforward FEED_FORWARD = new ElevatorFeedforward(0.28669, 0,0.60431, 0.021882); // TODO: kg
         // Current Limits
         public static Current STATOR_CURRENT_LIMIT = Amps.of(10); //TODO: Change this
         // Elevator Config Constants
@@ -64,8 +61,13 @@ public class Constants {
         public static Mass DLI_MASS = Pounds.of(6.825);
         public static Angle DLI_ANGLE = Degrees.of(360 - 24.16);
         public static Distance MECH_CIRCUMFERENCE = Inches.of(Math.PI);
-
+        public static boolean MOTOR_INVERTED = false;
         // Gear Reduction Constants
         public static final GearBox GEARBOX = GearBox.fromStages("54:16", "18:12");
+    }
+    public static class RollerConstants {
+        public static double INTAKE_SPEED = 1;
+        public static double OUTAKE_SPEED = -1;
+        public static int ROLLER_MOTOR_CAN_ID = 8;
     }
 }

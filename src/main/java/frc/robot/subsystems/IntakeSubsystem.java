@@ -5,10 +5,7 @@
 package frc.robot.subsystems;
 
 
-import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,46 +13,23 @@ import frc.robot.Constants.IntakeConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new IntakeSubsystem. */
-  private final static ElevatorSubsystem m_elevator = new ElevatorSubsystem();
-  private final TalonFX m_rollerMotor;
-  private final DigitalInput m_fullyRetractedLimitSwitch;
-  private final DigitalInput m_fullyExtendedLimitSwitch;
-  private boolean m_isExtendedSetpoint;
-
+  private final static LinearSlide m_elevator = new LinearSlide();
+  private final RollerSubsystem m_rollers = new RollerSubsystem();
+  
   public IntakeSubsystem() {
-    m_rollerMotor = new TalonFX(IntakeConstants.ROLLER_MOTOR_CAN_ID);
-    m_fullyExtendedLimitSwitch = new DigitalInput(IntakeConstants.DEEP_BUTTON_BREAK_DIO);
-    m_fullyRetractedLimitSwitch = new DigitalInput(IntakeConstants.SHALLOW_BUTTON_BREAK_DIO);
+    
   }
-  public boolean getIsExtended(){
-    return m_isExtendedSetpoint;
-  }
-  public void setIsExtended(boolean state){
-    m_isExtendedSetpoint = state;
-  }
-  public boolean extendedLimitSwitchTouched(){
-    return !m_fullyExtendedLimitSwitch.get();
-  }
-  public boolean retractedLimitSwitchTouched(){
-    return !m_fullyRetractedLimitSwitch.get();
-  }
-  public Command intake() {
-    return runOnce(() -> m_rollerMotor.set(IntakeConstants.INTAKE_SPEED));
-  }
-  public Command outtake() {
-    return runOnce(() -> m_rollerMotor.set(IntakeConstants.OUTAKE_SPEED));
-  }
-  public Command stopRollers(){
-    return runOnce(() -> m_rollerMotor.stopMotor());
-  }
+  
   public Command setElevatorHeight(Distance d) {
     return m_elevator.setHeight(d);
   }
+  public Distance getElevatorHeight(){
+    return m_elevator.getElevatorHeight();
+  }
   public Command intakeSequence() {
-    m_isExtendedSetpoint = true;
     return new SequentialCommandGroup(
       setElevatorHeight(IntakeConstants.EXTEND_SETPOINT),
-      intake());
+      m_rollers.intake());
   }
   public Command setElevator(double dutycycle) {
     return m_elevator.set(dutycycle);
@@ -63,13 +37,22 @@ public class IntakeSubsystem extends SubsystemBase {
   public Distance getElevatorSetpoint() {
     return m_elevator.getElevatorSetpoint();
   }
+  public boolean extendedLimitSwitchTouched() {
+    return m_elevator.extendedLimitSwitchTouched();
+  }
+  public boolean getPrevTouchedELS(){
+    return m_elevator.getPrevTouchedELS();
+  }
+  public boolean setPrevTouchedELS(boolean state){
+    return m_elevator.getPrevTouchedELS();
+  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    if (extendedLimitSwitchTouched()){
+    if (m_elevator.extendedLimitSwitchTouched()){
       m_elevator.setElevatorPosition(IntakeConstants.EXTEND_SETPOINT);
-    } else if (retractedLimitSwitchTouched()){
+    } else if (m_elevator.retractedLimitSwitchTouched()){
       m_elevator.setElevatorPosition(IntakeConstants.RETRACT_SETPOINT);
     }
   }

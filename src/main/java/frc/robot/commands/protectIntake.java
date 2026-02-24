@@ -5,29 +5,29 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.RobotContainer;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class retractIntake extends Command {
+public class protectIntake extends Command {
   /** Creates a new retractIntake. */
-  public retractIntake() {
+  public protectIntake() {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(RobotContainer.m_intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (!RobotContainer.m_intake.extendedLimitSwitchTouched() 
-    && RobotContainer.m_intake.getElevatorSetpoint().equals(IntakeConstants.EXTEND_SETPOINT)){
+    if (RobotContainer.m_intake.getPrevTouchedELS() && !RobotContainer.m_intake.extendedLimitSwitchTouched() && RobotContainer.m_intake.getElevatorSetpoint().equals(IntakeConstants.EXTEND_SETPOINT)){
       RobotContainer.m_intake.setElevatorHeight(IntakeConstants.RETRACT_SETPOINT);
-      RobotContainer.m_intake.setIsExtended(false);
+      
     } 
   }
 

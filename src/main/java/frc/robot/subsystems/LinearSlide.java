@@ -16,6 +16,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
@@ -29,12 +30,15 @@ import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
-public class ElevatorSubsystem extends SubsystemBase {
+public class LinearSlide extends SubsystemBase {
   // Vendor motor controller object
-  private TalonFX m_linearMotor = new TalonFX(IntakeConstants.LINEAR_MOTOR_CAN_ID);
+  private final TalonFX m_linearMotor = new TalonFX(IntakeConstants.LINEAR_MOTOR_CAN_ID);
+  private final DigitalInput m_fullyRetractedLimitSwitch;
+  private final DigitalInput m_fullyExtendedLimitSwitch;
+  private boolean previouslyTouchedELS;
 
-  // Motor configs for both elevator motors (they do the same thing)
-  private SmartMotorControllerConfig linearConfig = new SmartMotorControllerConfig(this)
+  // Motor configs for elevator motor
+  private final SmartMotorControllerConfig linearConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
   // Mechanism Circumference is the distance traveled by each mechanism rotation converting rotations to meters.
   .withMechanismCircumference(IntakeConstants.MECH_CIRCUMFERENCE)
@@ -42,7 +46,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   .withClosedLoopController(IntakeConstants.Linear_kP, IntakeConstants.Linear_kI, IntakeConstants.Linear_kD, IntakeConstants.MAX_VELOCITY,IntakeConstants.MAX_ACCELERATION)
   .withSimClosedLoopController(IntakeConstants.Linear_kP, IntakeConstants.Linear_kI, IntakeConstants.Linear_kD, IntakeConstants.MAX_VELOCITY, IntakeConstants.MAX_ACCELERATION)
   // Feedforward Constants
-  .withFeedforward(new ElevatorFeedforward(IntakeConstants.Linear_kS, IntakeConstants.Linear_kG,IntakeConstants.Linear_kV))
+  .withFeedforward(IntakeConstants.FEED_FORWARD)
   .withSimFeedforward(new ElevatorFeedforward(IntakeConstants.Linear_kS, IntakeConstants.Linear_kG, IntakeConstants.Linear_kV))
   // Telemetry name and verbosity level
   .withTelemetry("ElevatorMotor", TelemetryVerbosity.HIGH)
@@ -51,7 +55,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   // You could also use .withGearing(12) which does the same thing.
   .withGearing(new MechanismGearing(IntakeConstants.GEARBOX))
   // Motor properties to prevent over currenting.
-  .withMotorInverted(false)
+  .withMotorInverted(IntakeConstants.MOTOR_INVERTED)
   .withIdleMode(MotorMode.BRAKE)
   .withStatorCurrentLimit(IntakeConstants.STATOR_CURRENT_LIMIT)
   .withClosedLoopRampRate(IntakeConstants.CLOSED_LOOP_RAMP_RATE)
@@ -109,21 +113,38 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
     return linearConfig.convertFromMechanism(angle_position.get());
   }
-  //Sets the elevator position
+  // Corrects the elevator position
   public void setElevatorPosition(Distance actualPosition){
     Angle encoderPosition = linearConfig.convertToMechanism(actualPosition);
     linearMotorController.setEncoderPosition(encoderPosition);
   }
 
-  /** Creates a new Elevator. */
-  public ElevatorSubsystem() {
-    
+  public Distance getElevatorHeight(){
+    return elevator.getHeight();
   }
 
+  /** Creates a new Elevator. */
+  public LinearSlide() {
+    m_fullyExtendedLimitSwitch = new DigitalInput(IntakeConstants.DEEP_BUTTON_BREAK_DIO);
+    m_fullyRetractedLimitSwitch = new DigitalInput(IntakeConstants.SHALLOW_BUTTON_BREAK_DIO);
+  }
+  public boolean extendedLimitSwitchTouched(){
+    return m_fullyExtendedLimitSwitch.get(); //TODO: Need to check behaviour
+  }
+  public boolean retractedLimitSwitchTouched(){
+    return m_fullyRetractedLimitSwitch.get(); //TODO: Need to check behaviour
+  }
+  public boolean getPrevTouchedELS(){
+    return previouslyTouchedELS;
+  }
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     elevator.updateTelemetry();
+    if (extendedLimitSwitchTouched()){
+      previouslyTouchedELS = extendedLimitSwitchTouched();
+    }
+
   }
   public void simulationPeriodic() {
     elevator.simIterate();
