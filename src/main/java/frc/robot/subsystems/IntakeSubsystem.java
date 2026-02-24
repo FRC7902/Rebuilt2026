@@ -4,21 +4,18 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Meters;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.IntakeConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
-  /** Creates a new ClimberSubsystem. */
+  /** Creates a new IntakeSubsystem. */
   private final static ElevatorSubsystem m_elevator = new ElevatorSubsystem();
   private final TalonFX m_rollerMotor;
   private final DigitalInput m_fullyRetractedLimitSwitch;
@@ -43,7 +40,6 @@ public class IntakeSubsystem extends SubsystemBase {
     return !m_fullyRetractedLimitSwitch.get();
   }
   public Command intake() {
-    
     return runOnce(() -> m_rollerMotor.set(IntakeConstants.INTAKE_SPEED));
   }
   public Command outtake() {

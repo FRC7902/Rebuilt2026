@@ -4,32 +4,21 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
+import java.util.Optional;
+
+import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.system.plant.DCMotor;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
-
-import java.util.Optional;
-
-import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
-
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
-import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ElevatorConfig;
 import yams.mechanisms.positional.Elevator;
@@ -50,8 +39,8 @@ public class ElevatorSubsystem extends SubsystemBase {
   // Mechanism Circumference is the distance traveled by each mechanism rotation converting rotations to meters.
   .withMechanismCircumference(IntakeConstants.MECH_CIRCUMFERENCE)
   // Feedback Constants (PID Constants)
-  .withClosedLoopController(IntakeConstants.Linear_kP, IntakeConstants.Linear_kI, IntakeConstants.Linear_kD, MetersPerSecond.of(0.5), MetersPerSecondPerSecond.of(0.5))
-  .withSimClosedLoopController(IntakeConstants.Linear_kP, IntakeConstants.Linear_kI, IntakeConstants.Linear_kD, MetersPerSecond.of(0.5), MetersPerSecondPerSecond.of(0.5))
+  .withClosedLoopController(IntakeConstants.Linear_kP, IntakeConstants.Linear_kI, IntakeConstants.Linear_kD, IntakeConstants.MAX_VELOCITY,IntakeConstants.MAX_ACCELERATION)
+  .withSimClosedLoopController(IntakeConstants.Linear_kP, IntakeConstants.Linear_kI, IntakeConstants.Linear_kD, IntakeConstants.MAX_VELOCITY, IntakeConstants.MAX_ACCELERATION)
   // Feedforward Constants
   .withFeedforward(new ElevatorFeedforward(IntakeConstants.Linear_kS, IntakeConstants.Linear_kG,IntakeConstants.Linear_kV))
   .withSimFeedforward(new ElevatorFeedforward(IntakeConstants.Linear_kS, IntakeConstants.Linear_kG, IntakeConstants.Linear_kV))
@@ -60,7 +49,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   // Gearing from the motor rotor to final shaft.
   // In this example GearBox.fromReductionStages(3,4) is the same as GearBox.fromStages("3:1","4:1") which corresponds to the gearbox attached to your motor.
   // You could also use .withGearing(12) which does the same thing.
-  .withGearing(new MechanismGearing(GearBox.fromReductionStages(IntakeConstants.GEAR_REDUC_1, IntakeConstants.GEAR_REDUC_2,IntakeConstants.GEAR_REDUC_3)))
+  .withGearing(new MechanismGearing(IntakeConstants.GEARBOX))
   // Motor properties to prevent over currenting.
   .withMotorInverted(false)
   .withIdleMode(MotorMode.BRAKE)
@@ -126,19 +115,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     linearMotorController.setEncoderPosition(encoderPosition);
   }
 
-  /** Creates a new Climber. */
+  /** Creates a new Elevator. */
   public ElevatorSubsystem() {
-    // m_elevatorFollowerMotor.setControl(new Follower(ClimbConstants.LEADER_MOTOR_CAN_ID, MotorAlignmentValue.Opposed));
+    
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     elevator.updateTelemetry();
-    // System.out.println("Elevator: " + isAtTargetHeight());
-    // System.out.println("Elevator Setpoint: " + m_heightSetpoint);
-    // System.out.println("Current Height: " + elevator.getHeight());
-    // System.out.println("Elevator Compare" + elevator.getHeight().minus(m_heightSetpoint));
   }
   public void simulationPeriodic() {
     elevator.simIterate();
