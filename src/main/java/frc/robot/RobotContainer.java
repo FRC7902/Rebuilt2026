@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Commands.RotationLockCommand;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.Subsystems.SwerveSusbystem;
+import frc.robot.subsystems.SwerveSusbystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
 import frc.robot.Constants.IntakeConstants;
@@ -38,7 +38,7 @@ import static edu.wpi.first.units.Units.Meters;
 public class RobotContainer {
   public final static SwerveSusbystem drivebase  = new SwerveSusbystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve"));
-  CommandPS4Controller m_driverController = new CommandPS4Controller(0);
+  CommandXboxController m_driverController = new CommandXboxController(0);
   LinearSlide DLI = new LinearSlide();
   Rollers rollers = new Rollers();
 
@@ -139,22 +139,26 @@ public class RobotContainer {
     // Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
     // Command driveSetpointGenKeyboard = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleKeyboard);
 
-    // drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
     // test bindings, more to be added later
-    m_driverController.circle().onTrue(DLI.setHeight(Meters.of(Units.inchesToMeters(13))));
+    // m_driverController.circle().onTrue(DLI.setHeight(Meters.of(Units.inchesToMeters(13))));
     // m_driverController.cross().onTrue(DLI.setHeight(Meters.of(0)));
     // intaking sequence
-    m_driverController.triangle().onTrue(new SequentialCommandGroup(
-      DLI.setHeight(IntakeConstants.EXTEND_SETPOINT),
-      rollers.intake()
-    ));
-    // retracting sequence
-    m_driverController.cross().onTrue(new SequentialCommandGroup(
-      rollers.stopRollers(),
-      DLI.setHeight(IntakeConstants.RETRACT_SETPOINT)
-    ));
-    DLI.protectIntake();
+    // m_driverController.triangle().onTrue(new SequentialCommandGroup(
+    //   DLI.setHeight(IntakeConstants.EXTEND_SETPOINT),
+    //   rollers.intake()
+    // ));
+    // // retracting sequence
+    // m_driverController.cross().onTrue(new SequentialCommandGroup(
+    //   rollers.stopRollers(),
+    //   DLI.setHeight(IntakeConstants.RETRACT_SETPOINT)
+    // ));
+    // DLI.protectIntake();
+    m_driverController.povUp().whileTrue(drivebase.driveForward());
+    m_driverController.povDown().whileTrue(drivebase.driveBackward());
+    m_driverController.povLeft().whileTrue(drivebase.driveLeft());
+    m_driverController.povRight().whileTrue(drivebase.driveRight());  
   }
 
   public Command getAutonomousCommand() {

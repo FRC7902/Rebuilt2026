@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.Subsystems;
+package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Meter;
 
@@ -269,7 +269,7 @@ public class SwerveSusbystem extends SubsystemBase {
   public Command driveForward()
   {
     return run(() -> {
-      swerveDrive.drive(new Translation2d(1, 0), 0, false, false);
+      swerveDrive.drive(new Translation2d(-1, 0), 0, false, false);
     }).finallyDo(() -> swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
   }
 
@@ -634,6 +634,41 @@ public class SwerveSusbystem extends SubsystemBase {
     public void toggleRampSpeedDriveMode(){
 
     }
+ 
+    /**
+     * Returns a Command that tells the robot to drive backward until the command
+     * ends.
+     * 
+     * @return a Command that tells the robot to drive backward until the command
+     *         ends
+     */
+    public Command driveBackward() {
+        return run(() -> {
+            swerveDrive.drive(new Translation2d(1, 0), 0, false, false);
+        }).finallyDo(() -> swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
+    }
+ 
+    /**
+     * Returns a Command that tells the robot to drive left until the command ends.
+     * 
+     * @return a Command that tells the robot to drive left until the command ends
+     */
+    public Command driveLeft() {
+        return run(() -> {
+            swerveDrive.drive(new Translation2d(0, -1), 0, false, false);
+        }).finallyDo(() -> swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
+    }
+ 
+    /**
+     * Returns a Command that tells the robot to drive right until the command ends.
+     * 
+     * @return a Command that tells the robot to drive right until the command ends
+     */
+    public Command driveRight() {
+        return run(() -> {
+            swerveDrive.drive(new Translation2d(0, 1), 0, false, false);
+        }).finallyDo(() -> swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
+    }
 
     @Override
     public void periodic() {
@@ -641,6 +676,7 @@ public class SwerveSusbystem extends SubsystemBase {
         SmartDashboard.putNumber("Swerve - Gyro angle rotation (rad)",
                 swerveDrive.getGyro().getRotation3d().getAngle());
         SmartDashboard.putString("Swerve - Robo Pose2D", swerveDrive.getPose().toString());
+        
 
     }
 }
