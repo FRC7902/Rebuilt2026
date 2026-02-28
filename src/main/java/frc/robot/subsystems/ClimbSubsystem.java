@@ -24,6 +24,23 @@ public class ClimbSubsystem extends SubsystemBase {
         m_tongue = new TongueSubsystem();
     }
 
+    // Test Commands
+    public Command setHeight2() {
+        return m_elevator.setHeight(ClimbConstants.ElevatorConstants.MAX_HEIGHT);
+    }
+
+    public Command setHeight3() {
+        return m_elevator.setHeight(ClimbConstants.ElevatorConstants.MIN_HEIGHT);
+    }
+
+    public Command setHeight4() {
+        return m_tongue.extend();
+    }
+
+    public Command setHeight5() {
+        return m_tongue.retract();
+    }
+
     /**
      * 1. Elevator starts at 0m height
      * 2. Bring elevator to max height to grab the first (lowest) rung
@@ -31,18 +48,8 @@ public class ClimbSubsystem extends SubsystemBase {
      */
     public Command climbL1() {
         return new SequentialCommandGroup(
-            new InstantCommand(() -> {System.out.println("L1 Command");}),
-            m_elevator.setHeight(ClimbConstants.ElevatorConstants.MAX_HEIGHT),
-            m_elevator.setHeight(ClimbConstants.ElevatorConstants.SETPOINT_3)
-        );
-    }
-
-    public Command setHeight2() {
-        return m_elevator.setHeight(ClimbConstants.ElevatorConstants.MAX_HEIGHT);
-    }
-
-    public Command setHeight3() {
-        return m_elevator.setHeight(ClimbConstants.ElevatorConstants.MIN_HEIGHT);
+                m_elevator.setHeight(ClimbConstants.ElevatorConstants.MAX_HEIGHT),
+                m_elevator.setHeight(ClimbConstants.ElevatorConstants.SETPOINT_3));
     }
 
     /**
@@ -54,14 +61,12 @@ public class ClimbSubsystem extends SubsystemBase {
      */
     public Command climbL2() {
         return new SequentialCommandGroup(
-            new InstantCommand(() -> {System.out.println("L2 Command");}),
-            climbL1(),
-            m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_1),
-            m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.MAX_HEIGHT),
-            m_tongue.extend(),
-            m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_2),
-            m_tongue.retract()
-        );
+                climbL1(),
+                m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_1),
+                m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.MAX_HEIGHT),
+                m_tongue.extend(),
+                m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_2),
+                m_tongue.retract());
     }
 
     /**
@@ -73,13 +78,54 @@ public class ClimbSubsystem extends SubsystemBase {
      */
     public Command climbL3() {
         return new SequentialCommandGroup(
-            new InstantCommand(() -> {System.out.println("L3 Command");}),
-            climbL2(),
-            m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_1),
-            m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.MAX_HEIGHT),
-            m_tongue.extend(),
-            m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_2),
-            m_tongue.retract()
-        );
+                climbL2(),
+                m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_1),
+                m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.MAX_HEIGHT),
+                m_tongue.extend(),
+                m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_2),
+                m_tongue.retract());
+    }
+
+    /**
+     * Reverse L1: Bring elevator back up to max, then back to starting position
+     */
+    public Command reverseL1() {
+        return new SequentialCommandGroup(
+                m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.MAX_HEIGHT),
+                m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.MIN_HEIGHT));
+    }
+
+    /**
+     * Reverse L2: Undo L2 steps in reverse order
+     * 1. Extend tongue
+     * 2. Bring elevator back up to max height
+     * 3. Retract tongue
+     * 4. Bring elevator down to S1
+     * 5. Then reverse L1
+     */
+    public Command reverseL2() {
+        return new SequentialCommandGroup(
+                m_tongue.extend(),
+                m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.MAX_HEIGHT),
+                m_tongue.retract(),
+                m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_1),
+                reverseL1());
+    }
+
+    /**
+     * Reverse L3: Undo L3 steps in reverse order
+     * 1. Extend tongue
+     * 2. Bring elevator back up to max height
+     * 3. Retract tongue
+     * 4. Bring elevator down to S1
+     * 5. Then reverse L2
+     */
+    public Command reverseL3() {
+        return new SequentialCommandGroup(
+                m_tongue.extend(),
+                m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.MAX_HEIGHT),
+                m_tongue.retract(),
+                m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_1),
+                reverseL2());
     }
 }
