@@ -4,10 +4,6 @@
 
 package frc.robot;
 
-import java.io.File;
-
-import choreo.auto.AutoChooser;
-import choreo.auto.AutoFactory;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,6 +16,16 @@ import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.choreo.ChoreoVars;
 import frc.robot.subsystems.choreo.Routines;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Commands.RotationLockCommand;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.SwerveSusbystem;
+import java.io.File;
+
+import choreo.auto.AutoChooser;
+import choreo.auto.AutoFactory;
+import swervelib.SwerveInputStream;
 
 public class RobotContainer {
   private final static SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(

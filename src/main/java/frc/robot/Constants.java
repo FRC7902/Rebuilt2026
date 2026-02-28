@@ -6,26 +6,19 @@ package frc.robot;
 
 import edu.wpi.first.math.util.Units;
 
-/**
- * The Constants class provides a convenient place for teams to hold robot-wide
- * numerical or boolean
- * constants. This class should not be used for any other purpose. All constants
- * should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
- * <p>
- * It is advised to statically import this class (or one of its inner classes)
- * wherever the
- * constants are needed, to reduce verbosity.
- */
-public final class Constants {
-    public static class OperatorConstants {
-        public static final int DRIVER_CONTROLLER_PORT = 0;
-        public static final int OPERATOR_CONTROLLER_PORT = 1;
-        public static final double DEADBAND = 0.15;
-    }
+/** Add your docs here. */
+public class Constants {
 
-    // TODO: Change these as well
+  public static class OperatorConstants
+  {
+
+    // Joystick Deadband
+    public static final double DEADBAND        = 0.1;
+    public static final double LEFT_Y_DEADBAND = 0.1;
+    public static final double RIGHT_X_DEADBAND = 0.1;
+    public static final double TURN_CONSTANT    = 6;
+  }
+
     public static class SwerveConstants {
         public static final double MAX_SPEED = Units.feetToMeters(30);
 
@@ -33,6 +26,17 @@ public final class Constants {
         public static final double MIN_TRANSLATION_SPEED_SCALE = 0.175; // Minimum speed scaling factor for joystick input
         public static final double MIN_ROTATION_SPEED_SCALE = 0.25; // Minimum speed scaling factor for joystick input
 
-        public static final double FAST_DRIVE_RAMP_RATE = 0.15;
+        public static final double SLOW_SPEED_DRIVE_RATE = 0.25;
+        public static final double RAMP_SPEED_DRIVE_RATE = 0.25;
+    }
+public static class PathPlanner {
+        public static final double kPDrive = 1.95;
+        public static final double kIDrive = 0;
+        public static final double kDDrive = 0.01;
+
+        public static final double kPAngle = 2.6;
+        public static final double kIAngle = 0;
+        public static final double kDAngle = 0.01;
+
     }
 }
