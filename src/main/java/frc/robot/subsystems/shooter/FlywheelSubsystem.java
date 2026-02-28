@@ -1,24 +1,28 @@
 package frc.robot.subsystems.shooter;
 
+import java.util.function.Supplier;
+
+import com.ctre.phoenix6.hardware.TalonFX;
+
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.ShooterConstants;
-
-import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ShooterConstants;
 import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.velocity.FlyWheel;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.remote.TalonFXWrapper;
-
-import java.util.function.Supplier;
-
-import static edu.wpi.first.units.Units.*;
 
 public class FlywheelSubsystem extends SubsystemBase {
 	private final TalonFX flywheelMotorLeft = new TalonFX(ShooterConstants.FLYWHEEL_LEFT_ID);
@@ -36,7 +40,8 @@ public class FlywheelSubsystem extends SubsystemBase {
 			.withFeedforward(new SimpleMotorFeedforward(ShooterConstants.FLYWHEEL_KS, ShooterConstants.FLYWHEEL_KV, ShooterConstants.FLYWHEEL_KA))
 			.withSimFeedforward(new SimpleMotorFeedforward(ShooterConstants.FLYWHEEL_KS, ShooterConstants.FLYWHEEL_KV, ShooterConstants.FLYWHEEL_KA))
 			.withControlMode(SmartMotorControllerConfig.ControlMode.CLOSED_LOOP)
-			.withFollowers(Pair.of(flywheelMotorRight, true));
+			.withFollowers(Pair.of(flywheelMotorRight, true))
+			.withMomentOfInertia(ShooterConstants.FLYWHEEL_MOI);
 
 	private final SmartMotorController motor = new TalonFXWrapper(flywheelMotorLeft, DCMotor.getKrakenX60Foc(2), motorConfig);
 
@@ -46,6 +51,7 @@ public class FlywheelSubsystem extends SubsystemBase {
 			.withSoftLimit(ShooterConstants.FLYWHEEL_MAX_VELOCITY.times(-1), ShooterConstants.FLYWHEEL_MAX_VELOCITY)
 			.withSpeedometerSimulation(ShooterConstants.FLYWHEEL_MAX_VELOCITY)
 			.withMOI(ShooterConstants.FLYWHEEL_MOI);
+	
 
 	private final FlyWheel flywheel = new FlyWheel(flywheelConfig);
 

@@ -3,17 +3,12 @@ package frc.robot.subsystems.shooter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.*;
-
-import frc.robot.Constants.ShooterConstants;
-
-import java.util.function.Supplier;
-
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ShooterSubsystem extends SubsystemBase {
 	//initialise required subsystems
@@ -103,8 +98,9 @@ public class ShooterSubsystem extends SubsystemBase {
 	public void stopFeeder(){
 		feederSubsystem.stop();
 	}
-
-
+	public Angle getHoodAngle(){
+		return hoodSubsystem.getAngle();
+	}
 	//Hood aiming
 	public Command aimAtDistanceHub(double distanceInches){
 		return hoodSubsystem.setAngle(hoodAngleMapHub.get(distanceInches).getMeasure());
@@ -130,6 +126,9 @@ public class ShooterSubsystem extends SubsystemBase {
 		}
 
 		return flywheelSubsystem.setAngularVelocity(velocity);
+	}
+	public AngularVelocity getAngularVelocity(){
+		return flywheelSubsystem.getAngularVelocity();
 	}
 
 	public static void toggleContinuousShooting(){
