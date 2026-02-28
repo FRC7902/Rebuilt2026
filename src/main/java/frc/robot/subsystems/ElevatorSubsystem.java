@@ -1,6 +1,12 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.system.plant.DCMotor;
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Pounds;
@@ -14,7 +20,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import frc.robot.Constants.ClimbConstants;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
@@ -42,15 +47,17 @@ public class ElevatorSubsystem extends SubsystemBase {
                 .withControlMode(ControlMode.CLOSED_LOOP)
                 .withMechanismCircumference(Meters.of(Inches.of(0.25).in(Meters) * 22))
                 .withClosedLoopController(ClimbConstants.ElevatorConstants.kP, ClimbConstants.ElevatorConstants.kI,
-                        ClimbConstants.ElevatorConstants.kD, ClimbConstants.ElevatorConstants.MAX_VELOCITY, ClimbConstants.ElevatorConstants.MAX_ACCELERATION)
+                        ClimbConstants.ElevatorConstants.kD, ClimbConstants.ElevatorConstants.MAX_VELOCITY,
+                        ClimbConstants.ElevatorConstants.MAX_ACCELERATION)
                 .withSimClosedLoopController(ClimbConstants.ElevatorConstants.kP, ClimbConstants.ElevatorConstants.kI,
-                        ClimbConstants.ElevatorConstants.kD, ClimbConstants.ElevatorConstants.MAX_VELOCITY, ClimbConstants.ElevatorConstants.MAX_ACCELERATION)
+                        ClimbConstants.ElevatorConstants.kD, ClimbConstants.ElevatorConstants.MAX_VELOCITY,
+                        ClimbConstants.ElevatorConstants.MAX_ACCELERATION)
                 .withFeedforward(new ElevatorFeedforward(ClimbConstants.ElevatorConstants.kS,
                         ClimbConstants.ElevatorConstants.kG, ClimbConstants.ElevatorConstants.kV))
                 .withSimFeedforward(new ElevatorFeedforward(ClimbConstants.ElevatorConstants.kS,
                         ClimbConstants.ElevatorConstants.kG, ClimbConstants.ElevatorConstants.kV))
                 .withTelemetry("ClimbFollower", TelemetryVerbosity.HIGH)
-                .withGearing(new MechanismGearing(GearBox.fromReductionStages(12,1)))
+                .withGearing(new MechanismGearing(GearBox.fromReductionStages(12, 1)))
                 .withMotorInverted(true) // Opposite side of the elevator
                 .withIdleMode(MotorMode.BRAKE)
                 .withStatorCurrentLimit(Amps.of(ClimbConstants.ElevatorConstants.STATOR_CURRENT_LIMIT))
@@ -65,9 +72,11 @@ public class ElevatorSubsystem extends SubsystemBase {
                 .withControlMode(ControlMode.CLOSED_LOOP)
                 .withMechanismCircumference(Meters.of(Inches.of(0.25).in(Meters) * 22))
                 .withClosedLoopController(ClimbConstants.ElevatorConstants.kP, ClimbConstants.ElevatorConstants.kI,
-                        ClimbConstants.ElevatorConstants.kD, ClimbConstants.ElevatorConstants.MAX_VELOCITY, ClimbConstants.ElevatorConstants.MAX_ACCELERATION)
+                        ClimbConstants.ElevatorConstants.kD, ClimbConstants.ElevatorConstants.MAX_VELOCITY,
+                        ClimbConstants.ElevatorConstants.MAX_ACCELERATION)
                 .withSimClosedLoopController(ClimbConstants.ElevatorConstants.kP, ClimbConstants.ElevatorConstants.kI,
-                        ClimbConstants.ElevatorConstants.kD, ClimbConstants.ElevatorConstants.MAX_VELOCITY, ClimbConstants.ElevatorConstants.MAX_ACCELERATION)
+                        ClimbConstants.ElevatorConstants.kD, ClimbConstants.ElevatorConstants.MAX_VELOCITY,
+                        ClimbConstants.ElevatorConstants.MAX_ACCELERATION)
                 .withFeedforward(new ElevatorFeedforward(ClimbConstants.ElevatorConstants.kS,
                         ClimbConstants.ElevatorConstants.kG, ClimbConstants.ElevatorConstants.kV))
                 .withSimFeedforward(new ElevatorFeedforward(ClimbConstants.ElevatorConstants.kS,
@@ -84,8 +93,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_leaderMotor = new TalonFXWrapper(
                 new TalonFX(ClimbConstants.ElevatorConstants.LEADER_MOTOR_CAN_ID), DCMotor.getFalcon500(1),
                 m_leaderConfig);
-
-        
 
         m_elevConfig = new ElevatorConfig(m_leaderMotor)
                 .withStartingHeight(ClimbConstants.ElevatorConstants.STARTING_HEIGHT)
@@ -116,6 +123,10 @@ public class ElevatorSubsystem extends SubsystemBase {
      */
     public Command setHeightAndStop(Distance height) {
         return m_elevator.runTo(height, ClimbConstants.ElevatorConstants.TOLERANCE);
+    }
+
+    public Distance getHeight() {
+        return m_elevator.getHeight();
     }
 
     /**

@@ -3,10 +3,8 @@ package frc.robot.subsystems;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import frc.robot.Constants.ClimbConstants;
 
 /**
@@ -30,15 +28,13 @@ public class ClimbSubsystem extends SubsystemBase {
         return m_elevator.setHeight(k);
     }
 
-
     public Command setTongueLength(Distance k) {
         return m_tongue.setLength(k);
     }
 
     public Command runTongueTest() {
         return new SequentialCommandGroup(
-                m_tongue.setLength(ClimbConstants.TongueConstants.MAX_LENGTH)
-        );
+                m_tongue.setLength(ClimbConstants.TongueConstants.MAX_LENGTH));
     }
 
     /**
@@ -127,5 +123,9 @@ public class ClimbSubsystem extends SubsystemBase {
                 m_tongue.setLength(ClimbConstants.TongueConstants.MIN_LENGTH),
                 m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_1),
                 reverseL2());
+    }
+
+    public Distance getElevatorHeight() {
+        return m_elevator.getHeight();
     }
 }
