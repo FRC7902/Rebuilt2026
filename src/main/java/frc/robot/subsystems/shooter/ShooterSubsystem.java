@@ -90,7 +90,6 @@ public class ShooterSubsystem extends SubsystemBase {
 	private static boolean shootContinuous = false;
 
 	//Necessary variables
-	private Supplier<AngularVelocity> flywheelVelocitySupplier = () -> DegreesPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_SUPPLIER);
 
 	public ShooterSubsystem() {
 		hoodSubsystem = new HoodSubsystem();
@@ -121,13 +120,6 @@ public class ShooterSubsystem extends SubsystemBase {
 	}
 
 	//Shooter Commands
-	public Command runShooter(){
-		if(flywheelVelocitySupplier == null){
-			DriverStation.reportWarning("Shooter velocity set to null, not running shooter", true);
-			return flywheelSubsystem.idle();
-		}
-		return flywheelSubsystem.setAngularVelocity(flywheelVelocitySupplier);
-	}
 	public Command stopShooter(){
 		return flywheelSubsystem.setAngularVelocity(DegreesPerSecond.of(0));
 	}
@@ -138,9 +130,6 @@ public class ShooterSubsystem extends SubsystemBase {
 		}
 
 		return flywheelSubsystem.setAngularVelocity(velocity);
-	}
-	public void setVelocitySupplier(Supplier<AngularVelocity> velocitySupplier) {
-		this.flywheelVelocitySupplier = velocitySupplier;
 	}
 
 	public static void toggleContinuousShooting(){

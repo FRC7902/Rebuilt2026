@@ -36,18 +36,24 @@ public class FlywheelSubsystem extends SubsystemBase {
 			.withFeedforward(new SimpleMotorFeedforward(ShooterConstants.FLYWHEEL_KS, ShooterConstants.FLYWHEEL_KV, ShooterConstants.FLYWHEEL_KA))
 			.withSimFeedforward(new SimpleMotorFeedforward(ShooterConstants.FLYWHEEL_KS, ShooterConstants.FLYWHEEL_KV, ShooterConstants.FLYWHEEL_KA))
 			.withControlMode(SmartMotorControllerConfig.ControlMode.CLOSED_LOOP)
-			.withFollowers(Pair.of(flywheelMotorRight, false));
+			.withFollowers(Pair.of(flywheelMotorRight, true));
 
 	private final SmartMotorController motor = new TalonFXWrapper(flywheelMotorLeft, DCMotor.getKrakenX60Foc(2), motorConfig);
 
 	private final FlyWheelConfig flywheelConfig = new FlyWheelConfig(motor)
 			.withDiameter(ShooterConstants.FLYWHEEL_DIAMETER)
-			.withMass(ShooterConstants.FLYWHEEL_MASS)
 			.withTelemetry("FlywheelMech", SmartMotorControllerConfig.TelemetryVerbosity.LOW)
-			.withSoftLimit(ShooterConstants.FLYWHEEL_LIMIT_LOW, ShooterConstants.FLYWHEEL_LIMIT_HIGH)
-			.withSpeedometerSimulation(ShooterConstants.FLYWHEEL_MAX_VELOCITY);
+			.withSoftLimit(ShooterConstants.FLYWHEEL_MAX_VELOCITY.times(-1), ShooterConstants.FLYWHEEL_MAX_VELOCITY)
+			.withSpeedometerSimulation(ShooterConstants.FLYWHEEL_MAX_VELOCITY)
+			.withMOI(ShooterConstants.FLYWHEEL_MOI);
 
 	private final FlyWheel flywheel = new FlyWheel(flywheelConfig);
+
+	public Command stop() {
+        return this.runOnce(() -> {
+            motor.setVoltage(Volts.of(0));
+        });
+    }
 
 	public FlywheelSubsystem()
 	{
