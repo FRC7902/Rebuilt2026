@@ -24,6 +24,7 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -269,7 +270,7 @@ public class SwerveSusbystem extends SubsystemBase {
   public Command driveForward()
   {
     return run(() -> {
-      swerveDrive.drive(new Translation2d(-1, 0), 0, false, false);
+      swerveDrive.drive(new Translation2d(1, 0), 0, false, false);
     }).finallyDo(() -> swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
   }
 
@@ -644,7 +645,7 @@ public class SwerveSusbystem extends SubsystemBase {
      */
     public Command driveBackward() {
         return run(() -> {
-            swerveDrive.drive(new Translation2d(1, 0), 0, false, false);
+            swerveDrive.drive(new Translation2d(-1, 0), 0, false, false);
         }).finallyDo(() -> swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
     }
  
@@ -655,7 +656,7 @@ public class SwerveSusbystem extends SubsystemBase {
      */
     public Command driveLeft() {
         return run(() -> {
-            swerveDrive.drive(new Translation2d(0, -1), 0, false, false);
+            swerveDrive.drive(new Translation2d(0, 1), 0, false, false);
         }).finallyDo(() -> swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
     }
  
@@ -666,7 +667,7 @@ public class SwerveSusbystem extends SubsystemBase {
      */
     public Command driveRight() {
         return run(() -> {
-            swerveDrive.drive(new Translation2d(0, 1), 0, false, false);
+            swerveDrive.drive(new Translation2d(0, -1), 0, false, false);
         }).finallyDo(() -> swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
     }
 
