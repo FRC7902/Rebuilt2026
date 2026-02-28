@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Commands.RotationLockCommand;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.SwerveSusbystem;
+import frc.robot.subsystems.SwerveSubsystem;
 import java.io.File;
 
 import choreo.auto.AutoChooser;
@@ -32,9 +32,9 @@ public class RobotContainer {
     new File(Filesystem.getDeployDirectory(), "swerve"));
 
   private final static CommandXboxController m_driverController = new CommandXboxController(
-            OperatorConstants.DRIVER_CONTROLLER_PORT);
+            0);
   private final static CommandXboxController m_operatorController = new CommandXboxController(
-          OperatorConstants.OPERATOR_CONTROLLER_PORT);
+          0);
   
   public static final AutoFactory autoFactory = new AutoFactory(
       m_swerveSubsystem::getPose,
