@@ -13,7 +13,6 @@ public class Indexer {
     }
 
     public void setSpeed(double speed) {
-        currentSpeed = speed;
         m_indexerMotor.set(speed);
     }
 
