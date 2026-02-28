@@ -57,11 +57,11 @@ public class Constants {
     public static final double kDAngle = 0.01;
 
   }
-
-public static class IntakeConstants {
+  public static class IntakeConstants {
         // elevator setpoints
-        public static Distance RETRACT_SETPOINT = Meters.of(Units.inchesToMeters(0));
-        public static Distance EXTEND_SETPOINT = Meters.of(Units.inchesToMeters(16.325));
+        public static Distance RETRACT_SETPOINT = Meters.of(0.015);
+        public static Distance MID_SETPOINT = Meters.of(0.154995);
+        public static Distance EXTEND_SETPOINT = Meters.of(0.33 - 0.0127);
         // limit switch constants
         public static int RETRACTED_LIMIT_SWITCH_DIO = 1;
         public static int EXTENDED_LIMIT_SWITCH_DIO = 2;
@@ -80,33 +80,34 @@ public static class IntakeConstants {
         public static double Sim_kI = 0;
         public static double Sim_kD = 0;
 
-        public static Time CLOSED_LOOP_RAMP_RATE = Seconds.of(0.25);
-         public static Time OPEN_LOOP_RAMP_RATE = Seconds.of(0.25);
+        public static Time CLOSED_LOOP_RAMP_RATE = Seconds.of(0.1);
+        public static Time OPEN_LOOP_RAMP_RATE = Seconds.of(0.1);
         // Velocity + Acceleration
-        public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(1); // TODO
-        public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(5); // TODO
+        public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(1); // TODO change back to 2
+        public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(6.5); // TODO
         // Feedfoward Constants Linear Actuator
         public static double Linear_kS = 0;
         public static double Linear_kG = 0;
         public static double Linear_kV = 0;
         public static ElevatorFeedforward FEED_FORWARD = new ElevatorFeedforward(0.28669, 0,0.60431, 0.021882); // TODO: kg
         // Current Limits
-        public static Current STATOR_CURRENT_LIMIT = Amps.of(10); //TODO: Change this
+        public static Current STATOR_CURRENT_LIMIT = Amps.of(40); //TODO: Change this
+        public static Current SUPPLY_CURRENT_LIMIT = Amps.of(30); //TODO: Change this
         // Elevator Config Constants
-        public static Distance STARTING_HEIGHT = Meters.of(0.5);
-        public static Distance MIN_HARD_LIMIT = Meters.of(0);
-        public static Distance MAX_HARD_LIMIT = Meters.of(0.3333);
+        public static Distance STARTING_HEIGHT = Meters.of(0);
+        public static Distance MIN_HARD_LIMIT = Meters.of(0.015);
+        public static Distance MAX_HARD_LIMIT = Meters.of(0.33);
         public static Mass DLI_MASS = Pounds.of(6.825);
         public static Angle DLI_ANGLE = Degrees.of(360 - 24.16);
         public static Distance MECH_CIRCUMFERENCE = Inches.of(Math.PI);
-        public static boolean MOTOR_INVERTED = false;
+        public static boolean MOTOR_INVERTED = true;
         // Gear Reduction Constants
         public static final GearBox GEARBOX = GearBox.fromStages("54:16", "18:12");
     }
     public static class RollerConstants {
         public static double INTAKE_SPEED = 1;
         public static double OUTAKE_SPEED = -1;
-        public static int ROLLER_MOTOR_CAN_ID = 8;
+        public static int ROLLER_MOTOR_PWM_ID = 1;
         // Current Limits
         public static double STATOR_CURRENT_LIMIT = 50.0;
         public static double SUPPLY_CURRENT_LIMIT = 30.0;

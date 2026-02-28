@@ -23,21 +23,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Commands.RotationLockCommand;
+import frc.robot.commands.RotationLockCommand;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.SwerveSusbystem;
+import frc.robot.Subsystems.SwerveSusbystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
 import frc.robot.Constants.IntakeConstants;
-import frc.robot.subsystems.LinearSlide;
-import frc.robot.subsystems.Rollers;
-
-import static edu.wpi.first.units.Units.Meters;
+import frc.robot.Subsystems.LinearSlide;
+import frc.robot.Subsystems.Rollers;
 
 public class RobotContainer {
   public final static SwerveSusbystem drivebase  = new SwerveSusbystem(new File(Filesystem.getDeployDirectory(),
@@ -59,7 +58,6 @@ public class RobotContainer {
                                                             .deadband(OperatorConstants.DEADBAND)
                                                             .scaleTranslation(0.8)
                                                             .allianceRelativeControl(true);
-
   /**
    * Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
    */
@@ -143,7 +141,8 @@ public class RobotContainer {
     // Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
     // Command driveSetpointGenKeyboard = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleKeyboard);
 
-    drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    //drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    //TODO: uncomment the above
 
     // test bindings, more to be added later
     // m_driverController.circle().onTrue(DLI.setHeight(Meters.of(Units.inchesToMeters(13))));
@@ -164,6 +163,16 @@ public class RobotContainer {
     m_driverController.povLeft().whileTrue(drivebase.driveLeft());
     m_driverController.povRight().whileTrue(drivebase.driveRight());  
     m_driverController.a().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
+
+    // m_driverController.leftBumper().onTrue(
+    //   new ParallelCommandGroup(
+    //     DLI.setHeight(IntakeConstants.EXTEND_SETPOINT),
+    //     rollers.intake()))
+    //     .onFalse(new SequentialCommandGroup(
+    //     DLI.setHeight(IntakeConstants.MID_SETPOINT),
+    //     rollers.stopRollers()));
+    // TODO: Make the DLI weaker so that we don't destroy the rack...again
+    m_driverController.rightBumper().onTrue(rollers.intake()).onFalse(rollers.stopRollers());
   }
 
   public Command getAutonomousCommand() {
