@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter;
 
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.Pair;
@@ -9,12 +10,14 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
@@ -25,8 +28,8 @@ import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class FlywheelSubsystem extends SubsystemBase {
-	private final TalonFX flywheelMotorLeft = new TalonFX(ShooterConstants.FLYWHEEL_LEFT_ID);
-	private final TalonFX flywheelMotorRight = new TalonFX(ShooterConstants.FLYWHEEL_RIGHT_ID);
+	private final TalonFX flywheelMotorLeft = new TalonFX(ShooterConstants.FLYWHEEL_LEADER_ID);
+	private final TalonFX flywheelMotorRight = new TalonFX(ShooterConstants.FLYWHEEL_FOLLOWER_ID);
 
 	private final SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
 			.withClosedLoopController(ShooterConstants.FLYWHEEL_KP, ShooterConstants.FLYWHEEL_KI, ShooterConstants.FLYWHEEL_KD, ShooterConstants.FLYWHEEL_MAX_VELOCITY, ShooterConstants.FLYWHEEL_MAX_ACCELERATION)
@@ -56,6 +59,7 @@ public class FlywheelSubsystem extends SubsystemBase {
 	private final FlyWheel flywheel = new FlyWheel(flywheelConfig);
 
 	public Command stop() {
+		flywheel.setSpeed(RPM.of(0));
         return this.runOnce(() -> {
             motor.setVoltage(Volts.of(0));
         });
@@ -92,13 +96,18 @@ public class FlywheelSubsystem extends SubsystemBase {
 
 	public Command sysId()
 	{
-		return flywheel.sysId(Volts.of(10), Volts.of(1).per(Second), Seconds.of(5));
+		return flywheel.sysId(Volts.of(10), Volts.of(1).per(Second), Seconds.of(20))
+		.beforeStarting(() -> SignalLogger.start()).finallyDo(() -> SignalLogger.stop());
 	}
 
 	@Override
 	public void periodic()
 	{
 		flywheel.updateTelemetry();
+		SmartDashboard.putNumber("Flywheel velocity", flywheel.getSpeed().in(RPM));
+		SmartDashboard.putNumber("Flywheel velocity setpoint", motor.getMechanismSetpointVelocity().map(
+			setpoint -> setpoint.in(RPM)).orElse(Double.NaN)
+			);
 	}
 
 	@Override

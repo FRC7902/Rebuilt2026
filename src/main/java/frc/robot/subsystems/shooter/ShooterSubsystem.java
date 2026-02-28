@@ -98,6 +98,9 @@ public class ShooterSubsystem extends SubsystemBase {
 	public void stopFeeder(){
 		feederSubsystem.stop();
 	}
+	public Command stopFlyWheel(){
+		return flywheelSubsystem.stop();
+	}
 	public Angle getHoodAngle(){
 		return hoodSubsystem.getAngle();
 	}
@@ -137,5 +140,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
 	public static boolean isHopperAlmostEmpty(){
 		return FeederSubsystem.isHopperAlmostEmpty();
+	}
+	public Command sysIdFlywheel(){
+		return flywheelSubsystem.sysId();
 	}
 }
