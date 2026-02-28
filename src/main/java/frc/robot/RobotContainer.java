@@ -29,14 +29,16 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.RotationLockCommand;
+import frc.robot.Commands.RotationLockCommand;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.Subsystems.SwerveSusbystem;
+import frc.robot.subsystems.SwerveSusbystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
+import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
-import frc.robot.Subsystems.LinearSlide;
-import frc.robot.Subsystems.Rollers;
+import frc.robot.subsystems.Indexer;
+import frc.robot.subsystems.LinearSlide;
+import frc.robot.subsystems.Rollers;
 
 public class RobotContainer {
   public final static SwerveSusbystem drivebase  = new SwerveSusbystem(new File(Filesystem.getDeployDirectory(),
@@ -44,6 +46,7 @@ public class RobotContainer {
   CommandXboxController m_driverController = new CommandXboxController(0);
   LinearSlide DLI = new LinearSlide();
   Rollers rollers = new Rollers();
+  Indexer m_indexer = new Indexer();
 
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
@@ -128,7 +131,7 @@ public class RobotContainer {
     // m_driverController.start().onTrue(new RotationLockCommand());
 
     //toggling the slow
-    
+    m_indexer.setDefaultCommand(m_indexer.suckBalls(IndexerConstants.AGGRESIVE_MOTOR_SPEED));
   }
 
   private void configureBindings()
@@ -141,7 +144,7 @@ public class RobotContainer {
     // Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
     // Command driveSetpointGenKeyboard = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleKeyboard);
 
-    //drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     //TODO: uncomment the above
 
     // test bindings, more to be added later
@@ -173,6 +176,7 @@ public class RobotContainer {
     //     rollers.stopRollers()));
     // TODO: Make the DLI weaker so that we don't destroy the rack...again
     m_driverController.rightBumper().onTrue(rollers.intake()).onFalse(rollers.stopRollers());
+    m_driverController.leftBumper().onTrue(rollers.outtake()).onFalse(rollers.stopRollers());
   }
 
   public Command getAutonomousCommand() {

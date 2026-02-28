@@ -37,7 +37,7 @@ public class Constants {
   }
 
   public static class SwerveConstants {
-    public static final double MAX_SPEED = Units.feetToMeters(5);
+    public static final double MAX_SPEED = Units.feetToMeters(20);
 
     // Speed scaling factors, should be between 0 and 1
     public static final double MIN_TRANSLATION_SPEED_SCALE = 0.175; // Minimum speed scaling factor for joystick input
@@ -105,11 +105,15 @@ public class Constants {
         public static final GearBox GEARBOX = GearBox.fromStages("54:16", "18:12");
     }
     public static class RollerConstants {
-        public static double INTAKE_SPEED = 1;
-        public static double OUTAKE_SPEED = -1;
+        public static double INTAKE_SPEED = 0.75;
+        public static double OUTAKE_SPEED = -0.75;
         public static int ROLLER_MOTOR_PWM_ID = 1;
         // Current Limits
         public static double STATOR_CURRENT_LIMIT = 50.0;
         public static double SUPPLY_CURRENT_LIMIT = 30.0;
     }
+	public static class IndexerConstants {
+        public static final int INDEXER_MOTOR_CAN_ID = 19;
+        public static final double AGGRESIVE_MOTOR_SPEED = 0.125;
+	}
 }
