@@ -75,7 +75,19 @@ public class ShooterSubsystem extends SubsystemBase {
 		hoodAngleMapNeutral.put(410d, Rotation2d.fromDegrees(reverse(55)));
 		hoodAngleMapNeutral.put(420d, Rotation2d.fromDegrees(reverse(53)));
 
-		hoodAngleMapZone.put(500d, Rotation2d.fromDegrees(reverse(50)));
+		hoodAngleMapZone.put(430d, Rotation2d.fromDegrees(reverse(65)));
+		hoodAngleMapZone.put(440d, Rotation2d.fromDegrees(reverse(64)));
+		hoodAngleMapZone.put(450d, Rotation2d.fromDegrees(reverse(63)));
+		hoodAngleMapZone.put(460d, Rotation2d.fromDegrees(reverse(62.5)));
+		hoodAngleMapZone.put(470d, Rotation2d.fromDegrees(reverse(61.5)));
+		hoodAngleMapZone.put(480d, Rotation2d.fromDegrees(reverse(60.5)));
+		hoodAngleMapZone.put(490d, Rotation2d.fromDegrees(reverse(59.5)));
+		hoodAngleMapZone.put(500d, Rotation2d.fromDegrees(reverse(58.5)));
+		hoodAngleMapZone.put(510d, Rotation2d.fromDegrees(reverse(57.5)));
+		hoodAngleMapZone.put(520d, Rotation2d.fromDegrees(reverse(56)));
+		hoodAngleMapZone.put(530d, Rotation2d.fromDegrees(reverse(54.5)));
+		hoodAngleMapZone.put(540d, Rotation2d.fromDegrees(reverse(53)));
+		hoodAngleMapZone.put(550d, Rotation2d.fromDegrees(reverse(51)));
 	}
 
 	public static double reverse(double angle){
