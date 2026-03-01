@@ -16,19 +16,14 @@ import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.choreo.ChoreoVars;
 import frc.robot.subsystems.choreo.Routines;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Commands.RotationLockCommand;
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.SwerveSubsystem;
+
 import java.io.File;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
-import swervelib.SwerveInputStream;
 
 public class RobotContainer {
-  private final static SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(
+  public final static SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(
     new File(Filesystem.getDeployDirectory(), "swerve"));
 
   private final static CommandXboxController m_driverController = new CommandXboxController(
@@ -37,12 +32,12 @@ public class RobotContainer {
           0);
   
   public static final AutoFactory autoFactory = new AutoFactory(
-      m_swerveSubsystem::getPose,
-      m_swerveSubsystem::resetOdometry,
-      m_swerveSubsystem::followTrajectory,
-      true,
-      m_swerveSubsystem
-    );
+    m_swerveSubsystem::getPose,
+    m_swerveSubsystem::resetOdometry,
+    m_swerveSubsystem::followTrajectory,
+    true,
+    m_swerveSubsystem
+  );
   private final AutoChooser autoChooser;
 
   // private static boolean isHopperEmpty = false;
@@ -73,7 +68,7 @@ public class RobotContainer {
 
     m_operatorController.start().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
-    // Performs distance checks to determine which path is closer to the robot's location & should be ran
+    // Performs distance checks to determine which path is closer to the robot's location & should be ran for teleop
     // x is a substitute keybind for the auto trench teleop
     // TODO: Get the actual keybind when confirmed what it will be
     m_driverController.x().whileTrue(
@@ -99,12 +94,12 @@ public class RobotContainer {
   }
 
   private void setupAutonomous() {
-    autoChooser.addRoutine("twoCycleRightClimb", Routines::twoCycleRightClimb)
-    .addRoutine("twoCycleLeftClimb", Routines::twoCycleLeftClimb)
-    .addRoutine("oneCycleRightClimb", Routines::oneCycleRightClimb)
-    .addRoutine("twoCycleRight", Routines::twoCycleRight)
-    .addRoutine("twoCycleLeft", Routines::twoCycleLeft)
-    .addRoutine("oneCycleLeftClimb", Routines::oneCycleLeftClimb)
+    autoChooser.addRoutine("twoTrenchCycleRightClimb", Routines::twoTrenchCycleRightClimb)
+    .addRoutine("twoTrenchCycleLeftClimb", Routines::twoTrenchCycleLeftClimb)
+    .addRoutine("oneTrenchCycleRightClimb", Routines::oneTrenchCycleRightClimb)
+    .addRoutine("twoTrenchCycleRight", Routines::twoTrenchCycleRight)
+    .addRoutine("twoTrenchCycleLeft", Routines::twoTrenchCycleLeft)
+    .addRoutine("oneTrenchCycleLeftClimb", Routines::oneTrenchCycleLeftClimb)
     .addRoutine("twoDepotCycleLeftClimb", Routines::twoDepotCycleLeftClimb)
     .addRoutine("twoDepotCycleRightClimb", Routines::twoDepotCycleRightClimb)
     .addRoutine("twoDepotCycle", Routines::twoDepotCycle)
@@ -114,7 +109,15 @@ public class RobotContainer {
     .addRoutine("oneDepotOutpostCycleRightClimb", Routines::oneDepotOutpostCycleRightClimb)
     .addRoutine("oneDepotOutpostCycleRightClimb", Routines::oneDepotOutpostCycleLeftClimb)
     .addRoutine("oneDepotOutpostCycle", Routines::oneDepotOutpostCycle)
-    .addRoutine("preloadOnly", Routines::preloadOnly);
+    .addRoutine("preloadOnly", Routines::preloadOnly)
+    .addRoutine("twoTrenchCycleOutpostCycle", Routines::twoTrenchCycleOutpostCycle)
+    .addRoutine("twoBumpCycleLeftClimb", Routines::twoBumpCycleLeftClimb)
+    .addRoutine("twoBumpCycleLeft", Routines::twoBumpCycleLeft)
+    .addRoutine("twoBumpCycleRightClimb", Routines::twoBumpCycleRightClimb)
+    .addRoutine("twoBumpCycleRight", Routines::twoBumpCycleRight)
+    .addRoutine("twoTrenchCycleDepotCycle", Routines::twoTrenchCycleDepotCycle)
+    .addRoutine("twoCycleLeftSweepClimb", Routines::twoCycleLeftSweepClimb)
+    .addRoutine("twoCycleRightSweepClimb", Routines::twoCycleRightSweepClimb);
 
     // autoFactory
     //   .bind("Shoot", m_shooterSubsystem.ShootCommand())  // Consider hood adjustment later
@@ -126,7 +129,7 @@ public class RobotContainer {
   /*
   @Override
   private void periodic() {
-    //isHopperEmpty = shooterSubsystem.getIsHopperEmpty();
+    // isHopperEmpty = shooterSubsystem.getIsHopperEmpty();
   }
   */
 

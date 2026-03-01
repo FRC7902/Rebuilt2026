@@ -14,7 +14,7 @@ public class StrafeLeftCommand extends Command {
      */
     public StrafeLeftCommand() {
         // Use addRequirements() here to declare subsystem dependencies.
-        addRequirements(RobotContainer.drivebase);
+        addRequirements(RobotContainer.m_swerveSubsystem);
     }
 
     // Called when the command is initially scheduled.
@@ -25,7 +25,7 @@ public class StrafeLeftCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        RobotContainer.drivebase.strafe(
+        RobotContainer.m_swerveSubsystem.strafe(
                 1,
                 0.05
         );

@@ -24,201 +24,306 @@ public record ChoreoTraj(
     Pose2d initialPoseBlue,
     Pose2d endPoseBlue
 ) {
-    public static final ChoreoTraj LeftTrenchShoot1 = new ChoreoTraj(
+    public static final ChoreoTraj RightTrenchSweep = new ChoreoTraj(
+	    "RightTrenchSweep",
+	    OptionalInt.empty(),
+	    1.62629,
+	    new Pose2d(12.11, 7.523, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(8.271, 4.093, Rotation2d.fromRadians(-1.571))
+	);
+	public static final ChoreoTraj LeftTrenchShoot1 = new ChoreoTraj(
 	    "LeftTrenchShoot1",
 	    OptionalInt.empty(),
-	    1.74616,
+	    1.66691,
 	    new Pose2d(8.719, 2.631, Rotation2d.fromRadians(1.571)),
 	    new Pose2d(13.038, 0.639, Rotation2d.fromRadians(-1.297))
+	);
+	public static final ChoreoTraj RightSweepShoot = new ChoreoTraj(
+	    "RightSweepShoot",
+	    OptionalInt.empty(),
+	    2.20943,
+	    new Pose2d(8.271, 4.093, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(13.007, 7.484, Rotation2d.fromRadians(1.267))
 	);
 	public static final ChoreoTraj LeftTrenchNeutral2 = new ChoreoTraj(
 	    "LeftTrenchNeutral2",
 	    OptionalInt.empty(),
-	    2.51493,
+	    2.35106,
 	    new Pose2d(13.038, 0.639, Rotation2d.fromRadians(-1.297)),
 	    new Pose2d(8.66, 3.528, Rotation2d.fromRadians(1.571))
+	);
+	public static final ChoreoTraj LeftBumpShootAlt1 = new ChoreoTraj(
+	    "LeftBumpShootAlt1",
+	    OptionalInt.empty(),
+	    1.72683,
+	    new Pose2d(8.719, 2.631, Rotation2d.fromRadians(1.571)),
+	    new Pose2d(13.185, 2.631, Rotation2d.fromRadians(-0.983))
 	);
 	public static final ChoreoTraj RightTrenchShoot2 = new ChoreoTraj(
 	    "RightTrenchShoot2",
 	    OptionalInt.empty(),
-	    2.90027,
+	    2.82829,
 	    new Pose2d(8.699, 4.658, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(14.78, 4.639, Rotation2d.fromRadians(0.229))
 	);
 	public static final ChoreoTraj ClimbRightSide4 = new ChoreoTraj(
 	    "ClimbRightSide4",
 	    OptionalInt.empty(),
-	    1.1086,
+	    1.0627,
 	    new Pose2d(15.156, 2.051, Rotation2d.fromRadians(-0.6)),
 	    new Pose2d(14.917, 4.522, Rotation2d.fromRadians(3.142))
 	);
 	public static final ChoreoTraj TeleopNeutralLeft = new ChoreoTraj(
 	    "TeleopNeutralLeft",
 	    OptionalInt.empty(),
-	    1.99959,
+	    2.00544,
 	    new Pose2d(8.286, 4.036, Rotation2d.fromRadians(0)),
 	    new Pose2d(13.096, 7.331, Rotation2d.fromRadians(1.171))
+	);
+	public static final ChoreoTraj DepotCycle1 = new ChoreoTraj(
+	    "DepotCycle1",
+	    OptionalInt.empty(),
+	    1.04599,
+	    new Pose2d(15.156, 2.051, Rotation2d.fromRadians(-0.6)),
+	    new Pose2d(15.156, 2.051, Rotation2d.fromRadians(-0.6))
 	);
 	public static final ChoreoTraj ClimbRightSide3 = new ChoreoTraj(
 	    "ClimbRightSide3",
 	    OptionalInt.empty(),
-	    1.17461,
+	    1.11837,
 	    new Pose2d(15.658, 7.378, Rotation2d.fromRadians(0.835)),
 	    new Pose2d(14.917, 4.522, Rotation2d.fromRadians(3.142))
 	);
 	public static final ChoreoTraj LeftTrenchShootAlt2 = new ChoreoTraj(
 	    "LeftTrenchShootAlt2",
 	    OptionalInt.empty(),
-	    1.94624,
+	    1.8585,
 	    new Pose2d(8.66, 3.528, Rotation2d.fromRadians(1.571)),
 	    new Pose2d(13.045, 0.772, Rotation2d.fromRadians(-1.201))
+	);
+	public static final ChoreoTraj LeftTrenchDepot = new ChoreoTraj(
+	    "LeftTrenchDepot",
+	    OptionalInt.empty(),
+	    2.57291,
+	    new Pose2d(8.719, 2.631, Rotation2d.fromRadians(1.571)),
+	    new Pose2d(15.292, 2.497, Rotation2d.fromRadians(-0.423))
 	);
 	public static final ChoreoTraj RightTrenchNeutral2 = new ChoreoTraj(
 	    "RightTrenchNeutral2",
 	    OptionalInt.empty(),
-	    2.37036,
+	    2.27672,
 	    new Pose2d(13.007, 7.484, Rotation2d.fromRadians(1.267)),
 	    new Pose2d(8.699, 4.658, Rotation2d.fromRadians(-1.571))
 	);
 	public static final ChoreoTraj MidOutpost = new ChoreoTraj(
 	    "MidOutpost",
 	    OptionalInt.empty(),
-	    1.52899,
+	    1.3297,
 	    new Pose2d(12.938, 3.996, Rotation2d.fromRadians(0)),
 	    new Pose2d(15.658, 7.378, Rotation2d.fromRadians(0.835))
+	);
+	public static final ChoreoTraj RightBumpShoot1 = new ChoreoTraj(
+	    "RightBumpShoot1",
+	    OptionalInt.empty(),
+	    2.15721,
+	    new Pose2d(8.699, 4.658, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(14.78, 4.639, Rotation2d.fromRadians(0.229))
+	);
+	public static final ChoreoTraj LeftBumpShoot1 = new ChoreoTraj(
+	    "LeftBumpShoot1",
+	    OptionalInt.empty(),
+	    2.24323,
+	    new Pose2d(8.719, 2.631, Rotation2d.fromRadians(1.571)),
+	    new Pose2d(14.858, 3.859, Rotation2d.fromRadians(0))
 	);
 	public static final ChoreoTraj ClimbLeftSide1 = new ChoreoTraj(
 	    "ClimbLeftSide1",
 	    OptionalInt.empty(),
-	    0.68323,
+	    0.67435,
 	    new Pose2d(14.858, 3.859, Rotation2d.fromRadians(0)),
 	    new Pose2d(14.936, 4.054, Rotation2d.fromRadians(3.142))
 	);
 	public static final ChoreoTraj ClimbRightSide2 = new ChoreoTraj(
 	    "ClimbRightSide2",
 	    OptionalInt.empty(),
-	    1.26164,
+	    1.20198,
 	    new Pose2d(13.007, 7.484, Rotation2d.fromRadians(1.267)),
 	    new Pose2d(14.917, 4.522, Rotation2d.fromRadians(3.142))
+	);
+	public static final ChoreoTraj RightTrenchOutpost = new ChoreoTraj(
+	    "RightTrenchOutpost",
+	    OptionalInt.empty(),
+	    2.28707,
+	    new Pose2d(8.699, 4.658, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(15.658, 7.378, Rotation2d.fromRadians(0.835))
 	);
 	public static final ChoreoTraj ClimbRightSide1 = new ChoreoTraj(
 	    "ClimbRightSide1",
 	    OptionalInt.empty(),
-	    0.62219,
+	    0.62097,
 	    new Pose2d(14.78, 4.639, Rotation2d.fromRadians(0.229)),
 	    new Pose2d(14.917, 4.522, Rotation2d.fromRadians(3.142))
 	);
 	public static final ChoreoTraj ClimbLeftSide2 = new ChoreoTraj(
 	    "ClimbLeftSide2",
 	    OptionalInt.empty(),
-	    1.33054,
+	    1.27017,
 	    new Pose2d(13.038, 0.639, Rotation2d.fromRadians(-1.297)),
 	    new Pose2d(14.936, 4.054, Rotation2d.fromRadians(3.142))
 	);
 	public static final ChoreoTraj MidNothing = new ChoreoTraj(
 	    "MidNothing",
 	    OptionalInt.empty(),
-	    1.65736,
+	    1.94815,
 	    new Pose2d(12.938, 3.996, Rotation2d.fromRadians(0)),
 	    new Pose2d(16.035, 3.989, Rotation2d.fromRadians(0))
 	);
 	public static final ChoreoTraj TeleopAllianceLeft = new ChoreoTraj(
 	    "TeleopAllianceLeft",
 	    OptionalInt.empty(),
-	    2.08908,
+	    1.96797,
 	    new Pose2d(14.079, 3.996, Rotation2d.fromRadians(3.142)),
 	    new Pose2d(10.586, 0.674, Rotation2d.fromRadians(3.142))
 	);
 	public static final ChoreoTraj RightTrenchNeutral1 = new ChoreoTraj(
 	    "RightTrenchNeutral1",
 	    OptionalInt.empty(),
-	    1.69259,
-	    new Pose2d(12.169, 7.406, Rotation2d.fromRadians(3.142)),
+	    1.58946,
+	    new Pose2d(12.169, 7.406, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(8.777, 5.204, Rotation2d.fromRadians(-1.571))
 	);
 	public static final ChoreoTraj ClimbLeftSide3 = new ChoreoTraj(
 	    "ClimbLeftSide3",
 	    OptionalInt.empty(),
-	    0.99094,
+	    0.94669,
 	    new Pose2d(15.156, 2.051, Rotation2d.fromRadians(-0.6)),
 	    new Pose2d(14.936, 4.054, Rotation2d.fromRadians(3.142))
 	);
 	public static final ChoreoTraj TeleopNeutralRight = new ChoreoTraj(
 	    "TeleopNeutralRight",
 	    OptionalInt.empty(),
-	    2.06087,
+	    1.95788,
 	    new Pose2d(8.286, 4.036, Rotation2d.fromRadians(0)),
 	    new Pose2d(13.046, 0.707, Rotation2d.fromRadians(-1.298))
+	);
+	public static final ChoreoTraj DepotCycle2 = new ChoreoTraj(
+	    "DepotCycle2",
+	    OptionalInt.empty(),
+	    0.74309,
+	    new Pose2d(15.292, 2.497, Rotation2d.fromRadians(-0.423)),
+	    new Pose2d(15.88, 2.232, Rotation2d.fromRadians(-0.427))
 	);
 	public static final ChoreoTraj TeleopAllianceRight = new ChoreoTraj(
 	    "TeleopAllianceRight",
 	    OptionalInt.empty(),
-	    2.08754,
+	    1.96655,
 	    new Pose2d(14.079, 3.996, Rotation2d.fromRadians(3.142)),
 	    new Pose2d(10.586, 7.321, Rotation2d.fromRadians(3.142))
 	);
 	public static final ChoreoTraj RightTrenchShootAlt2 = new ChoreoTraj(
 	    "RightTrenchShootAlt2",
 	    OptionalInt.empty(),
-	    1.99064,
+	    1.89531,
 	    new Pose2d(8.699, 4.658, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(13.162, 7.214, Rotation2d.fromRadians(1.144))
 	);
 	public static final ChoreoTraj ClimbLeftSide4 = new ChoreoTraj(
 	    "ClimbLeftSide4",
 	    OptionalInt.empty(),
-	    1.26933,
+	    1.21553,
 	    new Pose2d(15.658, 7.378, Rotation2d.fromRadians(0.835)),
 	    new Pose2d(14.936, 4.054, Rotation2d.fromRadians(3.142))
 	);
 	public static final ChoreoTraj OutpostCycle = new ChoreoTraj(
 	    "OutpostCycle",
 	    OptionalInt.empty(),
-	    0.9279,
+	    0.89411,
 	    new Pose2d(15.658, 7.378, Rotation2d.fromRadians(0.835)),
 	    new Pose2d(15.658, 7.378, Rotation2d.fromRadians(0.835))
 	);
 	public static final ChoreoTraj MidDepot = new ChoreoTraj(
 	    "MidDepot",
 	    OptionalInt.empty(),
-	    1.17886,
+	    1.06997,
 	    new Pose2d(12.938, 3.996, Rotation2d.fromRadians(0)),
 	    new Pose2d(15.156, 2.051, Rotation2d.fromRadians(-0.6))
+	);
+	public static final ChoreoTraj RightBumpShootAlt1 = new ChoreoTraj(
+	    "RightBumpShootAlt1",
+	    OptionalInt.empty(),
+	    1.78347,
+	    new Pose2d(8.699, 4.658, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(13.413, 5.401, Rotation2d.fromRadians(0.891))
 	);
 	public static final ChoreoTraj LeftTrenchNeutral1 = new ChoreoTraj(
 	    "LeftTrenchNeutral1",
 	    OptionalInt.empty(),
-	    1.65626,
-	    new Pose2d(12.11, 0.604, Rotation2d.fromRadians(3.142)),
+	    1.54616,
+	    new Pose2d(12.11, 0.604, Rotation2d.fromRadians(1.571)),
 	    new Pose2d(8.719, 2.631, Rotation2d.fromRadians(1.571))
 	);
 	public static final ChoreoTraj DepotSwitchOutpost = new ChoreoTraj(
 	    "DepotSwitchOutpost",
 	    OptionalInt.empty(),
-	    1.99024,
+	    1.87627,
 	    new Pose2d(15.156, 2.051, Rotation2d.fromRadians(-0.6)),
 	    new Pose2d(15.658, 7.378, Rotation2d.fromRadians(0.835))
 	);
 	public static final ChoreoTraj RightTrenchShoot1 = new ChoreoTraj(
 	    "RightTrenchShoot1",
 	    OptionalInt.empty(),
-	    1.88587,
+	    1.79461,
 	    new Pose2d(8.777, 5.204, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(13.007, 7.484, Rotation2d.fromRadians(1.267))
 	);
 	public static final ChoreoTraj LeftTrenchShoot2 = new ChoreoTraj(
 	    "LeftTrenchShoot2",
 	    OptionalInt.empty(),
-	    3.08771,
+	    2.9485,
 	    new Pose2d(8.66, 3.528, Rotation2d.fromRadians(1.571)),
 	    new Pose2d(14.858, 3.859, Rotation2d.fromRadians(0))
 	);
-	public static final ChoreoTraj DepotCycle = new ChoreoTraj(
-	    "DepotCycle",
+	public static final ChoreoTraj RightPickupSwept = new ChoreoTraj(
+	    "RightPickupSwept",
 	    OptionalInt.empty(),
-	    1.10202,
-	    new Pose2d(15.156, 2.051, Rotation2d.fromRadians(-0.6)),
-	    new Pose2d(15.156, 2.051, Rotation2d.fromRadians(-0.6))
+	    2.27213,
+	    new Pose2d(13.007, 7.484, Rotation2d.fromRadians(1.267)),
+	    new Pose2d(10.2, 5.165, Rotation2d.fromRadians(-1.571))
+	);
+	public static final ChoreoTraj RightShootSwept = new ChoreoTraj(
+	    "RightShootSwept",
+	    OptionalInt.empty(),
+	    2.75868,
+	    new Pose2d(10.2, 5.165, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(14.78, 4.639, Rotation2d.fromRadians(0.229))
+	);
+	public static final ChoreoTraj LeftTrenchSweep = new ChoreoTraj(
+	    "LeftTrenchSweep",
+	    OptionalInt.empty(),
+	    1.72053,
+	    new Pose2d(12.13, 0.604, Rotation2d.fromRadians(1.571)),
+	    new Pose2d(8.271, 4.093, Rotation2d.fromRadians(1.571))
+	);
+	public static final ChoreoTraj LeftSweepShoot = new ChoreoTraj(
+	    "LeftSweepShoot",
+	    OptionalInt.empty(),
+	    2.15435,
+	    new Pose2d(8.271, 4.093, Rotation2d.fromRadians(1.571)),
+	    new Pose2d(13.038, 0.639, Rotation2d.fromRadians(-1.297))
+	);
+	public static final ChoreoTraj LeftPickupSwept = new ChoreoTraj(
+	    "LeftPickupSwept",
+	    OptionalInt.empty(),
+	    2.28179,
+	    new Pose2d(13.038, 0.639, Rotation2d.fromRadians(-1.297)),
+	    new Pose2d(10.258, 3.216, Rotation2d.fromRadians(1.571))
+	);
+	public static final ChoreoTraj LeftShootSwept = new ChoreoTraj(
+	    "LeftShootSwept",
+	    OptionalInt.empty(),
+	    2.86862,
+	    new Pose2d(10.258, 3.216, Rotation2d.fromRadians(1.571)),
+	    new Pose2d(14.858, 3.859, Rotation2d.fromRadians(0))
 	);
 
     /**
@@ -226,17 +331,25 @@ public record ChoreoTraj(
      * This allows for trajectory data to be looked up with strings during runtime.
      */
     public static final Map<String, ChoreoTraj> ALL_TRAJECTORIES = Map.ofEntries(
-    	Map.entry("LeftTrenchShoot1", LeftTrenchShoot1),
+    	Map.entry("RightTrenchSweep", RightTrenchSweep),
+		Map.entry("LeftTrenchShoot1", LeftTrenchShoot1),
+		Map.entry("RightSweepShoot", RightSweepShoot),
 		Map.entry("LeftTrenchNeutral2", LeftTrenchNeutral2),
+		Map.entry("LeftBumpShootAlt1", LeftBumpShootAlt1),
 		Map.entry("RightTrenchShoot2", RightTrenchShoot2),
 		Map.entry("ClimbRightSide4", ClimbRightSide4),
 		Map.entry("TeleopNeutralLeft", TeleopNeutralLeft),
+		Map.entry("DepotCycle1", DepotCycle1),
 		Map.entry("ClimbRightSide3", ClimbRightSide3),
 		Map.entry("LeftTrenchShootAlt2", LeftTrenchShootAlt2),
+		Map.entry("LeftTrenchDepot", LeftTrenchDepot),
 		Map.entry("RightTrenchNeutral2", RightTrenchNeutral2),
 		Map.entry("MidOutpost", MidOutpost),
+		Map.entry("RightBumpShoot1", RightBumpShoot1),
+		Map.entry("LeftBumpShoot1", LeftBumpShoot1),
 		Map.entry("ClimbLeftSide1", ClimbLeftSide1),
 		Map.entry("ClimbRightSide2", ClimbRightSide2),
+		Map.entry("RightTrenchOutpost", RightTrenchOutpost),
 		Map.entry("ClimbRightSide1", ClimbRightSide1),
 		Map.entry("ClimbLeftSide2", ClimbLeftSide2),
 		Map.entry("MidNothing", MidNothing),
@@ -244,16 +357,23 @@ public record ChoreoTraj(
 		Map.entry("RightTrenchNeutral1", RightTrenchNeutral1),
 		Map.entry("ClimbLeftSide3", ClimbLeftSide3),
 		Map.entry("TeleopNeutralRight", TeleopNeutralRight),
+		Map.entry("DepotCycle2", DepotCycle2),
 		Map.entry("TeleopAllianceRight", TeleopAllianceRight),
 		Map.entry("RightTrenchShootAlt2", RightTrenchShootAlt2),
 		Map.entry("ClimbLeftSide4", ClimbLeftSide4),
 		Map.entry("OutpostCycle", OutpostCycle),
 		Map.entry("MidDepot", MidDepot),
+		Map.entry("RightBumpShootAlt1", RightBumpShootAlt1),
 		Map.entry("LeftTrenchNeutral1", LeftTrenchNeutral1),
 		Map.entry("DepotSwitchOutpost", DepotSwitchOutpost),
 		Map.entry("RightTrenchShoot1", RightTrenchShoot1),
 		Map.entry("LeftTrenchShoot2", LeftTrenchShoot2),
-		Map.entry("DepotCycle", DepotCycle)
+		Map.entry("RightPickupSwept", RightPickupSwept),
+		Map.entry("RightShootSwept", RightShootSwept),
+		Map.entry("LeftTrenchSweep", LeftTrenchSweep),
+		Map.entry("LeftSweepShoot", LeftSweepShoot),
+		Map.entry("LeftPickupSwept", LeftPickupSwept),
+		Map.entry("LeftShootSwept", LeftShootSwept)
     );
 
     /**

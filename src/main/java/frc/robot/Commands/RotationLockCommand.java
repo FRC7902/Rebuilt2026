@@ -12,7 +12,7 @@ public class RotationLockCommand extends Command {
   /** Creates a new RotationLockCommand. */
   public RotationLockCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.drivebase);
+    addRequirements(RobotContainer.m_swerveSubsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -22,7 +22,7 @@ public class RotationLockCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    RobotContainer.drivebase.rotationLock();
+    RobotContainer.m_swerveSubsystem.rotationLock();
   }
 
   // Called once the command ends or is interrupted.
