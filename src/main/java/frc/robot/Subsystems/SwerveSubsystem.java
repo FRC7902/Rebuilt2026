@@ -51,7 +51,7 @@ import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 
-public class SwerveSusbystem extends SubsystemBase {
+public class SwerveSubsystem extends SubsystemBase {
 
   /**
    * Swerve drive object.
@@ -64,7 +64,7 @@ public class SwerveSusbystem extends SubsystemBase {
   private int m_speedChange=1;
 
   /** Creates a new SwerveSusbystem. */
-  public SwerveSusbystem(File directory) {
+  public SwerveSubsystem(File directory) {
      // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
@@ -80,13 +80,13 @@ public class SwerveSusbystem extends SubsystemBase {
       // Set these values to false so that simulation works
       swerveDrive.setCosineCompensator(false);
     } else {
-      swerveDrive.setCosineCompensator(true);
+      swerveDrive.setCosineCompensator(false);
       // Disables cosine compensation for simulations since it causes discrepancies
       // not seen in real life.
     }
 
    swerveDrive.setHeadingCorrection(false);
-   swerveDrive.setAngularVelocityCompensation(true, true, 0.1);
+   swerveDrive.setAngularVelocityCompensation(false, true, 0.1);
     // Correct for skew that gets worse as angular velocity increases. Start with a
     // coefficient of 0.1.
     swerveDrive.setModuleEncoderAutoSynchronize(false, 1);

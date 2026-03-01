@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Commands.RotationLockCommand;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.SwerveSusbystem;
+import frc.robot.subsystems.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
 import frc.robot.Constants.IndexerConstants;
@@ -41,7 +41,7 @@ import frc.robot.subsystems.LinearSlide;
 import frc.robot.subsystems.Rollers;
 
 public class RobotContainer {
-  public final static SwerveSusbystem drivebase  = new SwerveSusbystem(new File(Filesystem.getDeployDirectory(),
+  public final static SwerveSubsystem drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve"));
   CommandXboxController m_driverController = new CommandXboxController(0);
   LinearSlide DLI = new LinearSlide();
@@ -137,14 +137,14 @@ public class RobotContainer {
   private void configureBindings()
   {
     // Command driveFieldOrientedDirectAngle      = drivebase.driveFieldOriented(driveDirectAngle);
-    Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+    Command driveFieldOrientedAngularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
     // Command driveRobotOrientedAngularVelocity  = drivebase.driveFieldOriented(driveRobotOriented);
     // Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngle);
     // Command driveFieldOrientedDirectAngleKeyboard      = drivebase.driveFieldOriented(driveDirectAngleKeyboard);
     // Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
     // Command driveSetpointGenKeyboard = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleKeyboard);
 
-    drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
     //TODO: uncomment the above
 
     // test bindings, more to be added later
@@ -167,16 +167,14 @@ public class RobotContainer {
     m_driverController.povRight().whileTrue(drivebase.driveRight());  
     m_driverController.a().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
 
-    // m_driverController.leftBumper().onTrue(
-    //   new ParallelCommandGroup(
-    //     DLI.setHeight(IntakeConstants.EXTEND_SETPOINT),
-    //     rollers.intake()))
-    //     .onFalse(new SequentialCommandGroup(
-    //     DLI.setHeight(IntakeConstants.MID_SETPOINT),
-    //     rollers.stopRollers()));
-    // TODO: Make the DLI weaker so that we don't destroy the rack...again
-    m_driverController.rightBumper().onTrue(rollers.intake()).onFalse(rollers.stopRollers());
-    m_driverController.leftBumper().onTrue(rollers.outtake()).onFalse(rollers.stopRollers());
+  //   m_driverController.leftBumper().whileTrue(
+  //     new ParallelCommandGroup(
+  //       DLI.setHeight(IntakeConstants.EXTEND_SETPOINT),
+  //       rollers.intake()))
+  //       .onFalse(new SequentialCommandGroup(
+  //       rollers.stopRollers()));
+  //   m_driverController.rightBumper().onTrue(DLI.setHeight(IntakeConstants.RETRACT_SETPOINT));
+    m_driverController.leftBumper().whileTrue(rollers.intake()).onFalse(rollers.stopRollers());
   }
 
   public Command getAutonomousCommand() {
