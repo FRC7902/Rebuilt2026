@@ -61,34 +61,58 @@ public class RobotContainer {
             .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
             .allianceRelativeControl(true);
 
+  public static SwerveInputStream driveAngularVelocitySim = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
+                    () -> -m_driverController.getLeftY(),
+                    () -> -m_driverController.getLeftX())
+            .withControllerRotationAxis(() -> m_driverController.getRawAxis(
+                    2))
+            .deadband(OperatorConstants.DEADBAND)
+            .scaleTranslation(0.8)
+            .allianceRelativeControl(true);
+
   Command driveFieldOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
+  Command driveFieldOrientedAngularVelocitySim = m_swerveSubsystem.driveFieldOriented(driveAngularVelocitySim);
 
   private void configureBindings() {
+    // m_swerveSubsystem.setDefaultCommand(Robot.isSimulation() ? 
+    // driveFieldOrientedAngularVelocitySim : driveFieldOrientedAngularVelocity);
     m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity);
 
     m_operatorController.start().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
-    // Performs distance checks to determine which path is closer to the robot's location & should be ran for teleop
-    // x is a substitute keybind for the auto trench teleop
-    // TODO: Get the actual keybind when confirmed what it will be
+    // Keybind to auto traverse trenches
+    // TODO: Get the actual keybind
     m_driverController.x().whileTrue(
-      m_swerveSubsystem.getPose().getTranslation().getDistance(ChoreoVars.Poses.teleopNeutral.getTranslation()) <
-      m_swerveSubsystem.getPose().getTranslation().getDistance(ChoreoVars.Poses.teleopAlliance.getTranslation()) ?
       new ConditionalCommand(
-        autoFactory.trajectoryCmd("TeleopNeutralLeft"),
-        autoFactory.trajectoryCmd("TeleopNeutralRight"),
-        () -> m_swerveSubsystem.getPose().getTranslation()
-        .getDistance(ChoreoVars.Poses.teleopLeftNeutralEnd.getTranslation()) < 
-        m_swerveSubsystem.getPose().getTranslation()
-        .getDistance(ChoreoVars.Poses.teleopRightNeutralEnd.getTranslation())
-      ) :
+        new ConditionalCommand(
+          autoFactory.trajectoryCmd("TeleopNeutralLeft"),
+          autoFactory.trajectoryCmd("TeleopNeutralRight"),
+          () -> m_swerveSubsystem.getPose().getTranslation()
+          .getDistance(ChoreoVars.Poses.teleopLeftNeutralEnd.getTranslation()) < 
+          m_swerveSubsystem.getPose().getTranslation()
+          .getDistance(ChoreoVars.Poses.teleopRightNeutralEnd.getTranslation())
+        ),
+        new ConditionalCommand(
+          autoFactory.trajectoryCmd("TeleopAllianceLeft"),
+          autoFactory.trajectoryCmd("TeleopAllianceRight"),
+          () -> m_swerveSubsystem.getPose().getTranslation()
+          .getDistance(ChoreoVars.Poses.teleopLeftAllianceEnd.getTranslation()) < 
+          m_swerveSubsystem.getPose().getTranslation()
+          .getDistance(ChoreoVars.Poses.teleopRightAllianceEnd.getTranslation())
+        ),
+        () -> m_swerveSubsystem.getPose().getTranslation().getDistance(ChoreoVars.Poses.teleopNeutral.getTranslation()) <
+        m_swerveSubsystem.getPose().getTranslation().getDistance(ChoreoVars.Poses.teleopAlliance.getTranslation()) 
+      )
+    );
+
+    // Keybind to auto traverse to tower
+    // TODO: Get the actual keybind
+    m_driverController.y().whileTrue(
       new ConditionalCommand(
-        autoFactory.trajectoryCmd("TeleopAllianceLeft"),
-        autoFactory.trajectoryCmd("TeleopAllianceRight"),
-        () -> m_swerveSubsystem.getPose().getTranslation()
-        .getDistance(ChoreoVars.Poses.teleopLeftAllianceEnd.getTranslation()) < 
-        m_swerveSubsystem.getPose().getTranslation()
-        .getDistance(ChoreoVars.Poses.teleopRightAllianceEnd.getTranslation())
+        autoFactory.trajectoryCmd("TeleopClimbLeft"),
+        autoFactory.trajectoryCmd("TeleopClimbRight"),
+        () -> m_swerveSubsystem.getPose().getTranslation().getDistance(ChoreoVars.Poses.teleopClimbLeft.getTranslation()) <
+        m_swerveSubsystem.getPose().getTranslation().getDistance(ChoreoVars.Poses.teleopClimbRight.getTranslation())
       )
     );
   }
@@ -119,6 +143,7 @@ public class RobotContainer {
     .addRoutine("twoCycleLeftSweepClimb", Routines::twoCycleLeftSweepClimb)
     .addRoutine("twoCycleRightSweepClimb", Routines::twoCycleRightSweepClimb);
 
+    // TODO: Get the subsystem's commands when done
     // autoFactory
     //   .bind("Shoot", m_shooterSubsystem.ShootCommand())  // Consider hood adjustment later
     //   .bind("Intake", m_intakeSubsystem.intake())  // Might need a whileTrue instead + check if hopper is full
