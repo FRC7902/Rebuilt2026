@@ -2,8 +2,6 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Second;
@@ -11,7 +9,6 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Distance;
@@ -33,47 +30,69 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 public class ElevatorSubsystem extends SubsystemBase {
 
     private SmartMotorControllerConfig m_leaderConfig;
+    private SmartMotorControllerConfig m_followerConfig;
     private SmartMotorController m_leaderMotor;
+    private SmartMotorController m_followerMotor;
     private ElevatorConfig m_elevConfig;
     private Elevator m_elevator;
 
     public ElevatorSubsystem() {
 
+        m_followerConfig = new SmartMotorControllerConfig(this)
+                .withControlMode(ControlMode.CLOSED_LOOP)
+                .withMechanismCircumference(Meters.of(Inches.of(0.25).in(Meters) * 22))
+                .withClosedLoopController(ClimbConstants.ElevatorConstants.kP, ClimbConstants.ElevatorConstants.kI,
+                        ClimbConstants.ElevatorConstants.kD, ClimbConstants.ElevatorConstants.MAX_VELOCITY, ClimbConstants.ElevatorConstants.MAX_ACCELERATION)
+                .withSimClosedLoopController(ClimbConstants.ElevatorConstants.kP, ClimbConstants.ElevatorConstants.kI,
+                        ClimbConstants.ElevatorConstants.kD, ClimbConstants.ElevatorConstants.MAX_VELOCITY, ClimbConstants.ElevatorConstants.MAX_ACCELERATION)
+                .withFeedforward(new ElevatorFeedforward(ClimbConstants.ElevatorConstants.kS,
+                        ClimbConstants.ElevatorConstants.kG, ClimbConstants.ElevatorConstants.kV))
+                .withSimFeedforward(new ElevatorFeedforward(ClimbConstants.ElevatorConstants.kS,
+                        ClimbConstants.ElevatorConstants.kG, ClimbConstants.ElevatorConstants.kV))
+                .withTelemetry("ClimbFollower", TelemetryVerbosity.HIGH)
+                .withGearing(new MechanismGearing(GearBox.fromReductionStages(12,1)))
+                .withMotorInverted(true) // Opposite side of the elevator
+                .withIdleMode(MotorMode.BRAKE)
+                .withStatorCurrentLimit(Amps.of(ClimbConstants.ElevatorConstants.STATOR_CURRENT_LIMIT))
+                .withClosedLoopRampRate(Seconds.of(0.25))
+                .withOpenLoopRampRate(Seconds.of(0.25));
+
+        m_followerMotor = new TalonFXWrapper(
+                new TalonFX(ClimbConstants.ElevatorConstants.FOLLOWER_MOTOR_CAN_ID), DCMotor.getFalcon500(1),
+                m_followerConfig);
+
         m_leaderConfig = new SmartMotorControllerConfig(this)
-            .withControlMode(ControlMode.CLOSED_LOOP)
-            // Mechanism Circumference is the distance traveled by each mechanism rotation
-            // converting rotations to meters.
-            .withMechanismCircumference(Meters.of(Inches.of(0.25).in(Meters) * 22))
-            // Feedback Constants (PID Constants)
-            .withClosedLoopController(ClimbConstants.ElevatorConstants.kP, ClimbConstants.ElevatorConstants.kI, ClimbConstants.ElevatorConstants.kD, MetersPerSecond.of(0.5), MetersPerSecondPerSecond.of(0.5))
-            .withSimClosedLoopController(ClimbConstants.ElevatorConstants.kP, ClimbConstants.ElevatorConstants.kI, ClimbConstants.ElevatorConstants.kD, MetersPerSecond.of(0.5), MetersPerSecondPerSecond.of(0.5))
-            // Feedforward Constants
-            .withFeedforward(new ElevatorFeedforward(ClimbConstants.ElevatorConstants.kS, ClimbConstants.ElevatorConstants.kG, ClimbConstants.ElevatorConstants.kV))
-            .withSimFeedforward(new ElevatorFeedforward(ClimbConstants.ElevatorConstants.kS, ClimbConstants.ElevatorConstants.kG, ClimbConstants.ElevatorConstants.kV))
-            // Telemetry name and verbosity level
-            .withTelemetry("ClimbLeader", TelemetryVerbosity.HIGH)
-            // Gearing from the motor rotor to final shaft.
-            // In this example GearBox.fromReductionStages(3,4) is the same as
-            // GearBox.fromStages("3:1","4:1") which corresponds to the gearbox attached to
-            // your motor.
-            // You could also use .withGearing(12) which does the same thing
-            .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
-            // Motor properties to prevent over currenting.
-            .withMotorInverted(false)
-            .withIdleMode(MotorMode.BRAKE)
-            .withStatorCurrentLimit(Amps.of(ClimbConstants.ElevatorConstants.STATOR_CURRENT_LIMIT))
-            .withClosedLoopRampRate(Seconds.of(0.25))
-            .withOpenLoopRampRate(Seconds.of(0.25))
-            .withFollowers(Pair.of(new TalonFX(ClimbConstants.ElevatorConstants.FOLLOWER_MOTOR_CAN_ID), true));
+                .withControlMode(ControlMode.CLOSED_LOOP)
+                .withMechanismCircumference(Meters.of(Inches.of(0.25).in(Meters) * 22))
+                .withClosedLoopController(ClimbConstants.ElevatorConstants.kP, ClimbConstants.ElevatorConstants.kI,
+                        ClimbConstants.ElevatorConstants.kD, ClimbConstants.ElevatorConstants.MAX_VELOCITY, ClimbConstants.ElevatorConstants.MAX_ACCELERATION)
+                .withSimClosedLoopController(ClimbConstants.ElevatorConstants.kP, ClimbConstants.ElevatorConstants.kI,
+                        ClimbConstants.ElevatorConstants.kD, ClimbConstants.ElevatorConstants.MAX_VELOCITY, ClimbConstants.ElevatorConstants.MAX_ACCELERATION)
+                .withFeedforward(new ElevatorFeedforward(ClimbConstants.ElevatorConstants.kS,
+                        ClimbConstants.ElevatorConstants.kG, ClimbConstants.ElevatorConstants.kV))
+                .withSimFeedforward(new ElevatorFeedforward(ClimbConstants.ElevatorConstants.kS,
+                        ClimbConstants.ElevatorConstants.kG, ClimbConstants.ElevatorConstants.kV))
+                .withTelemetry("ClimbLeader", TelemetryVerbosity.HIGH)
+                .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
+                .withMotorInverted(false)
+                .withIdleMode(MotorMode.BRAKE)
+                .withStatorCurrentLimit(Amps.of(ClimbConstants.ElevatorConstants.STATOR_CURRENT_LIMIT))
+                .withClosedLoopRampRate(Seconds.of(0.25))
+                .withOpenLoopRampRate(Seconds.of(0.25))
+                .withLooselyCoupledFollowers(m_followerMotor);
 
         m_leaderMotor = new TalonFXWrapper(
-            new TalonFX(ClimbConstants.ElevatorConstants.LEADER_MOTOR_CAN_ID), DCMotor.getFalcon500(2), m_leaderConfig);
+                new TalonFX(ClimbConstants.ElevatorConstants.LEADER_MOTOR_CAN_ID), DCMotor.getFalcon500(1),
+                m_leaderConfig);
+
+        
 
         m_elevConfig = new ElevatorConfig(m_leaderMotor)
-            .withStartingHeight(ClimbConstants.ElevatorConstants.STARTING_HEIGHT)
-            .withHardLimits(ClimbConstants.ElevatorConstants.MIN_HEIGHT, ClimbConstants.ElevatorConstants.MAX_HEIGHT)
-            .withTelemetry("Elevator", TelemetryVerbosity.HIGH)
-            .withMass(Pounds.of(ClimbConstants.ElevatorConstants.MASS_LBS));
+                .withStartingHeight(ClimbConstants.ElevatorConstants.STARTING_HEIGHT)
+                .withHardLimits(ClimbConstants.ElevatorConstants.MIN_HEIGHT,
+                        ClimbConstants.ElevatorConstants.MAX_HEIGHT)
+                .withTelemetry("Elevator", TelemetryVerbosity.HIGH)
+                .withMass(Pounds.of(ClimbConstants.ElevatorConstants.MASS_LBS));
 
         m_elevator = new Elevator(m_elevConfig);
     }
@@ -122,9 +141,9 @@ public class ElevatorSubsystem extends SubsystemBase {
      */
     public Command sysId() {
         return m_elevator.sysId(
-            Volts.of(7),
-            Volts.of(2).per(Second),
-            Seconds.of(4));
+                Volts.of(7),
+                Volts.of(2).per(Second),
+                Seconds.of(4));
     }
 
     @Override

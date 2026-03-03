@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -25,20 +26,19 @@ public class ClimbSubsystem extends SubsystemBase {
     }
 
     // Test Commands
-    public Command setHeight2() {
-        return m_elevator.setHeight(ClimbConstants.ElevatorConstants.MAX_HEIGHT);
+    public Command setElevatorHeight(Distance k) {
+        return m_elevator.setHeight(k);
     }
 
-    public Command setHeight3() {
-        return m_elevator.setHeight(ClimbConstants.ElevatorConstants.MIN_HEIGHT);
+
+    public Command setTongueLength(Distance k) {
+        return m_tongue.setLength(k);
     }
 
-    public Command setHeight4() {
-        return m_tongue.extend();
-    }
-
-    public Command setHeight5() {
-        return m_tongue.retract();
+    public Command runTongueTest() {
+        return new SequentialCommandGroup(
+                m_tongue.setLength(ClimbConstants.TongueConstants.MAX_LENGTH)
+        );
     }
 
     /**
@@ -48,8 +48,8 @@ public class ClimbSubsystem extends SubsystemBase {
      */
     public Command climbL1() {
         return new SequentialCommandGroup(
-                m_elevator.setHeight(ClimbConstants.ElevatorConstants.MAX_HEIGHT),
-                m_elevator.setHeight(ClimbConstants.ElevatorConstants.SETPOINT_3));
+                m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.MAX_HEIGHT),
+                m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_3));
     }
 
     /**
@@ -64,9 +64,9 @@ public class ClimbSubsystem extends SubsystemBase {
                 climbL1(),
                 m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_1),
                 m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.MAX_HEIGHT),
-                m_tongue.extend(),
+                m_tongue.setLength(ClimbConstants.TongueConstants.MAX_LENGTH),
                 m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_2),
-                m_tongue.retract());
+                m_tongue.setLength(ClimbConstants.TongueConstants.MIN_LENGTH));
     }
 
     /**
@@ -81,9 +81,9 @@ public class ClimbSubsystem extends SubsystemBase {
                 climbL2(),
                 m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_1),
                 m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.MAX_HEIGHT),
-                m_tongue.extend(),
+                m_tongue.setLength(ClimbConstants.TongueConstants.MAX_LENGTH),
                 m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_2),
-                m_tongue.retract());
+                m_tongue.setLength(ClimbConstants.TongueConstants.MIN_LENGTH));
     }
 
     /**
@@ -105,9 +105,9 @@ public class ClimbSubsystem extends SubsystemBase {
      */
     public Command reverseL2() {
         return new SequentialCommandGroup(
-                m_tongue.extend(),
+                m_tongue.setLength(ClimbConstants.TongueConstants.MAX_LENGTH),
                 m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.MAX_HEIGHT),
-                m_tongue.retract(),
+                m_tongue.setLength(ClimbConstants.TongueConstants.MIN_LENGTH),
                 m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_1),
                 reverseL1());
     }
@@ -122,9 +122,9 @@ public class ClimbSubsystem extends SubsystemBase {
      */
     public Command reverseL3() {
         return new SequentialCommandGroup(
-                m_tongue.extend(),
+                m_tongue.setLength(ClimbConstants.TongueConstants.MAX_LENGTH),
                 m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.MAX_HEIGHT),
-                m_tongue.retract(),
+                m_tongue.setLength(ClimbConstants.TongueConstants.MIN_LENGTH),
                 m_elevator.setHeightAndStop(ClimbConstants.ElevatorConstants.SETPOINT_1),
                 reverseL2());
     }
