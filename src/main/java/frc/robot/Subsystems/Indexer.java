@@ -5,6 +5,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IndexerConstants;
@@ -43,5 +44,9 @@ public class Indexer extends SubsystemBase{
     }
     public Command stopBalls() {
         return runOnce(() -> setSpeed(0));
+    }
+    @Override
+    public void periodic(){
+        SmartDashboard.putNumber("Indexer - Motor Voltage", m_indexerMotor.getMotorVoltage().getValueAsDouble());
     }
 }
