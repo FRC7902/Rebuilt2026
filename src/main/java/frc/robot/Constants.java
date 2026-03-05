@@ -6,6 +6,17 @@ package frc.robot;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.util.Units;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -13,24 +24,12 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Time;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
 import yams.motorcontrollers.SmartMotorControllerConfig;
-
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Pounds;
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
-import edu.wpi.first.units.measure.Mass;
-import edu.wpi.first.units.measure.MomentOfInertia;
 
 /** Add your docs here. */
 public class Constants {
@@ -72,8 +71,8 @@ public class Constants {
     public static Distance MID_SETPOINT = Meters.of(0.154995);
     public static Distance EXTEND_SETPOINT = Meters.of(0.33 - 0.02);
     // limit switch constants
-    public static int RETRACTED_LIMIT_SWITCH_DIO = 1;
-    public static int EXTENDED_LIMIT_SWITCH_DIO = 2;
+    public static int RETRACTED_LIMIT_SWITCH_DIO = 3;
+    public static int EXTENDED_LIMIT_SWITCH_DIO = 4;
     // tolerances
     public static double LINEAR_TOLERANCE = 0.01;
     // dutycycle constants
