@@ -7,7 +7,6 @@ package frc.robot;
 import java.io.File;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import static edu.wpi.first.units.Units.Degrees;
@@ -19,14 +18,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Commands.OscillatingIndexer;
-import frc.robot.Constants.IndexerConstants;
+import frc.robot.Constants.FeederConstants;
+import frc.robot.Constants.FlyWheelConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.ShooterConstants;
-import frc.robot.subsystems.Indexer;
-import frc.robot.subsystems.LinearSlide;
+import frc.robot.subsystems.IndexerSubsystem;
+import frc.robot.subsystems.LinearIntakeSubsystem;
 import frc.robot.subsystems.Rollers;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.shooter.FeederTwoSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import swervelib.SwerveInputStream;
 
@@ -34,10 +33,11 @@ public class RobotContainer {
   public final static SwerveSubsystem drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve"));
   CommandXboxController m_driverController = new CommandXboxController(0);
-  LinearSlide m_linearSlide = new LinearSlide();
+  LinearIntakeSubsystem m_linearSlide = new LinearIntakeSubsystem();
   Rollers m_rollers = new Rollers();
-  public static Indexer m_indexer = new Indexer();
+  public static IndexerSubsystem m_indexer = new IndexerSubsystem();
   ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
+  FeederTwoSubsystem feederTwoSubsystem = new FeederTwoSubsystem();
 
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
@@ -101,11 +101,9 @@ public class RobotContainer {
   {
     // Configure the trigger bindings
     configureBindings();
-    DriverStation.silenceJoystickConnectionWarning(true);
-    
-    //Create the NamedCommands that will be used in PathPlanner
-    NamedCommands.registerCommand("test", Commands.print("I EXIST"));
-
+    if (Robot.isSimulation()){
+      DriverStation.silenceJoystickConnectionWarning(true);
+    }
     //Have the autoChooser pull in all PathPlanner autos as options
     autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -117,55 +115,31 @@ public class RobotContainer {
     
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
-    m_indexer.setDefaultCommand(new OscillatingIndexer());
   }
   
   private void configureBindings()
   {
     Command driveFieldOrientedAngularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
     
-    m_indexer.setDefaultCommand(m_indexer.suckBalls(IndexerConstants.AGGRESIVE_MOTOR_SPEED));
     drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
 
-    // test bindings, more to be added later
-    // m_driverController.circle().onTrue(DLI.setHeight(Meters.of(Units.inchesToMeters(13))));
-    // m_driverController.cross().onTrue(DLI.setHeight(Meters.of(0)));
-    // intaking sequence
-    // m_driverController.triangle().onTrue(new SequentialCommandGroup(
-    //   DLI.setHeight(IntakeConstants.EXTEND_SETPOINT),
-    //   rollers.intake()
-    // ));
-    // // retracting sequence
-    // m_driverController.cross().onTrue(new SequentialCommandGroup(
-    //   rollers.stopRollers(),
-    //   DLI.setHeight(IntakeConstants.RETRACT_SETPOINT)
-    // ));
-    // DLI.protectIntake();
     m_driverController.povUp().whileTrue(drivebase.driveForward());
     m_driverController.povDown().whileTrue(drivebase.driveBackward());
     m_driverController.povLeft().whileTrue(drivebase.driveLeft());
     m_driverController.povRight().whileTrue(drivebase.driveRight());  
     m_driverController.start().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
 
-  //   m_driverController.leftBumper().whileTrue(
-  //     new ParallelCommandGroup(
-  //       DLI.setHeight(IntakeConstants.EXTEND_SETPOINT),
-  //       rollers.intake()))
-  //       .onFalse(new SequentialCommandGroup(
-  //       rollers.stopRollers()));
-  //   m_driverController.rightBumper().onTrue(DLI.setHeight(IntakeConstants.RETRACT_SETPOINT));
     m_driverController.leftBumper().whileTrue(m_rollers.intake()).onFalse(m_rollers.stopRollers());
     m_driverController.a().onTrue(m_shooterSubsystem.aimAt(Degrees.of(30)));
 		m_driverController.b().onTrue(m_shooterSubsystem.aimAt(Degrees.of(9)));
 
     //Flywheel binding
-		m_driverController.x().onTrue(m_shooterSubsystem.runShooter(ShooterConstants.FLYWHEEL_TARGET_ANGULAR_VELOCITY));
+		m_driverController.x().onTrue(m_shooterSubsystem.runShooter(FlyWheelConstants.FLYWHEEL_TARGET_ANGULAR_VELOCITY));
     m_driverController.y().onTrue(m_shooterSubsystem.stopFlyWheel());
 		// // Feeder binding
-		m_driverController.leftBumper().onTrue(new InstantCommand(() -> m_shooterSubsystem.runFeeder(ShooterConstants.FEEDER_TARGET_SPEED)));
-    m_driverController.rightBumper().onTrue(new InstantCommand(() -> m_shooterSubsystem.stopFeeder()) );
+		m_driverController.rightTrigger().onTrue(new InstantCommand(() -> m_shooterSubsystem.runFeeder(FeederConstants.FEEDER_TARGET_SPEED)));
+    m_driverController.leftTrigger().onTrue(feederTwoSubsystem.stop());
   }
-
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
   }

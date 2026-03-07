@@ -5,6 +5,9 @@
 package frc.robot;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
+import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
@@ -125,10 +128,10 @@ public class Constants {
   public static class IndexerConstants {
     public static final int INDEXER_MOTOR_CAN_ID = 19;
     public static final double AGGRESIVE_MOTOR_SPEED = 0.125;
+    public static final boolean TELEMETRY = false;
   }
-  public static class ShooterConstants {
-
-		/*Flywheel Subsystem*/
+  public static class FlyWheelConstants {
+    /*Flywheel Subsystem*/
 		public static final int FLYWHEEL_LEADER_ID = 20;
 		public static final int FLYWHEEL_FOLLOWER_ID = 21;
 		//TODO: needs to be tuned
@@ -150,7 +153,9 @@ public class Constants {
 		public static final Distance FLYWHEEL_DIAMETER = Inches.of(3);
 		public static final MomentOfInertia FLYWHEEL_MOI = KilogramSquareMeters.of(0.0006438072);
 
-		/*Hood Subsystem*/
+  }
+  public static class HoodConstants {
+    /*Hood Subsystem*/
 		public static final int HOOD_ID = 22;
 		//TODO: needs to be tuned
 		public static final double HOOD_KP = 30.865;
@@ -170,7 +175,7 @@ public class Constants {
 		public static final double HOOD_KV = 11.922;
 		public static final double HOOD_KA = 0.37754;
 
-		public static final MechanismGearing HOOD_GEARING = new MechanismGearing(GearBox.fromReductionStages((double) 80 /14, (double) 24 /18, (double) 170 /10));
+		public static final MechanismGearing HOOD_GEARING = new MechanismGearing(GearBox.fromStages("80:14","24:18","170:10"));//new MechanismGearing(GearBox.fromReductionStages((double) 80 /14, (double) 24 /18, (double) 170 /10));
 		public static final Distance HOOD_LENGTH = Inches.of(8.884333);
 		public static final MomentOfInertia HOOD_MOI = KilogramSquareMeters.of(0.0664243573);
 		public static final Angle HOOD_SOFT_LIMIT_LOW = Degrees.of(5.5);
@@ -179,7 +184,9 @@ public class Constants {
 		public static final Angle HOOD_START_POSITION = Degrees.of(5.5);
 		public static final Angle  HOOD_HARD_LIMIT_HIGH = Degrees.of(45);
 
-		/*Feeder Subsystem*/
+  }
+  public static class FeederConstants {
+    /*Feeder Subsystem*/
 		public static final int FEEDER_ID = 23;
 		//TODO: Needs to be tuned
 		public static final double FEEDER_KP = 40;
@@ -189,7 +196,7 @@ public class Constants {
 		public static final double FEEDER_SUPPLY = 20;
 		public static final double FEEDER_KV = 1;
 		public static final double FEEDER_KA = 1;
-		public static final double FEEDER_TARGET_SPEED = 0.75; //TODO: Must be tested
+		public static final double FEEDER_TARGET_SPEED = 30; //TODO: Must be tested
 
 		public static final double FEEDER_SIM_LENGTH = 0.0762;
 
@@ -200,5 +207,84 @@ public class Constants {
 		public static final int BEAM_BREAK_BOTTOM_ID = 5;
 		public static final int BEAM_BREAK_TOP_ID = 6;
 
+  }
+  public static class ShooterConstants {
+    public static double reverse(double angle){
+		  return Math.abs(90 - angle);
+    }
+    // Degree to Displacement mapping
+    public static final InterpolatingTreeMap<Double, Rotation2d> hoodAngleMapHub =
+			new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Rotation2d::interpolate);
+    public static final InterpolatingTreeMap<Double, Rotation2d> hoodAngleMapNeutral =
+        new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Rotation2d::interpolate);
+    public static final InterpolatingTreeMap<Double, Rotation2d> hoodAngleMapZone =
+        new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Rotation2d::interpolate);
+
+    static {
+      hoodAngleMapHub.put(36d, Rotation2d.fromDegrees(reverse(84.5)));
+      hoodAngleMapHub.put(40d, Rotation2d.fromDegrees(reverse(84.5)));
+      hoodAngleMapHub.put(50d, Rotation2d.fromDegrees(reverse(84.5)));
+      hoodAngleMapHub.put(60d, Rotation2d.fromDegrees(reverse(83.5)));
+      hoodAngleMapHub.put(70d, Rotation2d.fromDegrees(reverse(82.5)));
+      hoodAngleMapHub.put(80d, Rotation2d.fromDegrees(reverse(81.5)));
+      hoodAngleMapHub.put(90d, Rotation2d.fromDegrees(reverse(80)));
+      hoodAngleMapHub.put(100d, Rotation2d.fromDegrees(reverse(79)));
+      hoodAngleMapHub.put(110d, Rotation2d.fromDegrees(reverse(77.5)));
+      hoodAngleMapHub.put(120d, Rotation2d.fromDegrees(reverse(76)));
+      hoodAngleMapHub.put(130d, Rotation2d.fromDegrees(reverse(74.5)));
+      hoodAngleMapHub.put(140d, Rotation2d.fromDegrees(reverse(73)));
+      hoodAngleMapHub.put(150d, Rotation2d.fromDegrees(reverse(72)));
+      hoodAngleMapHub.put(160d, Rotation2d.fromDegrees(reverse(70.5)));
+      hoodAngleMapHub.put(170d, Rotation2d.fromDegrees(reverse(69)));
+      hoodAngleMapHub.put(180d, Rotation2d.fromDegrees(reverse(67.5)));
+      hoodAngleMapHub.put(190d, Rotation2d.fromDegrees(reverse(65.5)));
+      hoodAngleMapHub.put(200d, Rotation2d.fromDegrees(reverse(63.5)));
+      hoodAngleMapHub.put(210d, Rotation2d.fromDegrees(reverse(60.5)));
+      hoodAngleMapHub.put(220d, Rotation2d.fromDegrees(reverse(57)));
+
+      hoodAngleMapNeutral.put(140d, Rotation2d.fromDegrees(reverse(80.5)));
+      hoodAngleMapNeutral.put(150d, Rotation2d.fromDegrees(reverse(80)));
+      hoodAngleMapNeutral.put(160d, Rotation2d.fromDegrees(reverse(79)));
+      hoodAngleMapNeutral.put(170d, Rotation2d.fromDegrees(reverse(78.5)));
+      hoodAngleMapNeutral.put(180d, Rotation2d.fromDegrees(reverse(77.5)));
+      hoodAngleMapNeutral.put(190d, Rotation2d.fromDegrees(reverse(77)));
+      hoodAngleMapNeutral.put(200d, Rotation2d.fromDegrees(reverse(76.5)));
+      hoodAngleMapNeutral.put(210d, Rotation2d.fromDegrees(reverse(75.5)));
+      hoodAngleMapNeutral.put(220d, Rotation2d.fromDegrees(reverse(75)));
+      hoodAngleMapNeutral.put(230d, Rotation2d.fromDegrees(reverse(74)));
+      hoodAngleMapNeutral.put(240d, Rotation2d.fromDegrees(reverse(73)));
+      hoodAngleMapNeutral.put(250d, Rotation2d.fromDegrees(reverse(72.5)));
+      hoodAngleMapNeutral.put(260d, Rotation2d.fromDegrees(reverse(71.5)));
+      hoodAngleMapNeutral.put(270d, Rotation2d.fromDegrees(reverse(71)));
+      hoodAngleMapNeutral.put(280d, Rotation2d.fromDegrees(reverse(70)));
+      hoodAngleMapNeutral.put(290d, Rotation2d.fromDegrees(reverse(69)));
+      hoodAngleMapNeutral.put(300d, Rotation2d.fromDegrees(reverse(68)));
+      hoodAngleMapNeutral.put(310d, Rotation2d.fromDegrees(reverse(67.5)));
+      hoodAngleMapNeutral.put(320d, Rotation2d.fromDegrees(reverse(66.5)));
+      hoodAngleMapNeutral.put(330d, Rotation2d.fromDegrees(reverse(65.5)));
+      hoodAngleMapNeutral.put(340d, Rotation2d.fromDegrees(reverse(64.5)));
+      hoodAngleMapNeutral.put(350d, Rotation2d.fromDegrees(reverse(63)));
+      hoodAngleMapNeutral.put(360d, Rotation2d.fromDegrees(reverse(62)));
+      hoodAngleMapNeutral.put(370d, Rotation2d.fromDegrees(reverse(61)));
+      hoodAngleMapNeutral.put(380d, Rotation2d.fromDegrees(reverse(59.5)));
+      hoodAngleMapNeutral.put(390d, Rotation2d.fromDegrees(reverse(58.5)));
+      hoodAngleMapNeutral.put(400d, Rotation2d.fromDegrees(reverse(57)));
+      hoodAngleMapNeutral.put(410d, Rotation2d.fromDegrees(reverse(55)));
+      hoodAngleMapNeutral.put(420d, Rotation2d.fromDegrees(reverse(53)));
+
+      hoodAngleMapZone.put(430d, Rotation2d.fromDegrees(reverse(65)));
+      hoodAngleMapZone.put(440d, Rotation2d.fromDegrees(reverse(64)));
+      hoodAngleMapZone.put(450d, Rotation2d.fromDegrees(reverse(63)));
+      hoodAngleMapZone.put(460d, Rotation2d.fromDegrees(reverse(62.5)));
+      hoodAngleMapZone.put(470d, Rotation2d.fromDegrees(reverse(61.5)));
+      hoodAngleMapZone.put(480d, Rotation2d.fromDegrees(reverse(60.5)));
+      hoodAngleMapZone.put(490d, Rotation2d.fromDegrees(reverse(59.5)));
+      hoodAngleMapZone.put(500d, Rotation2d.fromDegrees(reverse(58.5)));
+      hoodAngleMapZone.put(510d, Rotation2d.fromDegrees(reverse(57.5)));
+      hoodAngleMapZone.put(520d, Rotation2d.fromDegrees(reverse(56)));
+      hoodAngleMapZone.put(530d, Rotation2d.fromDegrees(reverse(54.5)));
+      hoodAngleMapZone.put(540d, Rotation2d.fromDegrees(reverse(53)));
+      hoodAngleMapZone.put(550d, Rotation2d.fromDegrees(reverse(51)));
+    }
 	}
 }

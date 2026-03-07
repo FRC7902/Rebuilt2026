@@ -7,8 +7,10 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
@@ -17,13 +19,11 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.Constants.ShooterConstants;
-
-import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.FeederConstants;
 
 public class FeederSubsystem extends SubsystemBase {
-	private static final TalonFX feederMotor = new TalonFX(ShooterConstants.FEEDER_ID);
+	private static final TalonFX feederMotor = new TalonFX(FeederConstants.FEEDER_ID);
 	private final TalonFXSimState feederSim;
 	private final DCMotorSim feederSimModel;
 	private final Mechanism2d mech2d;
@@ -33,33 +33,33 @@ public class FeederSubsystem extends SubsystemBase {
 	private final PositionVoltage positionRequest;
 	private final VelocityVoltage velocityRequest;
 
-	private static final DigitalInput BeamBreakBottomFeeder = new DigitalInput(ShooterConstants.BEAM_BREAK_BOTTOM_ID);
-	private static final DigitalInput BeamBreakTop = new DigitalInput(ShooterConstants.BEAM_BREAK_TOP_ID);
+	private static final DigitalInput BeamBreakBottomFeeder = new DigitalInput(FeederConstants.BEAM_BREAK_BOTTOM_ID);
+	private static final DigitalInput BeamBreakTop = new DigitalInput(FeederConstants.BEAM_BREAK_TOP_ID);
 
 	public FeederSubsystem() {
 		feederSim = feederMotor.getSimState();
 		feederSimModel = new DCMotorSim(
 				LinearSystemId.createDCMotorSystem(
-						DCMotor.getKrakenX60Foc(1),ShooterConstants.FEEDER_KA, ShooterConstants.FEEDER_GEAR_RATIO
+						DCMotor.getKrakenX60Foc(1),FeederConstants.FEEDER_KA, FeederConstants.FEEDER_GEAR_RATIO
 				),
 				DCMotor.getKrakenX60Foc(1)
 		);
 		mech2d = new Mechanism2d(1,1);
 		MechanismRoot2d root = mech2d.getRoot("feeder", 0.5, 0.5);
-		feederLig= root.append(new MechanismLigament2d("Feeder", ShooterConstants.FEEDER_SIM_LENGTH, 0));
+		feederLig= root.append(new MechanismLigament2d("Feeder", FeederConstants.FEEDER_SIM_LENGTH, 0));
 		TalonFXConfiguration config = new TalonFXConfiguration();
 		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 		config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-		config.CurrentLimits.StatorCurrentLimit = ShooterConstants.FEEDER_STATOR;
+		config.CurrentLimits.StatorCurrentLimit = FeederConstants.FEEDER_STATOR;
 		config.CurrentLimits.StatorCurrentLimitEnable = true;
-		config.CurrentLimits.SupplyCurrentLimit = ShooterConstants.FEEDER_SUPPLY;
+		config.CurrentLimits.SupplyCurrentLimit = FeederConstants.FEEDER_SUPPLY;
 		config.CurrentLimits.SupplyCurrentLimitEnable=true;
 
-		config.Slot0.kP = ShooterConstants.FEEDER_KP;
-		config.Slot0.kI = ShooterConstants.FEEDER_KI;
-		config.Slot0.kD = ShooterConstants.FEEDER_KD;
-		config.Slot0.kV = ShooterConstants.FEEDER_KV;
-		config.Slot0.kA = ShooterConstants.FEEDER_KA;
+		config.Slot0.kP = FeederConstants.FEEDER_KP;
+		config.Slot0.kI = FeederConstants.FEEDER_KI;
+		config.Slot0.kD = FeederConstants.FEEDER_KD;
+		config.Slot0.kV = FeederConstants.FEEDER_KV;
+		config.Slot0.kA = FeederConstants.FEEDER_KA;
 
 		config.MotionMagic.MotionMagicAcceleration = 10;
 		config.MotionMagic.MotionMagicCruiseVelocity = 10;
@@ -79,12 +79,13 @@ public class FeederSubsystem extends SubsystemBase {
 		feederMotor.stopMotor();
 	}
 
-	public static boolean getBeamBreakBottomFeeder(){
+	private static boolean getBeamBreakBottomFeeder(){
 		return BeamBreakBottomFeeder.get();
 	}
-	public static boolean getBeamBreakTop(){
+	private static boolean getBeamBreakTop(){
 		return BeamBreakTop.get();
 	}
+	@Override
 	public void periodic() {
 		SmartDashboard.putData("Feeder/Mech2d", mech2d);
 		SmartDashboard.putBoolean("Feeder/Beam Break bottom: ", getBeamBreakBottomFeeder());
@@ -96,13 +97,13 @@ public class FeederSubsystem extends SubsystemBase {
 		if(getBeamBreakBottomFeeder()){
 			timer.reset();
 		}
-		if(timer.hasElapsed(ShooterConstants.FEEDER_TIME_PERIOD)){
+		if(timer.hasElapsed(FeederConstants.FEEDER_TIME_PERIOD)){
 
 			timerEnded = true;
 			timer.stop();
 		}
 	}
-	public static void startTimer(){
+	private static void startTimer(){
 		timerEnded = false;
 		timer.stop();
 		timer.reset();
@@ -110,10 +111,9 @@ public class FeederSubsystem extends SubsystemBase {
 	public static boolean isHopperAlmostEmpty(){
 		return timerEnded;
 	}
-
 	@Override
 	public void simulationPeriodic() {
-		feederSim.setSupplyVoltage(ShooterConstants.FEEDER_VOLTAGE);
+		feederSim.setSupplyVoltage(FeederConstants.FEEDER_VOLTAGE);
 		Voltage motorVoltage = feederSim.getMotorVoltageMeasure();
 
 		feederSimModel.setInput(feederSim.getMotorVoltage());
@@ -121,7 +121,7 @@ public class FeederSubsystem extends SubsystemBase {
 		feederSimModel.setInputVoltage(motorVoltage.in(Volts));
 		feederSimModel.update(0.02);
 
-		feederSim.setRawRotorPosition(feederSimModel.getAngularPosition().times(ShooterConstants.FEEDER_GEAR_RATIO));
-		feederSim.setRotorVelocity(feederSimModel.getAngularVelocity().times(ShooterConstants.FEEDER_GEAR_RATIO));
+		feederSim.setRawRotorPosition(feederSimModel.getAngularPosition().times(FeederConstants.FEEDER_GEAR_RATIO));
+		feederSim.setRotorVelocity(feederSimModel.getAngularVelocity().times(FeederConstants.FEEDER_GEAR_RATIO));
 	}
 }

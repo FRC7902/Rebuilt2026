@@ -33,7 +33,7 @@ import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
-public class LinearSlide extends SubsystemBase {
+public class LinearIntakeSubsystem extends SubsystemBase {
   // Vendor motor controller object
   private final TalonFX m_linearMotor = new TalonFX(IntakeConstants.LINEAR_MOTOR_CAN_ID);
   private final DigitalInput m_fullyRetractedLimitSwitch;
@@ -51,7 +51,7 @@ public class LinearSlide extends SubsystemBase {
   .withFeedforward(IntakeConstants.FEED_FORWARD)
   .withSimFeedforward(new ElevatorFeedforward(IntakeConstants.Linear_kS, IntakeConstants.Linear_kG, IntakeConstants.Linear_kV))
   // Telemetry name and verbosity level
-  .withTelemetry("ElevatorMotor", TelemetryVerbosity.HIGH)
+  .withTelemetry("LinearIntakeMotor", TelemetryVerbosity.HIGH)
   // Gearing from the motor rotor to final shaft.
   // In this example GearBox.fromReductionStages(3,4) is the same as GearBox.fromStages("3:1","4:1") which corresponds to the gearbox attached to your motor.
   // You could also use .withGearing(12) which does the same thing.
@@ -71,11 +71,17 @@ public class LinearSlide extends SubsystemBase {
   private ElevatorConfig linearMotorconfig = new ElevatorConfig(linearMotorController)
       .withStartingHeight(IntakeConstants.STARTING_HEIGHT)
       .withHardLimits(IntakeConstants.MIN_HARD_LIMIT, IntakeConstants.MAX_HARD_LIMIT)
-      .withTelemetry("Elevator", TelemetryVerbosity.HIGH)
+      .withTelemetry("LinearIntake", TelemetryVerbosity.HIGH)
       .withMass(IntakeConstants.DLI_MASS)
       .withAngle(IntakeConstants.DLI_ANGLE);
   // Elevator Mechanism
   private Elevator elevator = new Elevator(linearMotorconfig);
+
+  /** Creates a new LinearSlide. */
+  public LinearIntakeSubsystem() {
+    m_fullyExtendedLimitSwitch = new DigitalInput(IntakeConstants.EXTENDED_LIMIT_SWITCH_DIO);
+    m_fullyRetractedLimitSwitch = new DigitalInput(IntakeConstants.RETRACTED_LIMIT_SWITCH_DIO);
+  }
   /**
    * Set the height of the elevator and does not end the command when reached.
    * @param angle Distance to go to.
@@ -110,23 +116,23 @@ public class LinearSlide extends SubsystemBase {
   public Command protectIntake(){
     return new ConditionalCommand(
       new InstantCommand(() -> {
-        setHeight(IntakeConstants.RETRACT_SETPOINT);
+        setHeight(IntakeConstants.MID_SETPOINT);
       }),
       Commands.none(), 
-      () -> !extendedLimitSwitchTouched() && getElevatorSetpoint().equals(IntakeConstants.EXTEND_SETPOINT)
+      () -> !extendedLimitSwitchTouched() && getElevatorSetpoint().get().equals(IntakeConstants.EXTEND_SETPOINT)
     ).repeatedly();
   }
 
   //Gets the elevator's setpoint as a distance
-  public Distance getElevatorSetpoint(){
+  public Optional<Distance> getElevatorSetpoint(){
     Optional<Angle> angle_position = elevator.getMechanismSetpoint();
-    if (!angle_position.isPresent()){
-      return null;
+    if(!angle_position.isPresent()){
+      return Optional.of(Meters.of(-1));
     }
-    return linearConfig.convertFromMechanism(angle_position.get());
+    return Optional.of(linearConfig.convertFromMechanism(angle_position.get()));
   }
   // Corrects the elevator position
-  public void setElevatorPosition(Distance actualPosition){
+  public void correctElevatorPosition(Distance actualPosition){
     Angle encoderPosition = linearConfig.convertToMechanism(actualPosition);
     linearMotorController.setEncoderPosition(encoderPosition);
   }
@@ -135,11 +141,7 @@ public class LinearSlide extends SubsystemBase {
     return elevator.getHeight();
   }
 
-  /** Creates a new LinearSlide. */
-  public LinearSlide() {
-    m_fullyExtendedLimitSwitch = new DigitalInput(IntakeConstants.EXTENDED_LIMIT_SWITCH_DIO);
-    m_fullyRetractedLimitSwitch = new DigitalInput(IntakeConstants.RETRACTED_LIMIT_SWITCH_DIO);
-  }
+  
   public boolean extendedLimitSwitchTouched(){
     return m_fullyExtendedLimitSwitch.get(); //TODO: Need to check behaviour
   }

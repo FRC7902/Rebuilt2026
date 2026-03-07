@@ -4,10 +4,6 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfigurator;
-import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.wpilibj.motorcontrol.PWMTalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -15,31 +11,20 @@ import frc.robot.Constants.RollerConstants;
 
 public class Rollers extends SubsystemBase {
   /** Creates a new Rollers. */
-  private final PWMTalonFX m_rollerMotor;
+  private final PWMTalonFX m_motor;
 
   public Rollers() {
-    m_rollerMotor = new PWMTalonFX(RollerConstants.ROLLER_MOTOR_PWM_ID);
-
-    // PWMTalonFXConfigurator rollerConfig = m_rollerMotor.getConfigurator();
-    // CurrentLimitsConfigs limitsConfigs = new CurrentLimitsConfigs();
-
-    // limitsConfigs.StatorCurrentLimit = RollerConstants.STATOR_CURRENT_LIMIT;
-    // limitsConfigs.StatorCurrentLimitEnable = true;
-
-    // limitsConfigs.SupplyCurrentLimit = RollerConstants.SUPPLY_CURRENT_LIMIT;
-    // limitsConfigs.SupplyCurrentLimitEnable = true;
-
-    // rollerConfig.apply(limitsConfigs);
+    m_motor = new PWMTalonFX(RollerConstants.ROLLER_MOTOR_PWM_ID);
   }
 
   public Command intake() {
-    return runOnce(() -> m_rollerMotor.set(RollerConstants.INTAKE_SPEED));
+    return runOnce(() -> m_motor.set(RollerConstants.INTAKE_SPEED));
   }
   public Command outtake() {
-    return runOnce(() -> m_rollerMotor.set(RollerConstants.OUTAKE_SPEED));
+    return runOnce(() -> m_motor.set(RollerConstants.OUTAKE_SPEED));
   }
   public Command stopRollers(){
-    return runOnce(() -> m_rollerMotor.stopMotor());
+    return runOnce(() -> m_motor.stopMotor());
   }
 
   @Override
