@@ -25,7 +25,7 @@ import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.LinearIntakeSubsystem;
 import frc.robot.subsystems.Rollers;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.shooter.FeederTwoSubsystem;
+import frc.robot.subsystems.shooter.FeederSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import swervelib.SwerveInputStream;
 
@@ -37,7 +37,7 @@ public class RobotContainer {
   Rollers m_rollers = new Rollers();
   public static IndexerSubsystem m_indexer = new IndexerSubsystem();
   ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
-  FeederTwoSubsystem feederTwoSubsystem = new FeederTwoSubsystem();
+  FeederSubsystem feederSubsystem = new FeederSubsystem();
 
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
@@ -138,7 +138,7 @@ public class RobotContainer {
     m_driverController.y().onTrue(m_shooterSubsystem.stopFlyWheel());
 		// // Feeder binding
 		m_driverController.rightTrigger().onTrue(new InstantCommand(() -> m_shooterSubsystem.runFeeder(FeederConstants.FEEDER_TARGET_SPEED)));
-    m_driverController.leftTrigger().onTrue(feederTwoSubsystem.stop());
+    m_driverController.leftTrigger().onTrue(feederSubsystem.stop());
   }
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");

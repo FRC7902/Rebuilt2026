@@ -196,16 +196,20 @@ public class Constants {
 		public static final double FEEDER_SUPPLY = 20;
 		public static final double FEEDER_KV = 1;
 		public static final double FEEDER_KA = 1;
-		public static final double FEEDER_TARGET_SPEED = 30; //TODO: Must be tested
+		public static final AngularVelocity FEEDER_TARGET_SPEED = RPM.of(30); //TODO: Must be tested
 
 		public static final double FEEDER_SIM_LENGTH = 0.0762;
 
 		public static final double FEEDER_TIME_PERIOD = 2;
 		public static final double FEEDER_GEAR_RATIO = 10;
+    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("1:10"));
 		public static final double FEEDER_VOLTAGE = 12;
 
 		public static final int BEAM_BREAK_BOTTOM_ID = 5;
 		public static final int BEAM_BREAK_TOP_ID = 6;
+
+    public static final Mass MASS = Pounds.of(1); //TODO: Needs to be tuned
+
 
   }
   public static class ShooterConstants {

@@ -1,7 +1,6 @@
 package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.RPM;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -13,18 +12,18 @@ public class ShooterSubsystem extends SubsystemBase {
 	//initialise required subsystems
 	private final HoodSubsystem m_hoodSubsystem;
 	private final FlywheelSubsystem m_flywheelSubsystem;
-	private final FeederTwoSubsystem m_feederSubsystem;
+	private final FeederSubsystem m_feederSubsystem;
 
 	//Necessary variables
 
 	public ShooterSubsystem() {
 		m_hoodSubsystem = new HoodSubsystem();
 		m_flywheelSubsystem = new FlywheelSubsystem();
-		m_feederSubsystem = new FeederTwoSubsystem();
+		m_feederSubsystem = new FeederSubsystem();
 	}
 
-	public void runFeeder(double speed){
-		m_feederSubsystem.setVelocity(RPM.of(speed));
+	public void runFeeder(AngularVelocity speed){
+		m_feederSubsystem.setVelocity(speed);
 	}
 	public void stopFeeder(){
 		m_feederSubsystem.stop();
