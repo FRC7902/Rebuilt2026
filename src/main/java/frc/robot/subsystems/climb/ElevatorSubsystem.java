@@ -29,8 +29,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ClimbConstants.ElevatorConstants;
+import frc.robot.Constants.MechanismPositionConstants;
 import frc.robot.Robot;
 import yams.mechanisms.config.ElevatorConfig;
+import yams.mechanisms.config.MechanismPositionConfig;
 import yams.mechanisms.positional.Elevator;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
@@ -124,10 +126,16 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_leaderSmartMotorController = new TalonFXWrapper(m_leaderMotor, ElevatorConstants.LEADER_MOTOR,
                 m_leaderMotorSMCConfig);
 
+        MechanismPositionConfig m_robotToMechanism = new MechanismPositionConfig()
+                .withMaxRobotHeight(MechanismPositionConstants.ROBOT_MAX_HEIGHT)
+                .withMaxRobotLength(MechanismPositionConstants.ROBOT_MAX_LENGTH)
+                .withRelativePosition(ElevatorConstants.RELATIVE_POSITION);
+
         ElevatorConfig climbConfig = new ElevatorConfig(m_leaderSmartMotorController)
                 .withMass(ElevatorConstants.MASS)
                 .withTelemetry("Elevator", Constants.TELEMETRY_VERBOSITY)
-                .withHardLimits(ElevatorConstants.HARD_LOWER_LIMIT, ElevatorConstants.HARD_UPPER_LIMIT);
+                .withHardLimits(ElevatorConstants.HARD_LOWER_LIMIT, ElevatorConstants.HARD_UPPER_LIMIT)
+                .withMechanismPositionConfig(m_robotToMechanism);
 
         if (Robot.isSimulation()) {
             climbConfig.withStartingHeight(ElevatorConstants.STARTING_HEIGHT);

@@ -474,6 +474,10 @@ public final class Constants {
             public static final Time HOMING_DEBOUNCE_TIME = Seconds.of(0.4); // TODO
             public static final Voltage HOMING_RUN_VOLTS = Volts.of(-2); // TODO
             public static final AngularVelocity HOMING_VELOCITY_THRESHOLD = DegreesPerSecond.of(2); // TODO
+
+            public static final Translation3d RELATIVE_POSITION = new Translation3d(Meters.of(-0.3),
+                    Meters.of(0),
+                    Meters.of(0.1));
         }
 
         public static final class TongueConstants {
