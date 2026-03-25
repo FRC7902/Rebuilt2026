@@ -1,11 +1,7 @@
 {
     "fileName": "yams.json",
     "name": "Yet Another Mechanism System",
-<<<<<<< HEAD
     "version": "2026.3.19.1",
-=======
-    "version": "2026.2.8",
->>>>>>> 8ba933e (still trying to fix YAMS just midpoint not the end only just incase i lost my code)
     "frcYear": "2026",
     "uuid": "a1051e86-a979-4880-a28b-a0d5362d1d96",
     "mavenUrls": [
@@ -16,11 +12,7 @@
         {
             "groupId": "yams",
             "artifactId": "YAMS-java",
-<<<<<<< HEAD
             "version": "2026.3.12"
-=======
-            "version": "2026.2.8"
->>>>>>> 8ba933e (still trying to fix YAMS just midpoint not the end only just incase i lost my code)
         }
     ],
     "cppDependencies": [],

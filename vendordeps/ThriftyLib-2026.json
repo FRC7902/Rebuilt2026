@@ -1,11 +1,7 @@
 {
     "fileName": "ThriftyLib-2026.json",
     "name": "ThriftyLib",
-<<<<<<< HEAD
     "version": "2026.1.2",
-=======
-    "version": "2026.0.1",
->>>>>>> 2b2a5a0 (I did the subsystem currently working on the bindings and the command)
     "frcYear": "2026",
     "uuid": "60b2694b-9e6e-4026-81ee-6f167946f4b0",
     "mavenUrls": [
@@ -16,11 +12,7 @@
         {
             "groupId": "com.thethriftybot.frc",
             "artifactId": "ThriftyLib-java",
-<<<<<<< HEAD
             "version": "2026.1.2"
-=======
-            "version": "2026.0.1"
->>>>>>> 2b2a5a0 (I did the subsystem currently working on the bindings and the command)
         }
     ],
     "jniDependencies": [],
