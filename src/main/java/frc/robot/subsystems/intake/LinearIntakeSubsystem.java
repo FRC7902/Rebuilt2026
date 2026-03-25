@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
@@ -101,6 +102,7 @@ public class LinearIntakeSubsystem extends SubsystemBase {
                         LinearIntakeConstants.HARD_LIMIT_MAX)
                 .withTelemetry("LinearIntakeMech", Constants.TELEMETRY_VERBOSITY)
                 .withMechanismPositionConfig(m_robotToMechanism)
+                .withAngle(LinearIntakeConstants.MECHANISM_ANGLE)
                 .withMass(LinearIntakeConstants.MECHANISM_MASS)
                 .withHorizontalElevator();
 

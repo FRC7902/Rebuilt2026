@@ -174,9 +174,9 @@ public final class Constants {
             public static final Distance SHUFFLE_FURTHEST_POSITION = EXTENDED_POSITION
                     .minus(Meters.of(0.05));
 
-            public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(0),
-                    Inches.of(10.682),
-                    Inches.of(22.767 / 2));
+            public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(-12),
+                    Inches.of(0),
+                    Inches.of(9));
         }
     }
 
@@ -365,9 +365,9 @@ public final class Constants {
             public static final Angle ANGLE_TARGET_ERROR_WHILE_FEEDING = Degrees.of(3.5);
             public static final double AT_ANGLE_DEBOUNCE_TIME = 0.2; // TODO
 
-            public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(-5.087),
-                    Inches.of(9.017),
-                    Inches.of(17.912 / 2));
+            public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(2.0),
+                    Inches.of(0),
+                    Inches.of(8));
         }
 
         public static final class FeederConstants {
