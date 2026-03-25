@@ -36,7 +36,9 @@ public class AutoConstants {
             Map.entry(Position.NEUTRAL_RIGHT_4,
                     new Pose2d(6.25515079498291, 0.632, new Rotation2d(Degrees.of(90)))),
             Map.entry(Position.NEUTRAL_RIGHT_5,
-                    new Pose2d(5.857057571411133, 1.9135074615478516, new Rotation2d(-1.100613104652783))),
+                    new Pose2d(5.857057571411133, 1.9135074615478516,
+                            new Rotation2d(-1.100613104652783))),
             Map.entry(Position.NEUTRAL_RIGHT_6,
-                    new Pose2d(5.857057571411133, 3.4187989234924316, new Rotation2d(-1.100613104652783))));
+                    new Pose2d(5.857057571411133, 3.4187989234924316,
+                            new Rotation2d(-1.100613104652783))));
 }
