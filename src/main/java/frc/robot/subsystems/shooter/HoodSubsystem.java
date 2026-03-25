@@ -1,98 +1,270 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.subsystems.shooter;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.system.plant.DCMotor;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Volts;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
+
+import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.ShooterConstants;
-
-import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.ShooterConstants.HoodConstants;
+import frc.robot.Constants.ShooterConstants.ShooterZone;
+import frc.robot.Constants.MechanismPositionConstants;
+import frc.robot.Constants.ShooterConstants;
+import frc.robot.Robot;
+import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ArmConfig;
+import yams.mechanisms.config.MechanismPositionConfig;
 import yams.mechanisms.positional.Arm;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
+import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
+import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
-import java.util.function.Supplier;
-
-import static edu.wpi.first.units.Units.*;
-
 public class HoodSubsystem extends SubsystemBase {
-	public final TalonFX hoodMotor = new TalonFX(ShooterConstants.HOOD_ID);
 
-	private final SmartMotorControllerConfig hoodMotorConfig = new SmartMotorControllerConfig(this)
-			.withClosedLoopController(ShooterConstants.HOOD_KP, ShooterConstants.HOOD_KI, ShooterConstants.HOOD_KD, ShooterConstants.HOOD_MAX_VELOCITY, ShooterConstants.HOOD_MAX_ACCELERATION)
-			.withSimClosedLoopController(ShooterConstants.HOOD_SIM_KP, ShooterConstants.HOOD_SIM_KI, ShooterConstants.HOOD_SIM_KD, ShooterConstants.HOOD_MAX_VELOCITY, ShooterConstants.HOOD_MAX_ACCELERATION)
-			.withGearing(ShooterConstants.HOOD_GEARING)
-			.withIdleMode(ShooterConstants.HOOD_MOTOR_IDLE_MODE)
-			.withTelemetry("HoodMotor", SmartMotorControllerConfig.TelemetryVerbosity.LOW)
-			.withStatorCurrentLimit(ShooterConstants.HOOD_STATOR)
-			.withSupplyCurrentLimit(ShooterConstants.HOOD_SUPPLY)
-			.withMotorInverted(false)
-			.withClosedLoopRampRate(ShooterConstants.HOOD_CLOSED_RATE)
-			.withOpenLoopRampRate(ShooterConstants.HOOD_OPEN_RATE)
-			.withFeedforward(new SimpleMotorFeedforward(ShooterConstants.HOOD_KS, ShooterConstants.HOOD_KV, ShooterConstants.HOOD_KA))
-			.withSimFeedforward(new SimpleMotorFeedforward(ShooterConstants.HOOD_KS, ShooterConstants.HOOD_KV, ShooterConstants.HOOD_KA))
-			.withControlMode(SmartMotorControllerConfig.ControlMode.CLOSED_LOOP);
+    private final TalonFX m_motor;
+    // private final CANcoder m_encoder;
 
-	private final SmartMotorController hoodSMC = new TalonFXWrapper(hoodMotor, DCMotor.getKrakenX44Foc(1), hoodMotorConfig);
-	private final ArmConfig hoodConfig = new ArmConfig(hoodSMC)
-			.withStartingPosition(ShooterConstants.HOOD_SOFT_LIMIT_LOW)
-			.withLength(ShooterConstants.HOOD_LENGTH)
-			.withMOI(ShooterConstants.HOOD_MOI)
-			.withTelemetry("HoodMech", SmartMotorControllerConfig.TelemetryVerbosity.LOW)
-			.withSoftLimits(ShooterConstants.HOOD_SOFT_LIMIT_LOW, ShooterConstants.HOOD_SOFT_LIMIT_HIGH)
-			.withHardLimit(ShooterConstants.HOOD_HARD_LIMIT_LOW, ShooterConstants.HOOD_HARD_LIMIT_HIGH);
+    private final SmartMotorController m_smartMotorController;
 
-	private final Arm hood = new Arm(hoodConfig);
+    private final Arm m_hood;
 
-	public HoodSubsystem() {
+    private final Debouncer m_atAngleDebouncer = new Debouncer(HoodConstants.AT_ANGLE_DEBOUNCE_TIME,
+            Debouncer.DebounceType.kRising);
 
-	}
+    public HoodSubsystem() {
+        m_motor = new TalonFX(HoodConstants.MOTOR_CAN_ID);
+        // m_encoder = new CANcoder(HoodConstants.ENCODER_CAN_ID);
 
-	public Command setAngle(Angle angle) {
-		return hood.setAngle(angle);
-	}
+        SmartMotorControllerConfig m_smcConfig = new SmartMotorControllerConfig(this)
+                .withClosedLoopController(
+                        HoodConstants.PID_kP,
+                        HoodConstants.PID_kI,
+                        HoodConstants.PID_kD,
+                        HoodConstants.MAX_VELOCITY_RPM,
+                        HoodConstants.MAX_ACCELERATION_RPS2)
+                .withSimClosedLoopController(
+                        HoodConstants.SIM_PID_kP,
+                        HoodConstants.SIM_PID_kI,
+                        HoodConstants.SIM_PID_kD,
+                        HoodConstants.MAX_VELOCITY_RPM,
+                        HoodConstants.MAX_ACCELERATION_RPS2)
+                .withGearing(new MechanismGearing(HoodConstants.GEARBOX))
+                .withIdleMode(MotorMode.COAST)
+                .withTelemetry("HoodMotor", Constants.TELEMETRY_VERBOSITY)
+                .withStatorCurrentLimit(HoodConstants.STATOR_CURRENT_LIMIT)
+                .withSupplyCurrentLimit(HoodConstants.SUPPLY_CURRENT_LIMIT)
+                .withMotorInverted(false)
+                .withClosedLoopRampRate(HoodConstants.CLOSED_LOOP_RAMP_RATE_SEC)
+                .withOpenLoopRampRate(HoodConstants.OPEN_LOOP_RAMP_RATE_SEC)
+                .withFeedforward(HoodConstants.FEEDFORWARD)
+                .withSimFeedforward(HoodConstants.SIM_FEEDFORWARD)
+                .withControlMode(ControlMode.CLOSED_LOOP);
+        // .withExternalEncoder(m_encoder)
+        // .withExternalEncoderInverted(HoodConstants.EXTERNAL_ENCODER_INVERTED)
+        // .withExternalEncoderGearing(HoodConstants.EXTERNAL_ENCODER_GEARING)
+        // .withExternalEncoderZeroOffset(HoodConstants.EXTERNAL_ENCODER_ZERO_OFFSET)
+        // .withUseExternalFeedbackEncoder(true);
 
-	public void setAngleDirect(Angle angle)
-	{
-		hoodSMC.setPosition(angle);
-	}
+        m_smartMotorController = new TalonFXWrapper(
+                m_motor,
+                HoodConstants.MOTOR,
+                m_smcConfig);
 
-	public Command setAngle(Supplier<Angle> angleSupplier) {
-		return hood.setAngle(angleSupplier);
-	}
+        MechanismPositionConfig m_robotToMechanism = new MechanismPositionConfig()
+                .withMaxRobotHeight(MechanismPositionConstants.ROBOT_MAX_HEIGHT)
+                .withMaxRobotLength(MechanismPositionConstants.ROBOT_MAX_LENGTH)
+                .withRelativePosition(HoodConstants.RELATIVE_POSITION);
 
-	public Angle getAngle() {
-		return hood.getAngle();
-	}
+        // The Hood can be modeled as an arm since it has a gravitational force acting
+        // on it
+        ArmConfig m_hoodConfig = new ArmConfig(m_smartMotorController)
+                .withTelemetry("HoodMech", Constants.TELEMETRY_VERBOSITY)
+                .withMechanismPositionConfig(m_robotToMechanism)
+                .withSoftLimits(HoodConstants.SOFT_LIMIT_MIN, HoodConstants.SOFT_LIMIT_MAX)
+                .withHardLimit(HoodConstants.HARD_LIMIT_MIN, HoodConstants.HARD_LIMIT_MAX)
+                .withLength(HoodConstants.LENGTH)
+                .withMass(HoodConstants.MASS);
 
-	public Command sysId() {
-		return hood.sysId(
-				Volts.of(4.0), // maximumVoltage
-				Volts.per(Second).of(0.5), // step
-				Seconds.of(8.0) // duration
-		);
-	}
+        if (Robot.isSimulation()) {
+            m_hoodConfig.withStartingPosition(HoodConstants.SOFT_LIMIT_MIN);
+        }
 
-	public Command setDutyCycle(Supplier<Double> dutyCycleSupplier) {
-		return hood.set(dutyCycleSupplier);
-	}
+        // TODO: Add MOI?
 
-	public Command setDutyCycle(double dutyCycle) {
-		return hood.set(dutyCycle);
-	}
+        m_hood = new Arm(m_hoodConfig);
+    }
 
-	@Override
-	public void periodic() {
-		SmartDashboard.putNumber("Hood degrees", getAngle().in(Degrees));
-		hood.updateTelemetry();
-	}
+    /**
+     * Creates a SysId characterization command for the hood.
+     *
+     * @return the SysId command
+     */
+    public Command sysId() {
+        return m_hood.sysId(
+                Volts.of(1), Volts.of(0.5).per(Second), Second.of(2.5))
+                .beforeStarting(
+                        () -> SignalLogger.start())
+                .finallyDo(() -> SignalLogger.stop());
+    }
 
-	@Override
-	public void simulationPeriodic() {
-		hood.simIterate();
-	}
+    /**
+     * Creates a command to set the hood angle.
+     *
+     * @param angle the target angle
+     * @return the command that sets the angle
+     */
+    public Command setAngle(Angle angle) {
+        return m_hood.setAngle(angle);
+    }
+
+    /**
+     * Directly sets the hood angle.
+     *
+     * @param angle the target angle
+     */
+    public void setAngleDirect(Angle angle) {
+        m_smartMotorController.setPosition(angle);
+    }
+
+    /**
+     * Creates a command to set the hood angle from a supplier.
+     *
+     * @param angleSupplier the supplier of target angle
+     * @return the command that sets the angle
+     */
+    public Command setAngle(Supplier<Angle> angleSupplier) {
+        return m_hood.setAngle(angleSupplier);
+    }
+
+    /**
+     * Gets the current hood angle.
+     *
+     * @return the current angle
+     */
+    public Angle getAngle() {
+        return m_hood.getAngle();
+    }
+
+    public Optional<Angle> getAngleSetpoint() {
+        return m_hood.getMechanismSetpoint();
+    }
+
+    public boolean isAtTargetAngle() {
+
+        Optional<Angle> setpoint = getAngleSetpoint();
+
+        if (!setpoint.isPresent())
+            return false;
+
+        return m_atAngleDebouncer.calculate(
+                getAngleSetpoint().get().isNear(m_hood.getAngle(), HoodConstants.ANGLE_TARGET_ERROR));
+    }
+
+    public boolean isAtTargetAngle(boolean isFeeding) {
+
+        Optional<Angle> setpoint = getAngleSetpoint();
+
+        if (!setpoint.isPresent())
+            return false;
+
+        if (isFeeding) {
+            return m_atAngleDebouncer.calculate(
+                    getAngleSetpoint().get().isNear(m_hood.getAngle(), HoodConstants.ANGLE_TARGET_ERROR_WHILE_FEEDING));
+        }
+
+        return m_atAngleDebouncer.calculate(
+                getAngleSetpoint().get().isNear(m_hood.getAngle(), HoodConstants.ANGLE_TARGET_ERROR));
+    }
+
+    public ShooterZone getSpeedZone(Distance distanceToTarget) {
+        return ShooterConstants.MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE.entrySet().stream()
+                .filter(entry -> distanceToTarget.in(Meters) >= entry.getKey().in(Meters))
+                .max((a, b) -> Double.compare(a.getKey().in(Meters), b.getKey().in(Meters)))
+                .map(Map.Entry::getValue)
+                .orElse(ShooterZone.ZONE_1);
+    }
+
+    public Angle getAngleToTarget(Distance distanceToTarget, ShooterZone zone) {
+        InterpolatingDoubleTreeMap map = ShooterConstants.SHOOTER_DISTANCE_TO_HOOD_ANGLE_INTERPOLATION.get(zone);
+        Double angleDeg = map != null ? map.get(distanceToTarget.in(Meters)) : null;
+        return Degrees.of(angleDeg != null ? angleDeg : HoodConstants.DEFAULT_ANGLE.in(Degrees));
+    }
+
+    /**
+     * Moves the hood up and down.
+     *
+     * @param dutyCycleSupplier the supplier of [-1, 1] speed to set the hood to.
+     * @return the command that sets duty cycle
+     */
+    public Command set(Supplier<Double> dutyCycleSupplier) {
+        return m_hood.set(dutyCycleSupplier);
+    }
+
+    /**
+     * Move the hood up and down.
+     * 
+     * @param dutyCycle [-1, 1] speed to set the hood to.
+     * @return the command that sets the duty cycle
+     */
+
+    public Command set(double dutyCycle) {
+        return m_hood.set(dutyCycle);
+    }
+
+    /**
+     * Lowers the hood to the default angle, to avoid hitting the hood on the trench
+     * when not shooting.
+     * 
+     * @return the command that lowers the hood
+     */
+    public Command lowerHood() {
+        return m_hood.setAngle(HoodConstants.LOWER_HOOD_ANGLE);
+    }
+
+    public Command setDefaultAngle() {
+        return m_hood.setAngle(HoodConstants.DEFAULT_ANGLE);
+    }
+
+    /**
+     * Updates hood telemetry.
+     */
+    @Override
+    public void periodic() {
+        m_hood.updateTelemetry();
+
+        if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
+            SmartDashboard.putNumber("HoodMech/angle (deg)", getAngle().in(Degrees));
+            SmartDashboard.putNumber("HoodMech/setpoint (deg)",
+                    getAngleSetpoint().map(angle -> angle.in(Degrees)).orElse(Double.NaN));
+        }
+    }
+
+    /**
+     * Runs the hood simulation step.
+     */
+    @Override
+    public void simulationPeriodic() {
+        m_hood.simIterate();
+    }
 }

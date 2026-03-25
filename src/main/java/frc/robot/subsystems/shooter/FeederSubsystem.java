@@ -1,127 +1,210 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.subsystems.shooter;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.sim.TalonFXSimState;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.Constants.ShooterConstants;
+import static edu.wpi.first.units.Units.FeetPerSecond;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Volts;
 
-import static edu.wpi.first.units.Units.*;
+import java.util.Optional;
+import java.util.function.Supplier;
+
+import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.ShooterConstants.FeederConstants;
+import yams.gearing.MechanismGearing;
+import yams.mechanisms.config.FlyWheelConfig;
+import yams.mechanisms.velocity.FlyWheel;
+import yams.motorcontrollers.SmartMotorController;
+import yams.motorcontrollers.SmartMotorControllerConfig;
+import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
+import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class FeederSubsystem extends SubsystemBase {
-	private static final TalonFX feederMotor = new TalonFX(ShooterConstants.FEEDER_ID);
-	private final TalonFXSimState feederSim;
-	private final DCMotorSim feederSimModel;
-	private final Mechanism2d mech2d;
-	private final MechanismLigament2d feederLig;
-	private static final Timer timer = new Timer();
-	private static boolean timerEnded = true;
-	private final PositionVoltage positionRequest;
-	private final VelocityVoltage velocityRequest;
 
-	private static final DigitalInput BeamBreakBottomFeeder = new DigitalInput(ShooterConstants.BEAM_BREAK_BOTTOM_ID);
-	private static final DigitalInput BeamBreakTop = new DigitalInput(ShooterConstants.BEAM_BREAK_TOP_ID);
+    private final TalonFX m_motor;
 
-	public FeederSubsystem() {
-		feederSim = feederMotor.getSimState();
-		feederSimModel = new DCMotorSim(
-				LinearSystemId.createDCMotorSystem(
-						DCMotor.getKrakenX60Foc(1),ShooterConstants.FEEDER_KA, ShooterConstants.FEEDER_GEAR_RATIO
-				),
-				DCMotor.getKrakenX60Foc(1)
-		);
-		mech2d = new Mechanism2d(1,1);
-		MechanismRoot2d root = mech2d.getRoot("feeder", 0.5, 0.5);
-		feederLig= root.append(new MechanismLigament2d("Feeder", ShooterConstants.FEEDER_SIM_LENGTH, 0));
-		TalonFXConfiguration config = new TalonFXConfiguration();
-		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-		config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-		config.CurrentLimits.StatorCurrentLimit = ShooterConstants.FEEDER_STATOR;
-		config.CurrentLimits.StatorCurrentLimitEnable = true;
-		config.CurrentLimits.SupplyCurrentLimit = ShooterConstants.FEEDER_SUPPLY;
-		config.CurrentLimits.SupplyCurrentLimitEnable=true;
+    private final SmartMotorController m_smartMotorController;
 
-		config.Slot0.kP = ShooterConstants.FEEDER_KP;
-		config.Slot0.kI = ShooterConstants.FEEDER_KI;
-		config.Slot0.kD = ShooterConstants.FEEDER_KD;
-		config.Slot0.kV = ShooterConstants.FEEDER_KV;
-		config.Slot0.kA = ShooterConstants.FEEDER_KA;
+    private final FlyWheel m_feeder;
 
-		config.MotionMagic.MotionMagicAcceleration = 10;
-		config.MotionMagic.MotionMagicCruiseVelocity = 10;
+    private final DigitalInput m_beamBreak;
 
-		positionRequest = new PositionVoltage(0).withSlot(0);
-		velocityRequest = new VelocityVoltage(1).withSlot(0);
+    public FeederSubsystem() {
+        m_motor = new TalonFX(FeederConstants.MOTOR_CAN_ID);
+        m_beamBreak = new DigitalInput(FeederConstants.BEAM_BREAK_DIO_PORT);
 
-		feederSim.setMotorType(TalonFXSimState.MotorType.KrakenX60);
+        SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
+                .withClosedLoopController(
+                        FeederConstants.PID_kP,
+                        FeederConstants.PID_kI,
+                        FeederConstants.PID_kD,
+                        FeederConstants.MAX_VELOCITY_RPM,
+                        FeederConstants.MAX_ACCELERATION_RPS2)
+                .withSimClosedLoopController(
+                        FeederConstants.SIM_PID_kP,
+                        FeederConstants.SIM_PID_kI,
+                        FeederConstants.SIM_PID_kD,
+                        FeederConstants.MAX_VELOCITY_RPM,
+                        FeederConstants.MAX_ACCELERATION_RPS2)
+                .withGearing(new MechanismGearing(FeederConstants.GEARBOX))
+                .withIdleMode(FeederConstants.IDLE_MODE) // Keep spinning even if not powered
+                .withTelemetry("FeederMotor", Constants.TELEMETRY_VERBOSITY)
+                .withStatorCurrentLimit(FeederConstants.STATOR_CURRENT_LIMIT_AMPS)
+                .withMotorInverted(FeederConstants.MOTOR_INVERTED)
+                .withClosedLoopRampRate(FeederConstants.CLOSED_LOOP_RAMP_RATE_SEC)
+                .withOpenLoopRampRate(FeederConstants.OPEN_LOOP_RAMP_RATE_SEC)
+                .withFeedforward(FeederConstants.FEEDFORWARD)
+                .withSimFeedforward(FeederConstants.SIM_FEEDFORWARD)
+                .withControlMode(ControlMode.CLOSED_LOOP)
+                .withMomentOfInertia(FeederConstants.MOI);
 
-		feederMotor.getConfigurator().apply(config);
-	}
+        m_smartMotorController = new TalonFXWrapper(
+                m_motor,
+                FeederConstants.MOTOR,
+                smcConfig);
 
-	public void run(double speed){
-		feederMotor.set(speed);
-	}
-	public void stop(){
-		feederMotor.stopMotor();
-	}
+        FlyWheelConfig feederConfig = new FlyWheelConfig(m_smartMotorController)
+                .withDiameter(FeederConstants.DIAMETER_INCHES)
+                .withMOI(FeederConstants.MOI)
+                .withTelemetry("FeederMech", Constants.TELEMETRY_VERBOSITY)
+                .withSoftLimit(FeederConstants.SOFT_LIMIT_RPM.times(-1), FeederConstants.SOFT_LIMIT_RPM)
+                .withSpeedometerSimulation(FeederConstants.SIM_MAX_VELOCITY_RPM);
 
-	public static boolean getBeamBreakBottomFeeder(){
-		return BeamBreakBottomFeeder.get();
-	}
-	public static boolean getBeamBreakTop(){
-		return BeamBreakTop.get();
-	}
-	public void periodic() {
-		SmartDashboard.putData("Feeder/Mech2d", mech2d);
-		SmartDashboard.putBoolean("Feeder/Beam Break bottom: ", getBeamBreakBottomFeeder());
-		SmartDashboard.putBoolean("Feeder/Beam Break top: ", getBeamBreakTop());
-		SmartDashboard.putNumber("Feeder/MotorSupplyCurrent: ", feederMotor.getSupplyCurrent().getValueAsDouble());
-		SmartDashboard.putNumber("Feeder/MotorVelocity: ", feederMotor.getVelocity().getValueAsDouble());
-		SmartDashboard.putNumber("Feeder/Position: ",feederMotor.getPosition().getValueAsDouble());
-		feederLig.setAngle(feederMotor.getPosition().getValueAsDouble());
-		if(getBeamBreakBottomFeeder()){
-			timer.reset();
-		}
-		if(timer.hasElapsed(ShooterConstants.FEEDER_TIME_PERIOD)){
+        m_feeder = new FlyWheel(feederConfig);
+    }
 
-			timerEnded = true;
-			timer.stop();
-		}
-	}
-	public static void startTimer(){
-		timerEnded = false;
-		timer.stop();
-		timer.reset();
-	}
-	public static boolean isHopperAlmostEmpty(){
-		return timerEnded;
-	}
+    /**
+     * Creates a SysId characterization command for the flywheel.
+     *
+     * @return the SysId command
+     */
+    public Command sysId() {
+        return m_feeder.sysId(
+                Volts.of(12), Volts.of(3).per(Second), Second.of(10))
+                .beforeStarting(
+                        () -> SignalLogger.start())
+                .finallyDo(() -> SignalLogger.stop());
+    }
 
-	@Override
-	public void simulationPeriodic() {
-		feederSim.setSupplyVoltage(ShooterConstants.FEEDER_VOLTAGE);
-		Voltage motorVoltage = feederSim.getMotorVoltageMeasure();
+    /**
+     * Gets the current flywheel velocity.
+     *
+     * @return the current angular velocity
+     */
+    public AngularVelocity getAngularVelocity() {
+        return m_feeder.getSpeed();
+    }
 
-		feederSimModel.setInput(feederSim.getMotorVoltage());
+    /**
+     * Gets the current flywheel velocity.
+     * 
+     * @return the current linear velocity
+     */
+    public LinearVelocity getLinearVelocity() {
+        return m_feeder.getLinearVelocity();
+    }
 
-		feederSimModel.setInputVoltage(motorVoltage.in(Volts));
-		feederSimModel.update(0.02);
+    /**
+     * Creates a command to set the flywheel velocity.
+     *
+     * @param speed the target angular velocity
+     * @return the command that sets flywheel speed
+     */
+    public Command setSpeed(AngularVelocity speed) {
+        return m_feeder.setSpeed(speed);
+    }
 
-		feederSim.setRawRotorPosition(feederSimModel.getAngularPosition().times(ShooterConstants.FEEDER_GEAR_RATIO));
-		feederSim.setRotorVelocity(feederSimModel.getAngularVelocity().times(ShooterConstants.FEEDER_GEAR_RATIO));
-	}
+    /**
+     * Creates a command to set the flywheel velocity from a supplier.
+     *
+     * @param speed the supplier of target angular velocity
+     * @return the command that sets flywheel speed
+     */
+    public Command setSpeed(Supplier<AngularVelocity> speed) {
+        return m_feeder.setSpeed(speed);
+    }
+
+    /**
+     * Creates a command to set the flywheel speed based on linear velocity.
+     *
+     * @param speed the desired linear velocity
+     * @return the command that sets flywheel speed
+     */
+    public Command setSpeed(LinearVelocity speed) {
+        return m_feeder.setSpeed(RotationsPerSecond
+                .of(speed.in(MetersPerSecond) / FeederConstants.DIAMETER_INCHES.times(Math.PI).in(Meters)));
+    }
+
+    public Optional<AngularVelocity> getSetpointVelocity() {
+        Optional<AngularVelocity> setpoint = m_smartMotorController.getMechanismSetpointVelocity();
+
+        if (!setpoint.isPresent())
+            return Optional.empty();
+
+        // Convert from output to input velocity for comparison with actual velocity
+        return Optional.of(setpoint.get().times(FeederConstants.GEARBOX.getInputToOutputConversionFactor()));
+    }
+
+    public Command feed() {
+        return setSpeed(FeederConstants.FEEDER_SPEED);
+    }
+
+    public Command reverse() {
+        return setSpeed(FeederConstants.REVERSE_SPEED);
+    }
+
+    public Command stop() {
+        return this.runOnce(() -> {
+            m_smartMotorController.stopClosedLoopController();
+            m_smartMotorController.setDutyCycle(0);
+        });
+    }
+
+    /**
+     * Checks if the beam break sensor is triggered, indicating that a ball is
+     * present in the feeder.
+     * 
+     * @return true if the beam is broken, false otherwise
+     */
+    public boolean isBeamBroken() {
+        return m_beamBreak.get();
+    }
+
+    /**
+     * Updates flywheel telemetry.
+     */
+    @Override
+    public void periodic() {
+        m_feeder.updateTelemetry();
+
+        if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
+            SmartDashboard.putNumber("FeederMech/linearVelocity (fps)", getLinearVelocity().in(FeetPerSecond));
+            SmartDashboard.putNumber("FeederMech/velocity (RPM)", getAngularVelocity().in(RPM));
+            SmartDashboard.putNumber("FeederMech/setpoint (RPM)",
+                    getSetpointVelocity().map(
+                            setpoint -> setpoint.in(RPM) * FeederConstants.GEARBOX.getOutputToInputConversionFactor())
+                            .orElse(Double.NaN));
+        }
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        m_feeder.simIterate();
+    }
 }

@@ -2,13 +2,6 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.IndexerConstants;
-import frc.robot.Constants.ShooterConstants;
-import frc.robot.subsystems.Indexer;
-import frc.robot.subsystems.Rollers;
-import frc.robot.subsystems.shooter.ShooterSubsystem;
 
 public class RobotContainer {
     public RobotContainer() {
