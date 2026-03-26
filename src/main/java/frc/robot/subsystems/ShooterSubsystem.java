@@ -106,13 +106,17 @@ public class ShooterSubsystem extends SubsystemBase {
                 }),
                 m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
                 stationaryShooting ? Commands.sequence(
+                        m_feederSubsystem.reverse(),
                         Commands.waitSeconds(0.25),
                         Commands.waitUntil(() -> isAutoAimReady.get() && isShooterReady(isFeeding.get()))
                                 .andThen(m_feederSubsystem.feed()))
-                        : new ConditionalCommand(
-                                m_feederSubsystem.feed(),
-                                m_feederSubsystem.stop(),
-                                () -> isAutoAimReady.get() && isShooterReady(isFeeding.get())).repeatedly())
+                        : Commands.sequence(
+                                m_feederSubsystem.reverse(),
+                                Commands.waitSeconds(0.25),
+                                new ConditionalCommand(
+                                        m_feederSubsystem.feed(),
+                                        m_feederSubsystem.stop(),
+                                        () -> isAutoAimReady.get() && isShooterReady(isFeeding.get())).repeatedly()))
                 .withName("SHTR - Aim and Shoot Stationary");
     }
 
