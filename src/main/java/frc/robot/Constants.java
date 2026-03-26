@@ -137,18 +137,20 @@ public final class Constants {
             public static final Distance MOTOR_CIRCUMFERENCE = Inches.of(1).times(Math.PI);
             public static final GearBox GEARBOX = GearBox.fromStages("54:16", "18:12");
             public static final Mass MECHANISM_MASS = Pounds.of(6.825);
-            public static final Angle MECHANISM_ANGLE = Degrees.of(-24.159);
+            public static final Angle MECHANISM_ANGLE = Degrees.of(180 + 24.159);
 
             public static final double PID_kP = 5.5;
             public static final double PID_kI = 0.0;
             public static final double PID_kD = 0.0;
 
-            public static final double SIM_PID_kP = 10.0; // TODO
+            public static final double SIM_PID_kP = 0.0; // TODO
             public static final double SIM_PID_kI = 0.0; // TODO
             public static final double SIM_PID_kD = 0.0; // TODO
 
             public static final ElevatorFeedforward FEEDFORWARD = new ElevatorFeedforward(0.32176, -0.04,
-                    0.6148, 0.021608); // TODO: Tune this via SysID
+                    0.6148, 0.021608);
+            public static final ElevatorFeedforward SIM_FEEDFORWARD = new ElevatorFeedforward(0.0, 0.0,
+                    0.0, 0.0);
 
             public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(2); // TODO
             public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(6.5); // TODO
@@ -174,7 +176,7 @@ public final class Constants {
             public static final Distance SHUFFLE_FURTHEST_POSITION = EXTENDED_POSITION
                     .minus(Meters.of(0.05));
 
-            public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(-12),
+            public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(12),
                     Inches.of(0),
                     Inches.of(9));
         }

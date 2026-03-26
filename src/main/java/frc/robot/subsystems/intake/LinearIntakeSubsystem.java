@@ -84,6 +84,7 @@ public class LinearIntakeSubsystem extends SubsystemBase {
                 .withClosedLoopRampRate(LinearIntakeConstants.CLOSED_LOOP_RAMP_RATE)
                 .withOpenLoopRampRate(LinearIntakeConstants.OPEN_LOOP_RAMP_RATE)
                 .withFeedforward(LinearIntakeConstants.FEEDFORWARD)
+                .withSimFeedforward(LinearIntakeConstants.SIM_FEEDFORWARD)
                 .withControlMode(ControlMode.CLOSED_LOOP);
 
         m_smartMotorController = new TalonFXWrapper(

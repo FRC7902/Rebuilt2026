@@ -91,7 +91,7 @@ public class SimSubsystem extends SubsystemBase {
                             // Specify the translation of the shooter from the robot center
                             // (in the
                             // shooter’s reference frame)
-                            new Translation2d(Inches.of(-5.087),
+                            new Translation2d(Inches.of(5.087),
                                     Inches.of(0)),
                             // Specify the field-relative speed of the chassis, adding it to
                             // the initial
@@ -108,7 +108,7 @@ public class SimSubsystem extends SubsystemBase {
                             flywheelLinearVelocity.get(),
                             // MetersPerSecond.of(5),
                             // The angle at which the fuel is launched
-                            Degrees.of(90).plus(hoodAngle.get()));
+                            Degrees.of(270).plus(hoodAngle.get()));
 
                     fuelOnFly
                             // Set the target center to the ReBuilt Hub of the current alliance
