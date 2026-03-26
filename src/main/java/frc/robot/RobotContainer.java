@@ -349,8 +349,7 @@ public class RobotContainer {
                 .onTrue(
                         Commands.sequence(
                                 Commands.waitSeconds(2),
-                                m_linearIntakeSubsystem.retract())
-                                .unless(m_driverController.L2()::getAsBoolean))
+                                m_linearIntakeSubsystem.retract()))
                 .onFalse(m_linearIntakeSubsystem.midpoint()
                         .unless(m_driverController.L2()::getAsBoolean));
 
