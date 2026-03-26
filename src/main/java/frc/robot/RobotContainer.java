@@ -64,8 +64,8 @@ public class RobotContainer {
 
     private final SimSubsystem m_simSubsystem;
 
-    private final LimelightWrapper m_limelightA;
-    private final LimelightWrapper m_limelightB;
+    private final LimelightWrapper m_leftLimelight;
+    private final LimelightWrapper m_frontLimelight;
 
     // Choreo
     public final AutoFactory m_autoFactory = new AutoFactory(
@@ -183,12 +183,12 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
 
-        m_limelightA = new LimelightWrapper("limelight-a", true);
-        m_limelightB = new LimelightWrapper("limelight-b", true);
+        m_leftLimelight = new LimelightWrapper("limelight-a", true);
+        m_frontLimelight = new LimelightWrapper("limelight-b", true);
 
         // Only do this for LL4, so we use heading readings from MT1 from 3G?
-        m_limelightA.getSettings().withImuMode(ImuMode.ExternalImu).save();
-        m_limelightB.getSettings().withImuMode(ImuMode.ExternalImu).save();
+        m_leftLimelight.getSettings().withImuMode(ImuMode.ExternalImu).save();
+        m_frontLimelight.getSettings().withImuMode(ImuMode.ExternalImu).save();
 
         // PID-tuned auto-align for climbing start position
         driveAngularVelocity.driveToPose(m_swerveSubsystem::getDriveToWaypoint,
@@ -504,7 +504,7 @@ public class RobotContainer {
 
     public void updateLocalization() {
         // TODO: Prioritize LL4 over LL3G
-        for (LimelightWrapper limelight : new LimelightWrapper[] { m_limelightB, m_limelightA }) {
+        for (LimelightWrapper limelight : new LimelightWrapper[] { m_frontLimelight, m_leftLimelight }) {
             if (limelight.updateLocalization(m_swerveSubsystem.getSwerveDrive())) {
                 break; // Stop once a limelight successfully localizes
             }
