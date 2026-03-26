@@ -42,8 +42,6 @@ import frc.robot.subsystems.climb.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeRollerSubsystem;
 import frc.robot.subsystems.intake.LinearIntakeSubsystem;
 import frc.robot.subsystems.intake.LinearIntakeSubsystem.LinearIntakePosition;
-import frc.robot.utils.LimelightWrapper;
-import limelight.networktables.LimelightSettings.ImuMode;
 import swervelib.SwerveInputStream;
 import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
@@ -63,9 +61,6 @@ public class RobotContainer {
             "swerve"));
 
     private final SimSubsystem m_simSubsystem;
-
-    private final LimelightWrapper m_leftLimelight;
-    private final LimelightWrapper m_frontLimelight;
 
     // Choreo
     public final AutoFactory m_autoFactory = new AutoFactory(
@@ -182,13 +177,6 @@ public class RobotContainer {
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
-
-        m_leftLimelight = new LimelightWrapper("limelight-a", true);
-        m_frontLimelight = new LimelightWrapper("limelight-b", true);
-
-        // Only do this for LL4, so we use heading readings from MT1 from 3G?
-        m_leftLimelight.getSettings().withImuMode(ImuMode.ExternalImu).save();
-        m_frontLimelight.getSettings().withImuMode(ImuMode.ExternalImu).save();
 
         // PID-tuned auto-align for climbing start position
         driveAngularVelocity.driveToPose(m_swerveSubsystem::getDriveToWaypoint,
@@ -499,15 +487,6 @@ public class RobotContainer {
             CommandScheduler.getInstance().schedule(m_linearIntakeSubsystem.setEncoderPositionExtended());
         } else if (m_linearIntakeSubsystem.getRetractedLimitSwitch()) {
             CommandScheduler.getInstance().schedule(m_linearIntakeSubsystem.setEncoderPositionRetracted());
-        }
-    }
-
-    public void updateLocalization() {
-        // TODO: Prioritize LL4 over LL3G
-        for (LimelightWrapper limelight : new LimelightWrapper[] { m_frontLimelight, m_leftLimelight }) {
-            if (limelight.updateLocalization(m_swerveSubsystem.getSwerveDrive())) {
-                break; // Stop once a limelight successfully localizes
-            }
         }
     }
 

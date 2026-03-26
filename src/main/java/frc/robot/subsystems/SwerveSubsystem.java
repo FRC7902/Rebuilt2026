@@ -5,11 +5,14 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -17,14 +20,18 @@ import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,6 +43,12 @@ import frc.robot.AutoConstants;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.FieldConstants;
+import limelight.Limelight;
+import limelight.networktables.AngularVelocity3d;
+import limelight.networktables.LimelightPoseEstimator;
+import limelight.networktables.LimelightPoseEstimator.EstimationMode;
+import limelight.networktables.LimelightResults;
+import limelight.networktables.Orientation3d;
 import limelight.networktables.PoseEstimate;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -51,8 +64,10 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     private final SwerveDrive swerveDrive;
 
-    private PoseEstimate poseEstimateMt2;
-    private PoseEstimate poseEstimateMt1;
+    private Limelight m_frontLimeight;
+    private LimelightPoseEstimator m_frontLimelightPoseEstimator;
+    private Limelight m_leftLimelight;
+    private LimelightPoseEstimator m_leftLimelightPoseEstimator;
 
     private Rotation2d autoAimTargetRotation = new Rotation2d();
 
@@ -105,6 +120,41 @@ public class SwerveSubsystem extends SubsystemBase {
         m_driveToWaypoint = getPose();
 
         m_choreoControllerHeading.enableContinuousInput(-Math.PI, Math.PI);
+
+        setupLimelight();
+    }
+
+    public void setupLimelight() {
+        swerveDrive.stopOdometryThread();
+        m_frontLimeight = new Limelight("limelight-b");
+        m_frontLimeight
+                .getSettings()
+                .withPipelineIndex(0)
+                // TODO: Add camera offset here
+                // .withCameraOffset(
+                // new Pose3d(
+                // Units.inchesToMeters(-12),
+                // Units.inchesToMeters(-12),
+                // Units.inchesToMeters(10),
+                // new Rotation3d(0, Units.degreesToRadians(45), Units.degreesToRadians(180))))
+                // /// Roll, Pitch, Yaw
+                // .withAprilTagIdFilter(List.of(17, 18, 19, 20, 21, 22, 6, 7, 8, 9, 10, 11))
+                .save();
+        m_frontLimelightPoseEstimator = m_frontLimeight.createPoseEstimator(EstimationMode.MEGATAG2);
+
+        m_leftLimelight = new Limelight("limelight-a");
+        m_leftLimelight
+                .getSettings()
+                .withPipelineIndex(0)
+                // .withCameraOffset(
+                // new Pose3d( // TODO: Give the right offset here
+                // Units.inchesToMeters(0),
+                // Units.inchesToMeters(0),
+                // Units.inchesToMeters(20.5),
+                // new Rotation3d(0, Units.degreesToRadians(45), 0))) /// Roll, Pitch, Yaw
+                // .withAprilTagIdFilter(List.of(17, 18, 19, 20, 21, 22, 6, 7, 8, 9, 10, 11))
+                .save();
+        m_leftLimelightPoseEstimator = m_leftLimelight.createPoseEstimator(EstimationMode.MEGATAG2);
     }
 
     /**
@@ -782,8 +832,58 @@ public class SwerveSubsystem extends SubsystemBase {
                 && Math.abs(rotationError.getDegrees()) < rotationToleranceDegrees;
     }
 
+    private double m_lastFrontLLTimestamp = 0;
+    private double m_lastLeftLLTimestamp = 0;
+
+    private double updateLimelight(
+            Limelight limelight,
+            LimelightPoseEstimator llPoseEst,
+            double llTimestamp,
+            Angle cameraYaw,
+            String llname) {
+        limelight
+                .getSettings()
+                .withRobotOrientation(
+                        new Orientation3d(
+                                new Rotation3d(swerveDrive.getOdometryHeading().rotateBy(new Rotation2d(cameraYaw))),
+                                new AngularVelocity3d(DegreesPerSecond.of(0), DegreesPerSecond.of(0),
+                                        DegreesPerSecond.of(0))))
+                .save();
+
+        Optional<PoseEstimate> poseEstimates = llPoseEst.getPoseEstimate();
+        Optional<LimelightResults> results = limelight.getLatestResults();
+        if (results.isPresent() && poseEstimates.isPresent()) {
+            LimelightResults result = results.get();
+            PoseEstimate poseEstimate = poseEstimates.get();
+            if (result.valid) {
+                Pose2d estimatorPose = poseEstimate.pose.toPose2d();
+                swerveDrive.field.getObject("Vision").setPose(estimatorPose);
+                SmartDashboard.putNumber("LimelightTuning/" + llname + "/ambiguity", poseEstimate.getAvgTagAmbiguity());
+                if (poseEstimate.getAvgTagAmbiguity() < 0.1 && // TODO: Tune this lower if ambiguity still causes bad
+                                                               // readings
+                        poseEstimate.tagCount > 1) {
+                    if (llTimestamp != poseEstimate.timestampSeconds) {
+                        // var stdDevScale = Math.pow(poseEstimate.avgTagDist, 2.0) /
+                        // poseEstimate.tagCount;
+                        swerveDrive.addVisionMeasurement(estimatorPose,
+                                poseEstimate.timestampSeconds);
+                        return poseEstimate.timestampSeconds;
+                    }
+                }
+            }
+        }
+        return llTimestamp;
+    }
+
     @Override
     public void periodic() {
+        swerveDrive.updateOdometry();
+
+        m_lastFrontLLTimestamp = updateLimelight(m_frontLimeight, m_frontLimelightPoseEstimator, m_lastFrontLLTimestamp,
+                SwerveConstants.FRONT_LIMELIGHT_CAMERA_YAW_OFFSET, "limelight-b");
+        m_lastLeftLLTimestamp = updateLimelight(m_leftLimelight, m_leftLimelightPoseEstimator, m_lastLeftLLTimestamp,
+                SwerveConstants.LEFT_LIMELIGHT_CAMERA_YAW_OFFSET, "limelight-a");
+
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
             SmartDashboard.putNumber("swerve/autoAimHeading", getAutoAimHeading().getDegrees());
             SmartDashboard.putNumber("swerve/currentHeading", getHeading().getDegrees());
