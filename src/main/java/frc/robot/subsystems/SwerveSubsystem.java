@@ -140,7 +140,7 @@ public class SwerveSubsystem extends SubsystemBase {
                 // /// Roll, Pitch, Yaw
                 // .withAprilTagIdFilter(List.of(17, 18, 19, 20, 21, 22, 6, 7, 8, 9, 10, 11))
                 .save();
-        m_frontLimelightPoseEstimator = m_frontLimeight.createPoseEstimator(EstimationMode.MEGATAG2);
+        m_frontLimelightPoseEstimator = m_frontLimeight.createPoseEstimator(EstimationMode.MEGATAG2); // TODO: Try MT1
 
         m_leftLimelight = new Limelight("limelight-a");
         m_leftLimelight
@@ -154,7 +154,7 @@ public class SwerveSubsystem extends SubsystemBase {
                 // new Rotation3d(0, Units.degreesToRadians(45), 0))) /// Roll, Pitch, Yaw
                 // .withAprilTagIdFilter(List.of(17, 18, 19, 20, 21, 22, 6, 7, 8, 9, 10, 11))
                 .save();
-        m_leftLimelightPoseEstimator = m_leftLimelight.createPoseEstimator(EstimationMode.MEGATAG2);
+        m_leftLimelightPoseEstimator = m_leftLimelight.createPoseEstimator(EstimationMode.MEGATAG2); // TODO: Try MT1
     }
 
     /**
