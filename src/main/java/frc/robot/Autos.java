@@ -12,9 +12,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.AutoConstants.Position;
-import frc.robot.subsystems.IndexerSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.IndexerSystem;
+import frc.robot.subsystems.ShooterSystem;
+import frc.robot.subsystems.SwerveSystem;
 import frc.robot.subsystems.intake.IntakeRollerSubsystem;
 import frc.robot.subsystems.intake.LinearIntakeSubsystem;
 
@@ -22,20 +22,20 @@ public class Autos {
 
     private final RobotContainer m_robotContainer;
 
-    private final IndexerSubsystem m_indexerSubsystem;
+    private final IndexerSystem m_indexerSystem;
     private final IntakeRollerSubsystem m_intakeRollerSubsystem;
     private final LinearIntakeSubsystem m_linearIntakeSubsystem;
-    private final ShooterSubsystem m_shooterSubsystem;
-    private final SwerveSubsystem m_swerveSubsystem;
+    private final ShooterSystem m_shooterSystem;
+    private final SwerveSystem m_swerveSystem;
 
     public Autos(RobotContainer robotContainer) {
         m_robotContainer = robotContainer;
 
-        m_indexerSubsystem = robotContainer.m_indexerSubsystem;
+        m_indexerSystem = robotContainer.m_indexerSystem;
         m_intakeRollerSubsystem = robotContainer.m_intakeRollerSubsystem;
         m_linearIntakeSubsystem = robotContainer.m_linearIntakeSubsystem;
-        m_shooterSubsystem = robotContainer.m_shooterSubsystem;
-        m_swerveSubsystem = robotContainer.m_swerveSubsystem;
+        m_shooterSystem = robotContainer.m_shooterSystem;
+        m_swerveSystem = robotContainer.m_swerveSystem;
 
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
             StructArrayPublisher<Pose2d> waypointPositions = NetworkTableInstance.getDefault()
@@ -59,22 +59,22 @@ public class Autos {
 
     private Command driveToWaypoint(Pose2d waypoint) {
         return new InstantCommand(
-                () -> m_swerveSubsystem.setDriveToWaypoint(waypoint))
+                () -> m_swerveSystem.setDriveToWaypoint(waypoint))
 
                 // Wait until the robot is within the specified default tolerances of the
                 // waypoint
                 .andThen(Commands.waitUntil(
-                        m_swerveSubsystem::isAtWaypoint));
+                        m_swerveSystem::isAtWaypoint));
     }
 
     private Command driveToWaypoint(Pose2d waypoint, Angle angleTolerance) {
         return new InstantCommand(
-                () -> m_swerveSubsystem.setDriveToWaypoint(waypoint))
+                () -> m_swerveSystem.setDriveToWaypoint(waypoint))
 
                 // Wait until the robot is within the specified angle tolerance of the waypoint
                 .andThen(
                         Commands.waitUntil(
-                                () -> m_swerveSubsystem.isAtWaypoint(
+                                () -> m_swerveSystem.isAtWaypoint(
                                         AutoConstants.DEFAULT_WAYPOINT_TOLERANCE,
                                         angleTolerance.in(Degrees))));
     }
@@ -88,7 +88,7 @@ public class Autos {
     }
 
     private Command resetOdometry(Pose2d waypoint) {
-        return Commands.runOnce(() -> m_swerveSubsystem.resetOdometry(waypoint));
+        return Commands.runOnce(() -> m_swerveSystem.resetOdometry(waypoint));
     }
 
     private Command resetOdometry(Position position) {
@@ -119,11 +119,11 @@ public class Autos {
                                 // m_linearIntakeSubsystem.midpoint().andThen(
                                 // Commands.parallel(
                                 m_intakeRollerSubsystem.stop(),
-                                m_indexerSubsystem.stop()
+                                m_indexerSystem.stop()
                         // ))
                         ),
 
-                m_indexerSubsystem.stop(),
+                m_indexerSystem.stop(),
 
                 // Get in shooting position
                 driveToWaypoint(Position.ALLIANCE_RIGHT_1),
@@ -132,17 +132,17 @@ public class Autos {
                 Commands.deadline(
                         Commands.waitSeconds(4),
                         driveToWaypoint(Position.ALLIANCE_RIGHT_1),
-                        m_shooterSubsystem.aimAndShootIgnoreCheck(
-                                m_swerveSubsystem::getDistanceToTarget),
-                        m_indexerSubsystem.run(),
+                        m_shooterSystem.aimAndShootIgnoreCheck(
+                                m_swerveSystem::getDistanceToTarget),
+                        m_indexerSystem.run(),
                         m_intakeRollerSubsystem.intake()
                 // m_linearIntakeSubsystem.shuffle()
                 ),
 
                 // Drive past trench (close to bump) and extend/run intake
                 driveToWaypoint(Position.NEUTRAL_RIGHT_4).deadlineFor(
-                        m_shooterSubsystem.stopShooting(),
-                        m_indexerSubsystem.stop(),
+                        m_shooterSystem.stopShooting(),
+                        m_indexerSystem.stop(),
                         m_intakeRollerSubsystem.stop()
                 // m_linearIntakeSubsystem.midpoint()
                 ),
@@ -150,14 +150,14 @@ public class Autos {
                 driveToWaypoint(Position.NEUTRAL_RIGHT_5).deadlineFor(
                         // m_linearIntakeSubsystem.extend(),
                         m_intakeRollerSubsystem.intake(),
-                        m_indexerSubsystem.run()),
+                        m_indexerSystem.run()),
 
                 driveToWaypoint(Position.NEUTRAL_RIGHT_6),
 
                 driveToWaypoint(Position.NEUTRAL_RIGHT_4).deadlineFor(
                         // m_linearIntakeSubsystem.midpoint().andThen(Commands.parallel(
                         m_intakeRollerSubsystem.stop(),
-                        m_indexerSubsystem.stop()
+                        m_indexerSystem.stop()
                 // ))
                 ),
 
@@ -165,9 +165,9 @@ public class Autos {
 
                 Commands.parallel(
                         driveToWaypoint(Position.ALLIANCE_RIGHT_1),
-                        m_shooterSubsystem.aimAndShootIgnoreCheck(
-                                m_swerveSubsystem::getDistanceToTarget),
-                        m_indexerSubsystem.run(),
+                        m_shooterSystem.aimAndShootIgnoreCheck(
+                                m_swerveSystem::getDistanceToTarget),
+                        m_indexerSystem.run(),
                         m_intakeRollerSubsystem.intake()
                 // m_linearIntakeSubsystem.shuffle()
                 ));

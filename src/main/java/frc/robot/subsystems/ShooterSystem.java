@@ -29,13 +29,13 @@ import frc.robot.subsystems.shooter.FeederSubsystem;
 import frc.robot.subsystems.shooter.FlywheelSubsystem;
 import frc.robot.subsystems.shooter.HoodSubsystem;
 
-public class ShooterSubsystem extends SubsystemBase {
+public class ShooterSystem extends SubsystemBase {
 
     private final FeederSubsystem m_feederSubsystem;
     private final FlywheelSubsystem m_flywheelSubsystem;
     private final HoodSubsystem m_hoodSubsystem;
 
-    public ShooterSubsystem() {
+    public ShooterSystem() {
         m_feederSubsystem = new FeederSubsystem();
         m_flywheelSubsystem = new FlywheelSubsystem();
         m_hoodSubsystem = new HoodSubsystem();

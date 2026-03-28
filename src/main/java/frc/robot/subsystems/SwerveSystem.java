@@ -45,7 +45,7 @@ import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
-public class SwerveSubsystem extends SubsystemBase {
+public class SwerveSystem extends SubsystemBase {
     /**
      * Swerve drive object.
      */
@@ -67,7 +67,7 @@ public class SwerveSubsystem extends SubsystemBase {
      *
      * @param directory Directory of swerve drive config files.
      */
-    public SwerveSubsystem(File directory) {
+    public SwerveSystem(File directory) {
         boolean blueAlliance = false;
         Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(1),
                 Meter.of(4)),

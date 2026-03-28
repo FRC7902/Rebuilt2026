@@ -18,7 +18,7 @@ import frc.robot.Constants.IndexerConstants;
 /**
  * Subsystem for controlling the indexer motor and its configuration.
  */
-public class IndexerSubsystem extends SubsystemBase {
+public class IndexerSystem extends SubsystemBase {
 
     /**
      * TalonFX motor controller for the indexer.
@@ -38,7 +38,7 @@ public class IndexerSubsystem extends SubsystemBase {
     /**
      * Constructs the indexer subsystem and applies motor configuration.
      */
-    public IndexerSubsystem() {
+    public IndexerSystem() {
         m_motor = new TalonFX(IndexerConstants.MOTOR_CAN_ID);
         m_motorConfig = new TalonFXConfiguration();
         m_motorOutputConfig = new MotorOutputConfigs();

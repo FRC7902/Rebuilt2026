@@ -9,9 +9,9 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.robot.Constants.ClimbConstants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.subsystems.IndexerSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.IndexerSystem;
+import frc.robot.subsystems.ShooterSystem;
+import frc.robot.subsystems.SwerveSystem;
 import frc.robot.subsystems.climb.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeRollerSubsystem;
 import frc.robot.subsystems.intake.LinearIntakeSubsystem;
@@ -23,11 +23,11 @@ public class Choreo {
 
     private final RobotContainer m_robotContainer;
 
-    private final IndexerSubsystem m_indexerSubsystem;
+    private final IndexerSystem m_indexerSystem;
     private final IntakeRollerSubsystem m_intakeRollerSubsystem;
     private final LinearIntakeSubsystem m_linearIntakeSubsystem;
-    private final ShooterSubsystem m_shooterSubsystem;
-    private final SwerveSubsystem m_swerveSubsystem;
+    private final ShooterSystem m_shooterSystem;
+    private final SwerveSystem m_swerveSystem;
     private final ElevatorSubsystem m_elevatorSubsystem;
 
     private final DoubleSupplier m_autoAimHeadingX;
@@ -45,17 +45,17 @@ public class Choreo {
 
         m_autoFactory = robotContainer.m_autoFactory;
 
-        m_indexerSubsystem = robotContainer.m_indexerSubsystem;
+        m_indexerSystem = robotContainer.m_indexerSystem;
         m_intakeRollerSubsystem = robotContainer.m_intakeRollerSubsystem;
         m_linearIntakeSubsystem = robotContainer.m_linearIntakeSubsystem;
-        m_shooterSubsystem = robotContainer.m_shooterSubsystem;
-        m_swerveSubsystem = robotContainer.m_swerveSubsystem;
+        m_shooterSystem = robotContainer.m_shooterSystem;
+        m_swerveSystem = robotContainer.m_swerveSystem;
         m_elevatorSubsystem = robotContainer.m_elevatorSubsystem;
 
         m_autoAimHeadingX = robotContainer.autoAimHeadingX();
         m_autoAimHeadingY = robotContainer.autoAimHeadingY();
 
-        stationaryAutoAim = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
+        stationaryAutoAim = SwerveInputStream.of(m_swerveSystem.getSwerveDrive(),
                 () -> 0.0,
                 () -> 0.0)
                 .deadband(OperatorConstants.DEADBAND)
@@ -71,7 +71,7 @@ public class Choreo {
         aimTowardsBlue = stationaryAutoAim.copy()
                 .withControllerHeadingAxis(() -> 0.0, () -> 1.0);
 
-        backUpAndAimRed = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
+        backUpAndAimRed = SwerveInputStream.of(m_swerveSystem.getSwerveDrive(),
                 () -> -0.25,
                 () -> 0.0)
                 .deadband(OperatorConstants.DEADBAND)
@@ -81,7 +81,7 @@ public class Choreo {
                 .headingWhile(true)
                 .scaleTranslation(SwerveConstants.AUTO_AIM_SCALE_TRANSLATION);
 
-        backUpAndAimBlue = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
+        backUpAndAimBlue = SwerveInputStream.of(m_swerveSystem.getSwerveDrive(),
                 () -> 0.25,
                 () -> 0.0)
                 .deadband(OperatorConstants.DEADBAND)
@@ -99,16 +99,16 @@ public class Choreo {
                 // new InstantCommand(
                 // () -> m_swerveSubsystem.drive(new Translation2d(-0.25, 0.0), 0, false)),
                 Commands.waitSeconds(3).deadlineFor(new ConditionalCommand(
-                        m_swerveSubsystem.driveFieldOriented(backUpAndAimRed),
-                        m_swerveSubsystem.driveFieldOriented(backUpAndAimBlue),
-                        m_swerveSubsystem::isRedAlliance)),
-                m_swerveSubsystem.stop(),
+                        m_swerveSystem.driveFieldOriented(backUpAndAimRed),
+                        m_swerveSystem.driveFieldOriented(backUpAndAimBlue),
+                        m_swerveSystem::isRedAlliance)),
+                m_swerveSystem.stop(),
                 Commands.parallel(
-                        m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
-                        m_indexerSubsystem.run(),
+                        m_swerveSystem.driveFieldOriented(stationaryAutoAim),
+                        m_indexerSystem.run(),
                         m_intakeRollerSubsystem.intake(),
-                        m_shooterSubsystem.aimAndShootIgnoreCheck(
-                                () -> m_swerveSubsystem.getDistanceToTarget(true))));
+                        m_shooterSystem.aimAndShootIgnoreCheck(
+                                () -> m_swerveSystem.getDistanceToTarget(true))));
     }
 
     private Command rightNeutralAutoFirstSweep() {
@@ -116,8 +116,8 @@ public class Choreo {
                 m_autoFactory.resetOdometry("RightAuto1"),
                 m_autoFactory.trajectoryCmd("RightAuto1").deadlineFor(
                         m_intakeRollerSubsystem.intake(),
-                        m_indexerSubsystem.run()),
-                m_swerveSubsystem.stop());
+                        m_indexerSystem.run()),
+                m_swerveSystem.stop());
     }
 
     private Command leftNeutralAutoFirstSweep() {
@@ -125,19 +125,19 @@ public class Choreo {
                 m_autoFactory.resetOdometry("LeftAuto1"),
                 m_autoFactory.trajectoryCmd("LeftAuto1").deadlineFor(
                         m_intakeRollerSubsystem.intake(),
-                        m_indexerSubsystem.run()),
-                m_swerveSubsystem.stop());
+                        m_indexerSystem.run()),
+                m_swerveSystem.stop());
     }
 
     public Command leftNeutralAutoSweepOnce() {
         return Commands.sequence(
                 leftNeutralAutoFirstSweep(),
                 m_autoFactory.trajectoryCmd("LeftAuto2a"),
-                m_swerveSubsystem.stop(),
+                m_swerveSystem.stop(),
                 Commands.parallel(
-                        m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
-                        m_shooterSubsystem.aimAndShootIgnoreCheck(
-                                () -> m_swerveSubsystem.getDistanceToTarget(true)),
+                        m_swerveSystem.driveFieldOriented(stationaryAutoAim),
+                        m_shooterSystem.aimAndShootIgnoreCheck(
+                                () -> m_swerveSystem.getDistanceToTarget(true)),
                         m_linearIntakeSubsystem.shuffle()));
     }
 
@@ -145,11 +145,11 @@ public class Choreo {
         return Commands.sequence(
                 rightNeutralAutoFirstSweep(),
                 m_autoFactory.trajectoryCmd("RightAuto2a"),
-                m_swerveSubsystem.stop(),
+                m_swerveSystem.stop(),
                 Commands.parallel(
-                        m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
-                        m_shooterSubsystem.aimAndShootIgnoreCheck(
-                                () -> m_swerveSubsystem.getDistanceToTarget(true)),
+                        m_swerveSystem.driveFieldOriented(stationaryAutoAim),
+                        m_shooterSystem.aimAndShootIgnoreCheck(
+                                () -> m_swerveSystem.getDistanceToTarget(true)),
                         m_linearIntakeSubsystem.shuffle()));
     }
 
@@ -157,21 +157,21 @@ public class Choreo {
         return Commands.sequence(
                 leftNeutralAutoFirstSweep(),
                 m_autoFactory.trajectoryCmd("LeftAuto2a"),
-                m_swerveSubsystem.stop(),
+                m_swerveSystem.stop(),
                 Commands.waitSeconds(8).deadlineFor(
-                        m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
-                        m_shooterSubsystem.aimAndShootIgnoreCheck(
-                                () -> m_swerveSubsystem.getDistanceToTarget(true)),
+                        m_swerveSystem.driveFieldOriented(stationaryAutoAim),
+                        m_shooterSystem.aimAndShootIgnoreCheck(
+                                () -> m_swerveSystem.getDistanceToTarget(true)),
                         m_linearIntakeSubsystem.shuffle()),
                 m_autoFactory.trajectoryCmd("LeftAuto3a").deadlineFor(
-                        m_shooterSubsystem.stopShooting(),
+                        m_shooterSystem.stopShooting(),
                         m_linearIntakeSubsystem.extend()),
                 Commands.parallel(
-                        m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
-                        m_shooterSubsystem.aimAndShootIgnoreCheck(
-                                () -> m_swerveSubsystem.getDistanceToTarget(true)),
+                        m_swerveSystem.driveFieldOriented(stationaryAutoAim),
+                        m_shooterSystem.aimAndShootIgnoreCheck(
+                                () -> m_swerveSystem.getDistanceToTarget(true)),
                         m_linearIntakeSubsystem.shuffle(),
-                        m_indexerSubsystem.run(),
+                        m_indexerSystem.run(),
                         m_intakeRollerSubsystem.intake()));
     }
 
@@ -179,20 +179,20 @@ public class Choreo {
         return Commands.sequence(
                 rightNeutralAutoFirstSweep(),
                 m_autoFactory.trajectoryCmd("RightAuto2a"),
-                m_swerveSubsystem.stop(),
+                m_swerveSystem.stop(),
                 Commands.waitSeconds(8).deadlineFor(
-                        m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
-                        m_shooterSubsystem.aimAndShootIgnoreCheck(
-                                () -> m_swerveSubsystem.getDistanceToTarget(true)),
+                        m_swerveSystem.driveFieldOriented(stationaryAutoAim),
+                        m_shooterSystem.aimAndShootIgnoreCheck(
+                                () -> m_swerveSystem.getDistanceToTarget(true)),
                         m_linearIntakeSubsystem.shuffle()),
                 m_autoFactory.trajectoryCmd("RightAuto3a").deadlineFor(
-                        m_shooterSubsystem.stopShooting(),
+                        m_shooterSystem.stopShooting(),
                         m_linearIntakeSubsystem.extend()),
                 Commands.parallel(
-                        m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
-                        m_shooterSubsystem.aimAndShootIgnoreCheck(
-                                () -> m_swerveSubsystem.getDistanceToTarget(true)),
-                        m_indexerSubsystem.run(),
+                        m_swerveSystem.driveFieldOriented(stationaryAutoAim),
+                        m_shooterSystem.aimAndShootIgnoreCheck(
+                                () -> m_swerveSystem.getDistanceToTarget(true)),
+                        m_indexerSystem.run(),
                         m_intakeRollerSubsystem.intake(),
                         m_linearIntakeSubsystem.shuffle()));
     }
@@ -201,23 +201,23 @@ public class Choreo {
         return Commands.sequence(
                 rightNeutralAutoFirstSweep(),
                 m_autoFactory.trajectoryCmd("RightAuto2b"),
-                m_swerveSubsystem.stop(),
+                m_swerveSystem.stop(),
                 // TODO: Tune timing of these waits and commands
                 Commands.waitSeconds(4.5).deadlineFor(
-                        m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
-                        m_shooterSubsystem.aimAndShootIgnoreCheck(
-                                () -> m_swerveSubsystem.getDistanceToTarget(true))),
+                        m_swerveSystem.driveFieldOriented(stationaryAutoAim),
+                        m_shooterSystem.aimAndShootIgnoreCheck(
+                                () -> m_swerveSystem.getDistanceToTarget(true))),
                 Commands.waitSeconds(1.0).deadlineFor(
                         new ConditionalCommand(
-                                m_swerveSubsystem.driveFieldOriented(aimTowardsBlue),
-                                m_swerveSubsystem.driveFieldOriented(aimTowardsRed),
-                                m_swerveSubsystem::isRedAlliance)),
+                                m_swerveSystem.driveFieldOriented(aimTowardsBlue),
+                                m_swerveSystem.driveFieldOriented(aimTowardsRed),
+                                m_swerveSystem::isRedAlliance)),
                 m_autoFactory.trajectoryCmd("RightAuto3b").deadlineFor(
                         m_intakeRollerSubsystem.stop(),
-                        m_indexerSubsystem.stop(),
+                        m_indexerSystem.stop(),
                         m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
                         m_linearIntakeSubsystem.retract()),
-                m_swerveSubsystem.stop(),
+                m_swerveSystem.stop(),
                 m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
     }
 
@@ -226,31 +226,31 @@ public class Choreo {
                 leftNeutralAutoFirstSweep(),
                 m_autoFactory.trajectoryCmd("LeftAuto2c"),
                 m_autoFactory.trajectoryCmd("LeftAuto3c").deadlineFor(
-                        m_shooterSubsystem.aimAndShootIgnoreCheck(
-                                () -> m_swerveSubsystem.getDistanceToTarget(true))));
+                        m_shooterSystem.aimAndShootIgnoreCheck(
+                                () -> m_swerveSystem.getDistanceToTarget(true))));
     }
 
     public Command leftNeutralAutoThenClimb() {
         return Commands.sequence(
                 leftNeutralAutoFirstSweep(),
                 m_autoFactory.trajectoryCmd("LeftAuto2b"),
-                m_swerveSubsystem.stop(),
+                m_swerveSystem.stop(),
                 // TODO: Tune timing of these waits and commands
                 Commands.waitSeconds(4.5).deadlineFor(
-                        m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
-                        m_shooterSubsystem.aimAndShootIgnoreCheck(
-                                () -> m_swerveSubsystem.getDistanceToTarget(true))),
+                        m_swerveSystem.driveFieldOriented(stationaryAutoAim),
+                        m_shooterSystem.aimAndShootIgnoreCheck(
+                                () -> m_swerveSystem.getDistanceToTarget(true))),
                 Commands.waitSeconds(1.0).deadlineFor(
                         new ConditionalCommand(
-                                m_swerveSubsystem.driveFieldOriented(aimTowardsBlue),
-                                m_swerveSubsystem.driveFieldOriented(aimTowardsRed),
-                                m_swerveSubsystem::isRedAlliance)),
+                                m_swerveSystem.driveFieldOriented(aimTowardsBlue),
+                                m_swerveSystem.driveFieldOriented(aimTowardsRed),
+                                m_swerveSystem::isRedAlliance)),
                 m_autoFactory.trajectoryCmd("LeftAuto3b").deadlineFor(
                         m_intakeRollerSubsystem.stop(),
-                        m_indexerSubsystem.stop(),
+                        m_indexerSystem.stop(),
                         m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
                         m_linearIntakeSubsystem.retract()),
-                m_swerveSubsystem.stop(),
+                m_swerveSystem.stop(),
                 m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
     }
 
@@ -259,17 +259,17 @@ public class Choreo {
                 m_autoFactory.resetOdometry("BackUpCenterLeft"),
                 m_autoFactory.trajectoryCmd("BackUpCenterLeft"),
                 Commands.waitSeconds(4.5).deadlineFor(
-                        m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
-                        m_shooterSubsystem.aimAndShootIgnoreCheck(
-                                () -> m_swerveSubsystem.getDistanceToTarget(true))),
+                        m_swerveSystem.driveFieldOriented(stationaryAutoAim),
+                        m_shooterSystem.aimAndShootIgnoreCheck(
+                                () -> m_swerveSystem.getDistanceToTarget(true))),
                 m_autoFactory.trajectoryCmd("CenterToClimbLeft"),
-                m_swerveSubsystem.stop(),
+                m_swerveSystem.stop(),
                 m_autoFactory.trajectoryCmd("LeftAuto3b").deadlineFor(
                         m_intakeRollerSubsystem.stop(),
-                        m_indexerSubsystem.stop(),
+                        m_indexerSystem.stop(),
                         m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
                         m_linearIntakeSubsystem.retract()),
-                m_swerveSubsystem.stop(),
+                m_swerveSystem.stop(),
                 m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
     }
 
@@ -278,17 +278,17 @@ public class Choreo {
                 m_autoFactory.resetOdometry("BackUpCenterRight"),
                 m_autoFactory.trajectoryCmd("BackUpCenterRight"),
                 Commands.waitSeconds(4.5).deadlineFor(
-                        m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
-                        m_shooterSubsystem.aimAndShootIgnoreCheck(
-                                () -> m_swerveSubsystem.getDistanceToTarget(true))),
+                        m_swerveSystem.driveFieldOriented(stationaryAutoAim),
+                        m_shooterSystem.aimAndShootIgnoreCheck(
+                                () -> m_swerveSystem.getDistanceToTarget(true))),
                 m_autoFactory.trajectoryCmd("CenterToClimbRight"),
-                m_swerveSubsystem.stop(),
+                m_swerveSystem.stop(),
                 m_autoFactory.trajectoryCmd("RightAuto3b").deadlineFor(
                         m_intakeRollerSubsystem.stop(),
-                        m_indexerSubsystem.stop(),
+                        m_indexerSystem.stop(),
                         m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
                         m_linearIntakeSubsystem.retract()),
-                m_swerveSubsystem.stop(),
+                m_swerveSystem.stop(),
                 m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
     }
 }

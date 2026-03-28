@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MatchConstants;
 
-public class DashboardSubsystem extends SubsystemBase {
+public class DashboardSystem extends SubsystemBase {
 
     private Color colorInactive;
     private Color color;
@@ -19,7 +19,7 @@ public class DashboardSubsystem extends SubsystemBase {
     /**
      * Creates a new DashboardSubsystem.
      */
-    public DashboardSubsystem() {
+    public DashboardSystem() {
         color = Color.BOTH;
         timeLeft = 0;
         previousTime = 0;

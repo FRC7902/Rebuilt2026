@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.climb.ElevatorSubsystem;
 import frc.robot.subsystems.climb.TongueSubsystem;
 
-public class ClimbSubsystem extends SubsystemBase {
+public class ClimbSystem extends SubsystemBase {
 
     private final ElevatorSubsystem m_elevatorSubsystem;
     private final TongueSubsystem m_tongueSubsystem;
@@ -24,7 +24,7 @@ public class ClimbSubsystem extends SubsystemBase {
     private boolean m_isClimbAttempted;
     private boolean m_isClimbInterrupted;
 
-    public ClimbSubsystem() {
+    public ClimbSystem() {
         m_elevatorSubsystem = new ElevatorSubsystem();
         m_tongueSubsystem = new TongueSubsystem();
         m_currentClimbPosition = ClimbPosition.NONE;

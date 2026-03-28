@@ -48,7 +48,7 @@ public class Robot extends TimedRobot {
         m_robotContainer.calibrateLinearIntakePosition();
 
         // Start the flywheel at the default RPM when teleop starts
-        CommandScheduler.getInstance().schedule(m_robotContainer.m_shooterSubsystem.startFlywheelDefaultRPM());
+        CommandScheduler.getInstance().schedule(m_robotContainer.m_shooterSystem.startFlywheelDefaultRPM());
 
         // Extend the intake to lower the hopper enough to go underneath the trench
         // NOTE: Extend intake fully in auto, due to bug not allowing you to move it
@@ -78,7 +78,7 @@ public class Robot extends TimedRobot {
         m_robotContainer.driveAngularVelocity.driveToPoseEnabled(false);
 
         // Start the flywheel at the default RPM when teleop starts
-        CommandScheduler.getInstance().schedule(m_robotContainer.m_shooterSubsystem.startFlywheelDefaultRPM());
+        CommandScheduler.getInstance().schedule(m_robotContainer.m_shooterSystem.startFlywheelDefaultRPM());
 
         // Extend the intake to lower the hopper enough to go underneath the trench
         CommandScheduler.getInstance().schedule(m_robotContainer.m_linearIntakeSubsystem.midpoint());
