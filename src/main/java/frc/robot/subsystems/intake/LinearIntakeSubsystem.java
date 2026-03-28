@@ -85,7 +85,7 @@ public class LinearIntakeSubsystem extends SubsystemBase {
 
     public Command sysId() {
         return m_linearIntake.sysId(
-                Volts.of(2), Volts.of(0.5).per(Second), Second.of(10))
+                        Volts.of(2), Volts.of(0.5).per(Second), Second.of(10))
                 .beforeStarting(SignalLogger::start)
                 .finallyDo(SignalLogger::stop);
     }
@@ -126,7 +126,7 @@ public class LinearIntakeSubsystem extends SubsystemBase {
         }
 
         return getSetpoint().map(
-                setpoint -> setpoint.isNear(m_linearIntake.getHeight(), LinearIntakeConstants.POSITION_TARGET_ERROR))
+                        setpoint -> setpoint.isNear(m_linearIntake.getHeight(), LinearIntakeConstants.POSITION_TARGET_ERROR))
                 .orElse(false);
     }
 
@@ -153,14 +153,14 @@ public class LinearIntakeSubsystem extends SubsystemBase {
                         new ConditionalCommand(
                                 // Full hopper (which intake cannot close past midpoint)
                                 Commands.sequence(
-                                        setPosition(LinearIntakeConstants.SHUFFLE_FURTHEST_POSITION).withTimeout(0.25),
-                                        setPosition(LinearIntakeConstants.EXTENDED_POSITION).withTimeout(0.25))
+                                                setPosition(LinearIntakeConstants.SHUFFLE_FURTHEST_POSITION).withTimeout(0.25),
+                                                setPosition(LinearIntakeConstants.EXTENDED_POSITION).withTimeout(0.25))
                                         .repeatedly(),
                                 // Not full hopper (which intake can close past midpoint, so shuffle closer to
                                 // midpoint)
                                 Commands.sequence(
-                                        setPosition(LinearIntakeConstants.SHUFFLE_FAR_POSITION).withTimeout(0.25),
-                                        setPosition(LinearIntakeConstants.MIDPOINT_POSITION).withTimeout(0.25))
+                                                setPosition(LinearIntakeConstants.SHUFFLE_FAR_POSITION).withTimeout(0.25),
+                                                setPosition(LinearIntakeConstants.MIDPOINT_POSITION).withTimeout(0.25))
                                         .repeatedly(),
                                 () -> getPosition().gt(
                                         LinearIntakeConstants.MIDPOINT_POSITION
@@ -170,8 +170,8 @@ public class LinearIntakeSubsystem extends SubsystemBase {
                 setPosition(LinearIntakeConstants.SHUFFLE_FAR_POSITION).withTimeout(0.5),
                 setPosition(LinearIntakeConstants.SHUFFLE_CLOSE_POSITION).withTimeout(0.5),
                 Commands.sequence(
-                        midpoint().withTimeout(0.5),
-                        retract().withTimeout(0.5))
+                                midpoint().withTimeout(0.5),
+                                retract().withTimeout(0.5))
                         .repeatedly());
     }
 
