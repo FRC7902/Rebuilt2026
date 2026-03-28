@@ -1,7 +1,6 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Seconds;
@@ -50,6 +49,7 @@ import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
 
 public class RobotContainer {
+
     final CommandXboxController m_driverController = new CommandXboxController(Constants.DRIVER_CONTROLLER_PORT);
 
     // private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
@@ -72,8 +72,8 @@ public class RobotContainer {
     public final AutoFactory m_autoFactory = new AutoFactory(
             m_swerveSubsystem::getPose, // A function that returns the current robot pose
             m_swerveSubsystem::resetOdometry, // A function that resets the current robot pose to
-                                              // the provided
-                                              // Pose2d
+            // the provided
+            // Pose2d
             m_swerveSubsystem::followTrajectory, // The drive subsystem trajectory follower
 
             true, // If alliance flipping should be enabled
@@ -85,21 +85,21 @@ public class RobotContainer {
     private final Choreo m_choreo = new Choreo(this);
 
     /**
-     * Converts driver input into a field-relative ChassisSpeeds that is controlled
-     * by angular velocity.
+     * Converts driver input into a field-relative ChassisSpeeds that is
+     * controlled by angular velocity.
      */
     public SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
             () -> m_driverController.getLeftY() * -1,
             () -> m_driverController.getLeftX() * -1)
             .withControllerRotationAxis(() -> m_driverController.getRightX() * -1) // TODO: Check if * -1 is
-                                                                                   // needed IRL
+            // needed IRL
             .deadband(OperatorConstants.DEADBAND)
             .scaleTranslation(1.0)
             .allianceRelativeControl(true);
 
     /**
-     * Clone's the angular velocity input stream and converts it to a fieldRelative
-     * input stream.
+     * Clone's the angular velocity input stream and converts it to a
+     * fieldRelative input stream.
      */
     SwerveInputStream driveDirectAngle = driveAngularVelocity.copy()
             .withControllerHeadingAxis(m_driverController::getRightX,
@@ -107,8 +107,8 @@ public class RobotContainer {
             .headingWhile(true);
 
     /**
-     * Clone's the angular velocity input stream and converts it to a robotRelative
-     * input stream.
+     * Clone's the angular velocity input stream and converts it to a
+     * robotRelative input stream.
      */
     SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
             .allianceRelativeControl(false);
@@ -117,26 +117,24 @@ public class RobotContainer {
             () -> -m_driverController.getLeftY(),
             () -> -m_driverController.getLeftX())
             .withControllerRotationAxis(() -> m_driverController.getRawAxis(
-                    2))
+            2))
             .deadband(OperatorConstants.DEADBAND)
             .scaleTranslation(0.8)
             .allianceRelativeControl(true);
     // Derive the heading axis with math!
     SwerveInputStream driveDirectAngleKeyboard = driveAngularVelocityKeyboard.copy()
             .withControllerHeadingAxis(() -> Math.sin(
-                    m_driverController.getRawAxis(
-                            2) *
-                            Math.PI)
-                    *
-                    (Math.PI *
-                            2),
+            m_driverController.getRawAxis(
+                    2)
+            * Math.PI)
+            * (Math.PI
+            * 2),
                     () -> Math.cos(
                             m_driverController.getRawAxis(
-                                    2) *
-                                    Math.PI)
-                            *
-                            (Math.PI *
-                                    2))
+                                    2)
+                            * Math.PI)
+                    * (Math.PI
+                    * 2))
             .headingWhile(true)
             .translationHeadingOffset(true)
             .translationHeadingOffset(Rotation2d.fromDegrees(
@@ -190,7 +188,6 @@ public class RobotContainer {
         // Only do this for LL4, so we use heading readings from MT1 from 3G?
         // m_leftLimelight.getSettings().withImuMode(ImuMode.ExternalImu).save();
         // m_frontLimelight.getSettings().withImuMode(ImuMode.ExternalImu).save();
-
         // PID-tuned auto-align for climbing start position
         driveAngularVelocity.driveToPose(m_swerveSubsystem::getDriveToWaypoint,
                 new ProfiledPIDController(
@@ -262,16 +259,15 @@ public class RobotContainer {
     private void configureBindings() {
         m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity);
 
-        BooleanSupplier isIdle = () -> Math.abs(m_driverController.getLeftX()) < OperatorConstants.DEADBAND &&
-                Math.abs(m_driverController.getLeftY()) < OperatorConstants.DEADBAND &&
-                Math.abs(m_driverController.getRightX()) < OperatorConstants.DEADBAND &&
-                !DriverStation.isAutonomous();
+        BooleanSupplier isIdle = () -> Math.abs(m_driverController.getLeftX()) < OperatorConstants.DEADBAND
+                && Math.abs(m_driverController.getLeftY()) < OperatorConstants.DEADBAND
+                && Math.abs(m_driverController.getRightX()) < OperatorConstants.DEADBAND
+                && !DriverStation.isAutonomous();
 
         Trigger isIdleTrigger = new Trigger(isIdle);
 
         // m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyroWithAlliance)));
         // m_driverController.create().whileTrue(m_swerveSubsystem.centerModulesCommand());
-
         // Trigger for if driver is controlling the robot
         Trigger isControllingDriveTrigger = new Trigger(() -> Math
                 .abs(m_driverController.getLeftX()) > OperatorConstants.DEADBAND
@@ -282,14 +278,14 @@ public class RobotContainer {
         // TODO: Check if aiming
         isClimberUp.and(
                 m_driverController.rightTrigger().negate()).onTrue(
-                        new InstantCommand(() -> {
-                            driveAngularVelocity.scaleTranslation(
-                                    SwerveConstants.AUTO_AIM_SCALE_TRANSLATION)
-                                    .scaleRotation(SwerveConstants.AUTO_AIM_SCALE_TRANSLATION);
-                        }))
+                new InstantCommand(() -> {
+                    driveAngularVelocity.scaleTranslation(
+                            SwerveConstants.AUTO_AIM_SCALE_TRANSLATION)
+                            .scaleRotation(SwerveConstants.AUTO_AIM_SCALE_TRANSLATION);
+                }))
                 .onFalse(
                         new InstantCommand(() -> driveAngularVelocity.scaleTranslation(
-                                1.0).scaleRotation(1.0)));
+                        1.0).scaleRotation(1.0)));
 
         Trigger autoAimOnTarget = new Trigger(m_swerveSubsystem::isAutoAimOnTarget);
 
@@ -361,9 +357,9 @@ public class RobotContainer {
                                             m_shooterSubsystem::getHoodSetpointAngle),
                                     Commands.waitTime(Seconds.of(0.1)))
                                     .onlyIf(() -> m_shooterSubsystem
-                                            .isShooterReady()
-                                            && m_swerveSubsystem
-                                                    .isAutoAimOnTarget())
+                                    .isShooterReady()
+                                    && m_swerveSubsystem
+                                            .isAutoAimOnTarget())
                                     .repeatedly());
 
             m_driverController.leftTrigger()
@@ -375,8 +371,8 @@ public class RobotContainer {
                                     .repeatedly())
                     .onFalse(m_simSubsystem.stopIntake());
 
-        //     m_driverController.L3().onTrue(m_swerveSubsystem.simulationLocalize());
-        //     m_driverController.R3().onTrue(m_swerveSubsystem.simulationLocalize());
+            //     m_driverController.L3().onTrue(m_swerveSubsystem.simulationLocalize());
+            //     m_driverController.R3().onTrue(m_swerveSubsystem.simulationLocalize());
         }
 
         // Shoot without auto-aiming, defaulting to a preset hood angle for shooting
@@ -428,12 +424,11 @@ public class RobotContainer {
 
                 // Extend intake, reverse indexer and intake rollers at the same time
                 .onTrue(Commands.sequence( // TODO: Check if sequence is needed, or if parallel alone is
-                                           // fine
+                        // fine
                         m_linearIntakeSubsystem.extend(),
                         Commands.parallel(
                                 m_indexerSubsystem.reverse(),
                                 m_intakeRollerSubsystem.outtake())))
-
                 // Retract intake, then stop indexer and intake rollers
                 .onFalse(
                         Commands.sequence(
@@ -478,7 +473,6 @@ public class RobotContainer {
         //                         m_shooterSubsystem.storeFuel()),
         //                 m_shooterSubsystem.stopShooting(),
         //                 m_driverController.leftTrigger()::getAsBoolean));
-
         // // Auto-traverse the trench through right side
         // m_driverController.R3().whileTrue(
         //         new ConditionalCommand(
@@ -505,7 +499,7 @@ public class RobotContainer {
 
     public void updateLocalization() {
         // TODO: Prioritize LL4 over LL3G
-        for (LimelightWrapper limelight : new LimelightWrapper[] { m_frontLimelight, m_leftLimelight }) {
+        for (LimelightWrapper limelight : new LimelightWrapper[]{m_frontLimelight, m_leftLimelight}) {
             if (limelight.updateLocalization(m_swerveSubsystem.getSwerveDrive())) {
                 break; // Stop once a limelight successfully localizes
             }
