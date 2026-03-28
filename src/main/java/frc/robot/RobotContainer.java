@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ClimbConstants.ElevatorConstants;
@@ -49,7 +50,7 @@ import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
 
 public class RobotContainer {
-    final CommandPS5Controller m_driverController = new CommandPS5Controller(Constants.DRIVER_CONTROLLER_PORT);
+    final CommandXboxController m_driverController = new CommandXboxController(Constants.DRIVER_CONTROLLER_PORT);
 
     // private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
     public final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
@@ -187,8 +188,8 @@ public class RobotContainer {
         m_frontLimelight = new LimelightWrapper("limelight-b", true);
 
         // Only do this for LL4, so we use heading readings from MT1 from 3G?
-        m_leftLimelight.getSettings().withImuMode(ImuMode.ExternalImu).save();
-        m_frontLimelight.getSettings().withImuMode(ImuMode.ExternalImu).save();
+        // m_leftLimelight.getSettings().withImuMode(ImuMode.ExternalImu).save();
+        // m_frontLimelight.getSettings().withImuMode(ImuMode.ExternalImu).save();
 
         // PID-tuned auto-align for climbing start position
         driveAngularVelocity.driveToPose(m_swerveSubsystem::getDriveToWaypoint,
@@ -268,8 +269,8 @@ public class RobotContainer {
 
         Trigger isIdleTrigger = new Trigger(isIdle);
 
-        m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyroWithAlliance)));
-        m_driverController.create().whileTrue(m_swerveSubsystem.centerModulesCommand());
+        // m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyroWithAlliance)));
+        // m_driverController.create().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
         // Trigger for if driver is controlling the robot
         Trigger isControllingDriveTrigger = new Trigger(() -> Math
@@ -280,7 +281,7 @@ public class RobotContainer {
 
         // TODO: Check if aiming
         isClimberUp.and(
-                m_driverController.R2().negate()).onTrue(
+                m_driverController.rightTrigger().negate()).onTrue(
                         new InstantCommand(() -> {
                             driveAngularVelocity.scaleTranslation(
                                     SwerveConstants.AUTO_AIM_SCALE_TRANSLATION)
@@ -293,19 +294,19 @@ public class RobotContainer {
         Trigger autoAimOnTarget = new Trigger(m_swerveSubsystem::isAutoAimOnTarget);
 
         // Auto-aim (swerve heading with calculated hood angle) and shoot
-        m_driverController.R2()
+        m_driverController.rightTrigger()
                 .and(isIdleTrigger.negate())
                 .and(autoAimOnTarget)
                 .whileTrue(driveFieldOrientedAutoAim);
-        m_driverController.R2()
+        m_driverController.rightTrigger()
                 .and(isIdleTrigger)
                 .and(autoAimOnTarget.negate())
                 .whileTrue(driveFieldOrientedAutoAim);
-        m_driverController.R2()
+        m_driverController.rightTrigger()
                 .and(isIdleTrigger.negate())
                 .and(autoAimOnTarget.negate())
                 .whileTrue(driveFieldOrientedAutoAim);
-        m_driverController.R2()
+        m_driverController.rightTrigger()
                 .and(isIdleTrigger)
                 .and(autoAimOnTarget)
                 .onTrue(
@@ -313,43 +314,43 @@ public class RobotContainer {
                                 Commands.waitSeconds(0.01),
                                 new InstantCommand(m_swerveSubsystem::lock,
                                         m_swerveSubsystem)));
-        m_driverController.R2()
+        m_driverController.rightTrigger()
                 .and(isControllingDriveTrigger)
                 .onTrue(m_shooterSubsystem.aimAndShoot(
                         () -> m_swerveSubsystem.getDistanceToTarget(true),
                         m_swerveSubsystem::isAutoAimOnTarget, false, m_swerveSubsystem::isInAllianceZone)
                         .beforeStarting(m_shooterSubsystem.stopFeeder()));
-        m_driverController.R2()
+        m_driverController.rightTrigger()
                 .and(isControllingDriveTrigger.negate())
                 .onTrue(m_shooterSubsystem.aimAndShoot(
                         () -> m_swerveSubsystem.getDistanceToTarget(true),
                         m_swerveSubsystem::isAutoAimOnTarget, true, m_swerveSubsystem::isInAllianceZone)
                         .beforeStarting(m_shooterSubsystem.stopFeeder()));
         // Stop shooter subsystem
-        m_driverController.R2()
+        m_driverController.rightTrigger()
                 .onFalse(new ConditionalCommand(
                         Commands.sequence(
                                 m_shooterSubsystem.stopShooting(),
                                 m_shooterSubsystem.storeFuel()),
                         m_shooterSubsystem.stopShooting(),
-                        m_driverController.L2()::getAsBoolean));
-        m_driverController.R2()
+                        m_driverController.leftTrigger()::getAsBoolean));
+        m_driverController.rightTrigger()
                 .onTrue(m_indexerSubsystem.run())
                 .onFalse(m_indexerSubsystem.stop()
-                        .unless(m_driverController.L2()::getAsBoolean));
-        m_driverController.R2()
+                        .unless(m_driverController.leftTrigger()::getAsBoolean));
+        m_driverController.rightTrigger()
                 .onTrue(m_intakeRollerSubsystem.intake())
                 .onFalse(m_intakeRollerSubsystem.stop()
-                        .unless(m_driverController.L2()::getAsBoolean));
-        m_driverController.R2()
+                        .unless(m_driverController.leftTrigger()::getAsBoolean));
+        m_driverController.rightTrigger()
                 .onTrue(m_linearIntakeSubsystem.shuffle()
-                        .unless(m_driverController.L2()::getAsBoolean))
+                        .unless(m_driverController.leftTrigger()::getAsBoolean))
                 .onFalse(m_linearIntakeSubsystem.midpoint()
-                        .unless(m_driverController.L2()::getAsBoolean));
+                        .unless(m_driverController.leftTrigger()::getAsBoolean));
 
         if (Robot.isSimulation()) {
             SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(new Translation2d(3, 3)));
-            m_driverController.R2()
+            m_driverController.rightTrigger()
                     .whileTrue(
                             Commands.sequence(
                                     m_simSubsystem.shootFuel(
@@ -365,7 +366,7 @@ public class RobotContainer {
                                                     .isAutoAimOnTarget())
                                     .repeatedly());
 
-            m_driverController.L2()
+            m_driverController.leftTrigger()
                     .onTrue(
                             new ConditionalCommand(m_simSubsystem.startIntake(),
                                     m_simSubsystem.stopIntake(),
@@ -374,56 +375,56 @@ public class RobotContainer {
                                     .repeatedly())
                     .onFalse(m_simSubsystem.stopIntake());
 
-            m_driverController.L3().onTrue(m_swerveSubsystem.simulationLocalize());
-            m_driverController.R3().onTrue(m_swerveSubsystem.simulationLocalize());
+        //     m_driverController.L3().onTrue(m_swerveSubsystem.simulationLocalize());
+        //     m_driverController.R3().onTrue(m_swerveSubsystem.simulationLocalize());
         }
 
         // Shoot without auto-aiming, defaulting to a preset hood angle for shooting
         // from directly in front of the hub
-        m_driverController.R1()
-                .and(m_driverController.R2().negate())
+        m_driverController.rightBumper()
+                .and(m_driverController.rightTrigger().negate())
                 .onTrue(m_shooterSubsystem.shootNoAutoAim())
                 .onFalse(new ConditionalCommand(
                         Commands.sequence(
                                 m_shooterSubsystem.stopShooting(),
                                 m_shooterSubsystem.storeFuel()),
                         m_shooterSubsystem.stopShooting(),
-                        m_driverController.L2()::getAsBoolean));
-        m_driverController.R1()
+                        m_driverController.leftTrigger()::getAsBoolean));
+        m_driverController.rightBumper()
                 .whileTrue(
                         Commands.sequence(
                                 Commands.waitSeconds(0.01),
                                 new InstantCommand(m_swerveSubsystem::lock,
                                         m_swerveSubsystem)));
-        m_driverController.R1()
-                .and(m_driverController.R2().negate())
+        m_driverController.rightBumper()
+                .and(m_driverController.rightTrigger().negate())
                 .onTrue(m_indexerSubsystem.run())
                 .onFalse(m_indexerSubsystem.stop()
-                        .unless(m_driverController.L2()::getAsBoolean));
-        m_driverController.R1()
+                        .unless(m_driverController.leftTrigger()::getAsBoolean));
+        m_driverController.rightBumper()
                 .onTrue(m_linearIntakeSubsystem.shuffle()
-                        .unless(m_driverController.L2()::getAsBoolean))
+                        .unless(m_driverController.leftTrigger()::getAsBoolean))
                 .onFalse(m_linearIntakeSubsystem.midpoint()
-                        .unless(m_driverController.L2()::getAsBoolean));
+                        .unless(m_driverController.leftTrigger()::getAsBoolean));
 
         // Extend intake, expand hopper, and run intake rollers
-        m_driverController.L2()
+        m_driverController.leftTrigger()
                 .onTrue(Commands.parallel(
                         m_linearIntakeSubsystem.extend(),
                         m_intakeRollerSubsystem.intake()))
                 .onFalse(m_linearIntakeSubsystem.midpoint().andThen(m_intakeRollerSubsystem.stop()));
-        m_driverController.L2()
+        m_driverController.leftTrigger()
                 .whileTrue(
                         Commands.parallel(
                                 m_indexerSubsystem.run(),
                                 m_shooterSubsystem.storeFuel()))
                 .onFalse(
                         m_indexerSubsystem.stop()
-                                .unless(m_driverController.R2()::getAsBoolean));
+                                .unless(m_driverController.rightTrigger()::getAsBoolean));
 
-        m_driverController.L1()
-                .and(m_driverController.R2().negate()) // Not shooting
-                .and(m_driverController.L2().negate()) // Not intaking
+        m_driverController.leftBumper()
+                .and(m_driverController.rightTrigger().negate()) // Not shooting
+                .and(m_driverController.leftTrigger().negate()) // Not intaking
 
                 // Extend intake, reverse indexer and intake rollers at the same time
                 .onTrue(Commands.sequence( // TODO: Check if sequence is needed, or if parallel alone is
@@ -464,34 +465,34 @@ public class RobotContainer {
         m_driverController.povDown().onTrue(m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
 
         // Auto-traverse the trench through left side
-        m_driverController.L3().whileTrue(
-                new ConditionalCommand(
-                        selectRedLeftTrenchTraversal,
-                        selectBlueLeftTrenchTraversal,
-                        m_swerveSubsystem::isRedAlliance));
-        // Stop shooting to prevent hood from hitting trench
-        m_driverController.L3().onTrue(
-                new ConditionalCommand(
-                        Commands.sequence( // If intake is active, continue storing fuel
-                                m_shooterSubsystem.stopShooting(),
-                                m_shooterSubsystem.storeFuel()),
-                        m_shooterSubsystem.stopShooting(),
-                        m_driverController.L2()::getAsBoolean));
+        // m_driverController.L3().whileTrue(
+        //         new ConditionalCommand(
+        //                 selectRedLeftTrenchTraversal,
+        //                 selectBlueLeftTrenchTraversal,
+        //                 m_swerveSubsystem::isRedAlliance));
+        // // Stop shooting to prevent hood from hitting trench
+        // m_driverController.L3().onTrue(
+        //         new ConditionalCommand(
+        //                 Commands.sequence( // If intake is active, continue storing fuel
+        //                         m_shooterSubsystem.stopShooting(),
+        //                         m_shooterSubsystem.storeFuel()),
+        //                 m_shooterSubsystem.stopShooting(),
+        //                 m_driverController.leftTrigger()::getAsBoolean));
 
-        // Auto-traverse the trench through right side
-        m_driverController.R3().whileTrue(
-                new ConditionalCommand(
-                        selectRedRightTrenchTraversal,
-                        selectBlueRightTrenchTraversal,
-                        m_swerveSubsystem::isRedAlliance));
-        // Stop shooting to prevent hood from hitting trench
-        m_driverController.R3().onTrue(
-                new ConditionalCommand(
-                        Commands.sequence( // If intake is active, continue storing fuel
-                                m_shooterSubsystem.stopShooting(),
-                                m_shooterSubsystem.storeFuel()),
-                        m_shooterSubsystem.stopShooting(),
-                        m_driverController.L2()::getAsBoolean));
+        // // Auto-traverse the trench through right side
+        // m_driverController.R3().whileTrue(
+        //         new ConditionalCommand(
+        //                 selectRedRightTrenchTraversal,
+        //                 selectBlueRightTrenchTraversal,
+        //                 m_swerveSubsystem::isRedAlliance));
+        // // Stop shooting to prevent hood from hitting trench
+        // m_driverController.R3().onTrue(
+        //         new ConditionalCommand(
+        //                 Commands.sequence( // If intake is active, continue storing fuel
+        //                         m_shooterSubsystem.stopShooting(),
+        //                         m_shooterSubsystem.storeFuel()),
+        //                 m_shooterSubsystem.stopShooting(),
+        //                 m_driverController.leftTrigger()::getAsBoolean));
     }
 
     public void calibrateLinearIntakePosition() {
