@@ -19,6 +19,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -47,6 +48,11 @@ import edu.wpi.first.units.measure.Voltage;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
+import yams.mechanisms.config.ArmConfig;
+import yams.mechanisms.config.ElevatorConfig;
+import yams.mechanisms.config.FlyWheelConfig;
+import yams.mechanisms.config.MechanismPositionConfig;
+import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 
@@ -56,8 +62,8 @@ public final class Constants {
 
     public static final class SwerveConstants {
         public static final double MAX_SPEED = Units.feetToMeters(16); // TODO: Try increasing this to see if it
-                                                                       // does
-                                                                       // anything
+        // does
+        // anything
 
         public static final double AUTO_AIM_VELOCITY_COMPENSATION_FACTOR = 1.2; // TODO
         public static final Angle AUTO_AIM_ANGLE_TARGET_ERROR = Degrees.of(5); // TODO
@@ -123,6 +129,63 @@ public final class Constants {
         }
 
         public static class LinearIntakeConstants {
+            public static final UnaryOperator<SmartMotorControllerConfig> SMC_CONFIG = (
+                    SmartMotorControllerConfig config) -> config
+                            .withMechanismCircumference(
+                                    LinearIntakeConstants.MOTOR_CIRCUMFERENCE)
+                            .withClosedLoopController(
+                                    LinearIntakeConstants.PID_kP,
+                                    LinearIntakeConstants.PID_kI,
+                                    LinearIntakeConstants.PID_kD,
+                                    LinearIntakeConstants.MAX_VELOCITY,
+                                    LinearIntakeConstants.MAX_ACCELERATION)
+                            .withSimClosedLoopController(
+                                    LinearIntakeConstants.SIM_PID_kP,
+                                    LinearIntakeConstants.SIM_PID_kI,
+                                    LinearIntakeConstants.SIM_PID_kD,
+                                    LinearIntakeConstants.MAX_VELOCITY,
+                                    LinearIntakeConstants.MAX_ACCELERATION)
+                            .withSoftLimit(
+                                    LinearIntakeConstants.SOFT_LIMIT_MIN,
+                                    LinearIntakeConstants.SOFT_LIMIT_MAX)
+                            .withGearing(new MechanismGearing(
+                                    LinearIntakeConstants.GEARBOX))
+                            .withIdleMode(LinearIntakeConstants.IDLE_MODE)
+                            .withTelemetry("LinearIntakeMotor",
+                                    Constants.TELEMETRY_VERBOSITY)
+                            .withStatorCurrentLimit(
+                                    LinearIntakeConstants.STATOR_CURRENT_LIMIT)
+                            .withSupplyCurrentLimit(
+                                    LinearIntakeConstants.SUPPLY_CURRENT_LIMIT)
+                            .withMotorInverted(LinearIntakeConstants.INVERT_MOTOR)
+                            .withClosedLoopRampRate(
+                                    LinearIntakeConstants.CLOSED_LOOP_RAMP_RATE)
+                            .withOpenLoopRampRate(LinearIntakeConstants.OPEN_LOOP_RAMP_RATE)
+                            .withFeedforward(LinearIntakeConstants.FEEDFORWARD)
+                            .withSimFeedforward(LinearIntakeConstants.SIM_FEEDFORWARD)
+                            .withControlMode(
+                                    SmartMotorControllerConfig.ControlMode.CLOSED_LOOP);
+
+            public static final UnaryOperator<MechanismPositionConfig> MECHANISM_POSITION_CONFIG = (
+                    MechanismPositionConfig config) -> config
+                            .withMaxRobotHeight(MechanismPositionConstants.ROBOT_MAX_HEIGHT)
+                            .withMaxRobotLength(MechanismPositionConstants.ROBOT_MAX_LENGTH)
+                            .withRelativePosition(LinearIntakeConstants.RELATIVE_POSITION);
+
+            public static final UnaryOperator<ElevatorConfig> ELEVATOR_CONFIG = (
+                    ElevatorConfig config) -> config
+                            .withHardLimits(
+                                    LinearIntakeConstants.HARD_LIMIT_MIN,
+                                    LinearIntakeConstants.HARD_LIMIT_MAX)
+                            .withTelemetry("LinearIntakeMech",
+                                    Constants.TELEMETRY_VERBOSITY)
+                            .withMechanismPositionConfig(
+                                    LinearIntakeConstants.MECHANISM_POSITION_CONFIG
+                                            .apply(new MechanismPositionConfig()))
+                            .withAngle(LinearIntakeConstants.MECHANISM_ANGLE)
+                            .withMass(LinearIntakeConstants.MECHANISM_MASS)
+                            .withHorizontalElevator();
+
             public static final int MOTOR_CAN_ID = 18;
             public static final DCMotor MOTOR = DCMotor.getKrakenX60Foc(1);
 
@@ -260,6 +323,57 @@ public final class Constants {
         }
 
         public static final class FlywheelConstants {
+            public static final UnaryOperator<SmartMotorControllerConfig> SMC_CONFIG = (
+                    SmartMotorControllerConfig config) -> config
+                            .withClosedLoopController(
+                                    FlywheelConstants.PID_kP,
+                                    FlywheelConstants.PID_kI,
+                                    FlywheelConstants.PID_kD,
+                                    FlywheelConstants.MAX_VELOCITY_RPM,
+                                    FlywheelConstants.MAX_ACCELERATION_RPS2)
+                            .withSimClosedLoopController(
+                                    FlywheelConstants.SIM_PID_kP,
+                                    FlywheelConstants.SIM_PID_kI,
+                                    FlywheelConstants.SIM_PID_kD,
+                                    FlywheelConstants.MAX_VELOCITY_RPM,
+                                    FlywheelConstants.MAX_ACCELERATION_RPS2)
+                            .withGearing(new MechanismGearing(FlywheelConstants.GEARBOX))
+                            .withIdleMode(FlywheelConstants.IDLE_MODE) // Keep spinning even
+                                                                       // if not powered
+                            .withTelemetry("FlywheelMotor", Constants.TELEMETRY_VERBOSITY)
+                            .withStatorCurrentLimit(
+                                    FlywheelConstants.STATOR_CURRENT_LIMIT_AMPS)
+                            .withSupplyCurrentLimit(
+                                    FlywheelConstants.SUPPLY_CURRENT_LIMIT_AMPS)
+                            .withMotorInverted(FlywheelConstants.LEADER_MOTOR_INVERTED)
+                            .withClosedLoopRampRate(
+                                    FlywheelConstants.CLOSED_LOOP_RAMP_RATE_SEC)
+                            .withOpenLoopRampRate(FlywheelConstants.OPEN_LOOP_RAMP_RATE_SEC)
+                            .withFeedforward(FlywheelConstants.FEEDFORWARD)
+                            .withSimFeedforward(FlywheelConstants.SIM_FEEDFORWARD)
+                            .withControlMode(
+                                    SmartMotorControllerConfig.ControlMode.CLOSED_LOOP)
+                            .withMomentOfInertia(FlywheelConstants.MOI);
+
+            public static final UnaryOperator<MechanismPositionConfig> MECHANISM_POSITION_CONFIG = (
+                    MechanismPositionConfig config) -> config
+                            .withMaxRobotHeight(MechanismPositionConstants.ROBOT_MAX_HEIGHT)
+                            .withMaxRobotLength(MechanismPositionConstants.ROBOT_MAX_LENGTH)
+                            .withRelativePosition(FlywheelConstants.RELATIVE_POSITION);
+
+            public static final UnaryOperator<FlyWheelConfig> FLYWHEEL_CONFIG = (
+                    FlyWheelConfig config) -> config
+                            .withDiameter(FlywheelConstants.DIAMETER_INCHES)
+                            .withMOI(FlywheelConstants.MOI)
+                            .withTelemetry("FlywheelMech", Constants.TELEMETRY_VERBOSITY)
+                            .withSoftLimit(FlywheelConstants.SOFT_LIMIT_RPM.times(-1),
+                                    FlywheelConstants.SOFT_LIMIT_RPM)
+                            .withSpeedometerSimulation(
+                                    FlywheelConstants.SIM_MAX_VELOCITY_RPM)
+                            .withMechanismPositionConfig(
+                                    FlywheelConstants.MECHANISM_POSITION_CONFIG
+                                            .apply(new MechanismPositionConfig()));
+
             public static final int LEADER_MOTOR_CAN_ID = 20;
             public static final int FOLLOWER_MOTOR_CAN_ID = 21;
 
@@ -314,6 +428,48 @@ public final class Constants {
         }
 
         public static final class HoodConstants {
+            public static final UnaryOperator<SmartMotorControllerConfig> SMC_CONFIG = (
+                    SmartMotorControllerConfig config) -> config
+                            .withClosedLoopController(
+                                    HoodConstants.PID_kP,
+                                    HoodConstants.PID_kI,
+                                    HoodConstants.PID_kD,
+                                    HoodConstants.MAX_VELOCITY_RPM,
+                                    HoodConstants.MAX_ACCELERATION_RPS2)
+                            .withSimClosedLoopController(
+                                    HoodConstants.SIM_PID_kP,
+                                    HoodConstants.SIM_PID_kI,
+                                    HoodConstants.SIM_PID_kD,
+                                    HoodConstants.MAX_VELOCITY_RPM,
+                                    HoodConstants.MAX_ACCELERATION_RPS2)
+                            .withGearing(new MechanismGearing(HoodConstants.GEARBOX))
+                            .withIdleMode(MotorMode.COAST)
+                            .withTelemetry("HoodMotor", Constants.TELEMETRY_VERBOSITY)
+                            .withStatorCurrentLimit(HoodConstants.STATOR_CURRENT_LIMIT)
+                            .withSupplyCurrentLimit(HoodConstants.SUPPLY_CURRENT_LIMIT)
+                            .withMotorInverted(false)
+                            .withClosedLoopRampRate(HoodConstants.CLOSED_LOOP_RAMP_RATE_SEC)
+                            .withOpenLoopRampRate(HoodConstants.OPEN_LOOP_RAMP_RATE_SEC)
+                            .withFeedforward(HoodConstants.FEEDFORWARD)
+                            .withSimFeedforward(HoodConstants.SIM_FEEDFORWARD)
+                            .withControlMode(
+                                    SmartMotorControllerConfig.ControlMode.CLOSED_LOOP);
+
+            public static final UnaryOperator<MechanismPositionConfig> MECHANISM_POSITION_CONFIG = (
+                    MechanismPositionConfig config) -> config
+                            .withMaxRobotHeight(MechanismPositionConstants.ROBOT_MAX_HEIGHT)
+                            .withMaxRobotLength(MechanismPositionConstants.ROBOT_MAX_LENGTH)
+                            .withRelativePosition(HoodConstants.RELATIVE_POSITION);
+
+            public static final UnaryOperator<ArmConfig> ARM_CONFIG = (ArmConfig config) -> config
+                    .withTelemetry("HoodMech", Constants.TELEMETRY_VERBOSITY)
+                    .withMechanismPositionConfig(HoodConstants.MECHANISM_POSITION_CONFIG
+                            .apply(new MechanismPositionConfig()))
+                    .withSoftLimits(HoodConstants.SOFT_LIMIT_MIN, HoodConstants.SOFT_LIMIT_MAX)
+                    .withHardLimit(HoodConstants.HARD_LIMIT_MIN, HoodConstants.HARD_LIMIT_MAX)
+                    .withLength(HoodConstants.LENGTH)
+                    .withMass(HoodConstants.MASS);
+
             public static final int MOTOR_CAN_ID = 22;
             public static final int ENCODER_CAN_ID = 6;
 
@@ -373,6 +529,46 @@ public final class Constants {
         }
 
         public static final class FeederConstants {
+            public static final UnaryOperator<SmartMotorControllerConfig> SMC_CONFIG = (
+                    SmartMotorControllerConfig config) -> config
+                            .withClosedLoopController(
+                                    FeederConstants.PID_kP,
+                                    FeederConstants.PID_kI,
+                                    FeederConstants.PID_kD,
+                                    FeederConstants.MAX_VELOCITY_RPM,
+                                    FeederConstants.MAX_ACCELERATION_RPS2)
+                            .withSimClosedLoopController(
+                                    FeederConstants.SIM_PID_kP,
+                                    FeederConstants.SIM_PID_kI,
+                                    FeederConstants.SIM_PID_kD,
+                                    FeederConstants.MAX_VELOCITY_RPM,
+                                    FeederConstants.MAX_ACCELERATION_RPS2)
+                            .withGearing(new MechanismGearing(FeederConstants.GEARBOX))
+                            .withIdleMode(FeederConstants.IDLE_MODE) // Keep spinning even
+                                                                     // if not powered
+                            .withTelemetry("FeederMotor", Constants.TELEMETRY_VERBOSITY)
+                            .withStatorCurrentLimit(
+                                    FeederConstants.STATOR_CURRENT_LIMIT_AMPS)
+                            .withMotorInverted(FeederConstants.MOTOR_INVERTED)
+                            .withClosedLoopRampRate(
+                                    FeederConstants.CLOSED_LOOP_RAMP_RATE_SEC)
+                            .withOpenLoopRampRate(FeederConstants.OPEN_LOOP_RAMP_RATE_SEC)
+                            .withFeedforward(FeederConstants.FEEDFORWARD)
+                            .withSimFeedforward(FeederConstants.SIM_FEEDFORWARD)
+                            .withControlMode(
+                                    SmartMotorControllerConfig.ControlMode.CLOSED_LOOP)
+                            .withMomentOfInertia(FeederConstants.MOI);
+
+            public static final UnaryOperator<FlyWheelConfig> FLYWHEEL_CONFIG = (
+                    FlyWheelConfig config) -> config
+                            .withDiameter(FeederConstants.DIAMETER_INCHES)
+                            .withMOI(FeederConstants.MOI)
+                            .withTelemetry("FeederMech", Constants.TELEMETRY_VERBOSITY)
+                            .withSoftLimit(FeederConstants.SOFT_LIMIT_RPM.times(-1),
+                                    FeederConstants.SOFT_LIMIT_RPM)
+                            .withSpeedometerSimulation(
+                                    FeederConstants.SIM_MAX_VELOCITY_RPM);
+
             public static final int MOTOR_CAN_ID = 23;
             public static final int BEAM_BREAK_DIO_PORT = 2; // TODO
 
@@ -429,6 +625,92 @@ public final class Constants {
 
     public static final class ClimbConstants {
         public static final class ElevatorConstants {
+            public static final ElevatorFeedforward FEEDFORWARD = new ElevatorFeedforward(
+                    ElevatorConstants.FEEDFORWARD_kS,
+                    ElevatorConstants.FEEDFORWARD_kG,
+                    ElevatorConstants.FEEDFORWARD_kV,
+                    ElevatorConstants.FEEDFORWARD_kA);
+
+            public static final UnaryOperator<SmartMotorControllerConfig> FOLLOWER_SMC_CONFIG = (
+                    SmartMotorControllerConfig config) -> config
+                            .withMotorInverted(true)
+                            .withIdleMode(MotorMode.BRAKE)
+                            .withControlMode(
+                                    SmartMotorControllerConfig.ControlMode.CLOSED_LOOP)
+                            .withMechanismCircumference(
+                                    ElevatorConstants.CHAIN_PITCH.times(
+                                            ElevatorConstants.TOOTH_COUNT))
+                            .withGearing(ElevatorConstants.GEARBOX)
+                            .withStatorCurrentLimit(ElevatorConstants.STATOR_CURRENT_LIMIT)
+                            .withSupplyCurrentLimit(ElevatorConstants.SUPPLY_CURRENT_LIMIT)
+                            .withClosedLoopRampRate(ElevatorConstants.CLOSED_LOOP_RAMP_RATE)
+                            .withOpenLoopRampRate(ElevatorConstants.OPEN_LOOP_RAMP_RATE)
+                            .withTelemetry("FollowerElevatorMotor",
+                                    Constants.TELEMETRY_VERBOSITY)
+                            .withClosedLoopController(
+                                    ElevatorConstants.PID_kP,
+                                    ElevatorConstants.PID_kI,
+                                    ElevatorConstants.PID_kD,
+                                    ElevatorConstants.MAX_VELOCITY,
+                                    ElevatorConstants.MAX_ACCELERATION)
+                            .withSimClosedLoopController(
+                                    ElevatorConstants.SIM_PID_kP,
+                                    ElevatorConstants.SIM_PID_kI,
+                                    ElevatorConstants.SIM_PID_kD,
+                                    ElevatorConstants.MAX_VELOCITY,
+                                    ElevatorConstants.MAX_ACCELERATION)
+                            .withFeedforward(ElevatorConstants.FEEDFORWARD)
+                            .withSoftLimit(ElevatorConstants.SOFT_LOWER_LIMIT,
+                                    ElevatorConstants.SOFT_UPPER_LIMIT);
+
+            public static final UnaryOperator<SmartMotorControllerConfig> LEADER_SMC_CONFIG = (
+                    SmartMotorControllerConfig config) -> config
+                            .withMotorInverted(false)
+                            .withIdleMode(MotorMode.BRAKE)
+                            .withControlMode(
+                                    SmartMotorControllerConfig.ControlMode.CLOSED_LOOP)
+                            .withMechanismCircumference(
+                                    ElevatorConstants.CHAIN_PITCH.times(
+                                            ElevatorConstants.TOOTH_COUNT))
+                            .withGearing(ElevatorConstants.GEARBOX)
+                            .withStatorCurrentLimit(ElevatorConstants.STATOR_CURRENT_LIMIT)
+                            .withSupplyCurrentLimit(ElevatorConstants.SUPPLY_CURRENT_LIMIT)
+                            .withClosedLoopRampRate(ElevatorConstants.CLOSED_LOOP_RAMP_RATE)
+                            .withOpenLoopRampRate(ElevatorConstants.OPEN_LOOP_RAMP_RATE)
+                            .withTelemetry("LeaderElevatorMotor",
+                                    Constants.TELEMETRY_VERBOSITY)
+                            .withClosedLoopController(
+                                    ElevatorConstants.PID_kP,
+                                    ElevatorConstants.PID_kI,
+                                    ElevatorConstants.PID_kD,
+                                    ElevatorConstants.MAX_VELOCITY,
+                                    ElevatorConstants.MAX_ACCELERATION)
+                            .withSimClosedLoopController(
+                                    ElevatorConstants.SIM_PID_kP,
+                                    ElevatorConstants.SIM_PID_kI,
+                                    ElevatorConstants.SIM_PID_kD,
+                                    ElevatorConstants.MAX_VELOCITY,
+                                    ElevatorConstants.MAX_ACCELERATION)
+                            .withFeedforward(ElevatorConstants.FEEDFORWARD)
+                            .withSoftLimit(ElevatorConstants.SOFT_LOWER_LIMIT,
+                                    ElevatorConstants.SOFT_UPPER_LIMIT);
+
+            public static final UnaryOperator<MechanismPositionConfig> MECHANISM_POSITION_CONFIG = (
+                    MechanismPositionConfig config) -> config
+                            .withMaxRobotHeight(MechanismPositionConstants.ROBOT_MAX_HEIGHT)
+                            .withMaxRobotLength(MechanismPositionConstants.ROBOT_MAX_LENGTH)
+                            .withRelativePosition(ElevatorConstants.RELATIVE_POSITION);
+
+            public static final UnaryOperator<ElevatorConfig> ELEVATOR_CONFIG = (
+                    ElevatorConfig config) -> config
+                            .withMass(ElevatorConstants.MASS)
+                            .withTelemetry("Elevator", Constants.TELEMETRY_VERBOSITY)
+                            .withHardLimits(ElevatorConstants.HARD_LOWER_LIMIT,
+                                    ElevatorConstants.HARD_UPPER_LIMIT)
+                            .withMechanismPositionConfig(
+                                    ElevatorConstants.MECHANISM_POSITION_CONFIG
+                                            .apply(new MechanismPositionConfig()));
+
             public static final int LEADER_MOTOR_CAN_ID = 55;
             public static final int FOLLOWER_MOTOR_CAN_ID = 54;
 
@@ -483,6 +765,46 @@ public final class Constants {
         }
 
         public static final class TongueConstants {
+            public static final UnaryOperator<SmartMotorControllerConfig> SMC_CONFIG = (
+                    SmartMotorControllerConfig config) -> config
+                            .withMechanismCircumference(
+                                    TongueConstants.MECHANISM_CIRCUMFERENCE)
+                            .withClosedLoopController(
+                                    TongueConstants.PID_kP,
+                                    TongueConstants.PID_kI,
+                                    TongueConstants.PID_kD,
+                                    TongueConstants.MAX_VELOCITY,
+                                    TongueConstants.MAX_ACCELERATION)
+                            .withSoftLimit(TongueConstants.SOFT_LIMIT_MIN,
+                                    TongueConstants.SOFT_LIMIT_MAX)
+                            .withGearing(new MechanismGearing(TongueConstants.GEARBOX))
+                            .withIdleMode(MotorMode.BRAKE)
+                            .withTelemetry("ElevatorMotor",
+                                    SmartMotorControllerConfig.TelemetryVerbosity.HIGH)
+                            .withStatorCurrentLimit(TongueConstants.STATOR_CURRENT_LIMIT)
+                            .withMotorInverted(false)
+                            .withClosedLoopRampRate(TongueConstants.CLOSED_LOOP_RAMP_RATE)
+                            .withFeedforward(TongueConstants.FEEDFORWARD)
+                            .withControlMode(
+                                    SmartMotorControllerConfig.ControlMode.CLOSED_LOOP);
+
+            public static final UnaryOperator<MechanismPositionConfig> MECHANISM_POSITION_CONFIG = (
+                    MechanismPositionConfig config) -> config
+                            .withMaxRobotHeight(MechanismPositionConstants.ROBOT_MAX_HEIGHT)
+                            .withMaxRobotLength(MechanismPositionConstants.ROBOT_MAX_LENGTH)
+                            .withRelativePosition(TongueConstants.RELATIVE_POSITION);
+
+            public static final UnaryOperator<ElevatorConfig> ELEVATOR_CONFIG = (
+                    ElevatorConfig config) -> config
+                            .withHardLimits(TongueConstants.HARD_LIMIT_MIN,
+                                    TongueConstants.HARD_LIMIT_MAX)
+                            .withTelemetry("Elevator",
+                                    SmartMotorControllerConfig.TelemetryVerbosity.HIGH)
+                            .withMechanismPositionConfig(
+                                    TongueConstants.MECHANISM_POSITION_CONFIG.apply(
+                                            new MechanismPositionConfig()))
+                            .withMass(TongueConstants.MECHANISM_MASS);
+
             public static final int MOTOR_CAN_ID = 9; // TODO
 
             public static final Distance MECHANISM_CIRCUMFERENCE = Meters

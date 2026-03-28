@@ -36,11 +36,13 @@ import swervelib.simulation.ironmaple.simulation.drivesims.AbstractDriveTrainSim
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 
-public class SimSubsystem extends SubsystemBase {
-    /** Creates a new FuelSimSubsystem. */
+public class SimSystem extends SubsystemBase {
+    /**
+     * Creates a new FuelSimSubsystem.
+     */
     private final IntakeSimulation intakeSimulation;
 
-    public SimSubsystem(AbstractDriveTrainSimulation driveTrainSimulation) {
+    public SimSystem(AbstractDriveTrainSimulation driveTrainSimulation) {
         intakeSimulation = IntakeSimulation.OverTheBumperIntake(
                 // Specify the type of game pieces that the intake can collect
                 "Fuel",
@@ -68,8 +70,8 @@ public class SimSubsystem extends SubsystemBase {
     }
 
     public Command shootFuel(Supplier<LinearVelocity> flywheelLinearVelocity, Supplier<Pose2d> robotPose,
-            Supplier<ChassisSpeeds> chassisSpeedsFieldRelative, Supplier<Rotation2d> heading,
-            Supplier<Angle> hoodAngle) {
+                             Supplier<ChassisSpeeds> chassisSpeedsFieldRelative, Supplier<Rotation2d> heading,
+                             Supplier<Angle> hoodAngle) {
 
         return Commands.runOnce(
                 () -> {
