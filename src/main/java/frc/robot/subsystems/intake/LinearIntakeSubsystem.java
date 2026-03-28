@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -84,7 +85,7 @@ public class LinearIntakeSubsystem extends SubsystemBase {
 
     public Command sysId() {
         return m_linearIntake.sysId(
-                        Volts.of(2), Volts.of(0.5).per(Second), Second.of(10))
+                Volts.of(2), Volts.of(0.5).per(Second), Second.of(10))
                 .beforeStarting(SignalLogger::start)
                 .finallyDo(SignalLogger::stop);
     }
@@ -125,7 +126,7 @@ public class LinearIntakeSubsystem extends SubsystemBase {
         }
 
         return getSetpoint().map(
-                        setpoint -> setpoint.isNear(m_linearIntake.getHeight(), LinearIntakeConstants.POSITION_TARGET_ERROR))
+                setpoint -> setpoint.isNear(m_linearIntake.getHeight(), LinearIntakeConstants.POSITION_TARGET_ERROR))
                 .orElse(false);
     }
 
@@ -152,14 +153,14 @@ public class LinearIntakeSubsystem extends SubsystemBase {
                         new ConditionalCommand(
                                 // Full hopper (which intake cannot close past midpoint)
                                 Commands.sequence(
-                                                setPosition(LinearIntakeConstants.SHUFFLE_FURTHEST_POSITION).withTimeout(0.25),
-                                                setPosition(LinearIntakeConstants.EXTENDED_POSITION).withTimeout(0.25))
+                                        setPosition(LinearIntakeConstants.SHUFFLE_FURTHEST_POSITION).withTimeout(0.25),
+                                        setPosition(LinearIntakeConstants.EXTENDED_POSITION).withTimeout(0.25))
                                         .repeatedly(),
                                 // Not full hopper (which intake can close past midpoint, so shuffle closer to
                                 // midpoint)
                                 Commands.sequence(
-                                                setPosition(LinearIntakeConstants.SHUFFLE_FAR_POSITION).withTimeout(0.25),
-                                                setPosition(LinearIntakeConstants.MIDPOINT_POSITION).withTimeout(0.25))
+                                        setPosition(LinearIntakeConstants.SHUFFLE_FAR_POSITION).withTimeout(0.25),
+                                        setPosition(LinearIntakeConstants.MIDPOINT_POSITION).withTimeout(0.25))
                                         .repeatedly(),
                                 () -> getPosition().gt(
                                         LinearIntakeConstants.MIDPOINT_POSITION
@@ -169,8 +170,8 @@ public class LinearIntakeSubsystem extends SubsystemBase {
                 setPosition(LinearIntakeConstants.SHUFFLE_FAR_POSITION).withTimeout(0.5),
                 setPosition(LinearIntakeConstants.SHUFFLE_CLOSE_POSITION).withTimeout(0.5),
                 Commands.sequence(
-                                midpoint().withTimeout(0.5),
-                                retract().withTimeout(0.5))
+                        midpoint().withTimeout(0.5),
+                        retract().withTimeout(0.5))
                         .repeatedly());
     }
 
@@ -214,6 +215,14 @@ public class LinearIntakeSubsystem extends SubsystemBase {
     public Command setEncoderPositionRetracted() {
         return this.runOnce(
                 () -> m_smartMotorController.setEncoderPosition(LinearIntakeConstants.RETRACTED_POSITION));
+    }
+
+    public void calibrateLinearIntakePosition() {
+        if (getExtendedLimitSwitch()) {
+            CommandScheduler.getInstance().schedule(setEncoderPositionExtended());
+        } else if (getRetractedLimitSwitch()) {
+            CommandScheduler.getInstance().schedule(setEncoderPositionRetracted());
+        }
     }
 
     @Override

@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -34,13 +33,12 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.DashboardSystem;
 import frc.robot.subsystems.IndexerSystem;
+import frc.robot.subsystems.IntakeSystem;
 import frc.robot.subsystems.ShooterSystem;
 import frc.robot.subsystems.SimSystem;
 import frc.robot.subsystems.SwerveSystem;
 import frc.robot.subsystems.SwerveSystem.Zone;
 import frc.robot.subsystems.climb.ElevatorSubsystem;
-import frc.robot.subsystems.intake.IntakeRollerSubsystem;
-import frc.robot.subsystems.intake.LinearIntakeSubsystem;
 import frc.robot.subsystems.intake.LinearIntakeSubsystem.LinearIntakePosition;
 import frc.robot.utils.LimelightWrapper;
 import limelight.networktables.LimelightSettings.ImuMode;
@@ -56,8 +54,7 @@ public class RobotContainer {
 
     private final DashboardSystem m_dashboardSystem = new DashboardSystem();
     public final IndexerSystem m_indexerSystem = new IndexerSystem();
-    public final IntakeRollerSubsystem m_intakeRollerSubsystem = new IntakeRollerSubsystem();
-    public final LinearIntakeSubsystem m_linearIntakeSubsystem = new LinearIntakeSubsystem();
+    public final IntakeSystem m_intakeSystem = new IntakeSystem();
     public final ShooterSystem m_shooterSystem = new ShooterSystem();
     public final SwerveSystem m_swerveSystem = new SwerveSystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
@@ -71,8 +68,8 @@ public class RobotContainer {
     public final AutoFactory m_autoFactory = new AutoFactory(
             m_swerveSystem::getPose, // A function that returns the current robot pose
             m_swerveSystem::resetOdometry, // A function that resets the current robot pose to
-                                              // the provided
-                                              // Pose2d
+                                           // the provided
+                                           // Pose2d
             m_swerveSystem::followTrajectory, // The drive subsystem trajectory follower
 
             true, // If alliance flipping should be enabled
@@ -317,13 +314,15 @@ public class RobotContainer {
                 .and(isControllingDriveTrigger)
                 .onTrue(m_shooterSystem.aimAndShoot(
                         () -> m_swerveSystem.getDistanceToTarget(true),
-                        m_swerveSystem::isAutoAimOnTarget, false, m_swerveSystem::isInAllianceZone)
+                        m_swerveSystem::isAutoAimOnTarget, false,
+                        m_swerveSystem::isInAllianceZone)
                         .beforeStarting(m_shooterSystem.stopFeeder()));
         m_driverController.R2()
                 .and(isControllingDriveTrigger.negate())
                 .onTrue(m_shooterSystem.aimAndShoot(
                         () -> m_swerveSystem.getDistanceToTarget(true),
-                        m_swerveSystem::isAutoAimOnTarget, true, m_swerveSystem::isInAllianceZone)
+                        m_swerveSystem::isAutoAimOnTarget, true,
+                        m_swerveSystem::isInAllianceZone)
                         .beforeStarting(m_shooterSystem.stopFeeder()));
         // Stop shooter subsystem
         m_driverController.R2()
@@ -338,13 +337,13 @@ public class RobotContainer {
                 .onFalse(m_indexerSystem.stop()
                         .unless(m_driverController.L2()::getAsBoolean));
         m_driverController.R2()
-                .onTrue(m_intakeRollerSubsystem.intake())
-                .onFalse(m_intakeRollerSubsystem.stop()
+                .onTrue(m_intakeSystem.intake())
+                .onFalse(m_intakeSystem.stopRoller()
                         .unless(m_driverController.L2()::getAsBoolean));
         m_driverController.R2()
-                .onTrue(m_linearIntakeSubsystem.shuffle()
+                .onTrue(m_intakeSystem.shuffle()
                         .unless(m_driverController.L2()::getAsBoolean))
-                .onFalse(m_linearIntakeSubsystem.midpoint()
+                .onFalse(m_intakeSystem.midpoint()
                         .unless(m_driverController.L2()::getAsBoolean));
 
         if (Robot.isSimulation()) {
@@ -369,7 +368,7 @@ public class RobotContainer {
                     .onTrue(
                             new ConditionalCommand(m_simSystem.startIntake(),
                                     m_simSystem.stopIntake(),
-                                    () -> m_linearIntakeSubsystem
+                                    () -> m_intakeSystem
                                             .getCurrentPositionEnum() == LinearIntakePosition.EXTENDED)
                                     .repeatedly())
                     .onFalse(m_simSystem.stopIntake());
@@ -401,17 +400,17 @@ public class RobotContainer {
                 .onFalse(m_indexerSystem.stop()
                         .unless(m_driverController.L2()::getAsBoolean));
         m_driverController.R1()
-                .onTrue(m_linearIntakeSubsystem.shuffle()
+                .onTrue(m_intakeSystem.shuffle()
                         .unless(m_driverController.L2()::getAsBoolean))
-                .onFalse(m_linearIntakeSubsystem.midpoint()
+                .onFalse(m_intakeSystem.midpoint()
                         .unless(m_driverController.L2()::getAsBoolean));
 
         // Extend intake, expand hopper, and run intake rollers
         m_driverController.L2()
                 .onTrue(Commands.parallel(
-                        m_linearIntakeSubsystem.extend(),
-                        m_intakeRollerSubsystem.intake()))
-                .onFalse(m_linearIntakeSubsystem.midpoint().andThen(m_intakeRollerSubsystem.stop()));
+                        m_intakeSystem.extend(),
+                        m_intakeSystem.intake()))
+                .onFalse(m_intakeSystem.midpoint().andThen(m_intakeSystem.stopRoller()));
         m_driverController.L2()
                 .whileTrue(
                         Commands.parallel(
@@ -428,18 +427,18 @@ public class RobotContainer {
                 // Extend intake, reverse indexer and intake rollers at the same time
                 .onTrue(Commands.sequence( // TODO: Check if sequence is needed, or if parallel alone is
                                            // fine
-                        m_linearIntakeSubsystem.extend(),
+                        m_intakeSystem.extend(),
                         Commands.parallel(
                                 m_indexerSystem.reverse(),
-                                m_intakeRollerSubsystem.outtake())))
+                                m_intakeSystem.outtake())))
 
                 // Retract intake, then stop indexer and intake rollers
                 .onFalse(
                         Commands.sequence(
-                                m_linearIntakeSubsystem.midpoint(),
+                                m_intakeSystem.midpoint(),
                                 Commands.parallel(
                                         m_indexerSystem.stop(),
-                                        m_intakeRollerSubsystem.stop())));
+                                        m_intakeSystem.stopRoller())));
 
         // Auto-align to left side tower for climbing
         m_driverController.povLeft().whileTrue(
@@ -460,7 +459,7 @@ public class RobotContainer {
                                 () -> driveAngularVelocity.driveToPoseEnabled(false))));
 
         m_driverController.povUp().onTrue(m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT));
-        m_driverController.povUp().onTrue(m_linearIntakeSubsystem.retract());
+        m_driverController.povUp().onTrue(m_intakeSystem.retract());
         m_driverController.povDown().onTrue(m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
 
         // Auto-traverse the trench through left side
@@ -494,14 +493,6 @@ public class RobotContainer {
                         m_driverController.L2()::getAsBoolean));
     }
 
-    public void calibrateLinearIntakePosition() {
-        if (m_linearIntakeSubsystem.getExtendedLimitSwitch()) {
-            CommandScheduler.getInstance().schedule(m_linearIntakeSubsystem.setEncoderPositionExtended());
-        } else if (m_linearIntakeSubsystem.getRetractedLimitSwitch()) {
-            CommandScheduler.getInstance().schedule(m_linearIntakeSubsystem.setEncoderPositionRetracted());
-        }
-    }
-
     public void updateLocalization() {
         // TODO: Prioritize LL4 over LL3G
         for (LimelightWrapper limelight : new LimelightWrapper[] { m_frontLimelight, m_leftLimelight }) {
@@ -516,8 +507,8 @@ public class RobotContainer {
                 m_swerveSystem.stop(),
                 m_shooterSystem.stopShooting(true, true),
                 m_indexerSystem.stop(),
-                m_intakeRollerSubsystem.stop(),
-                m_linearIntakeSubsystem.midpoint());
+                m_intakeSystem.stopRoller(),
+                m_intakeSystem.midpoint());
     }
 
     public void zeroGyroWithAlliance() {

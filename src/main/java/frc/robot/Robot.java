@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().schedule(m_robotContainer.stopAllSubsystems());
 
         // Check the linear intake position and set the encoder position accordingly
-        m_robotContainer.calibrateLinearIntakePosition();
+        m_robotContainer.m_intakeSystem.calibrateLinearIntakePosition();
 
         // Start the flywheel at the default RPM when teleop starts
         CommandScheduler.getInstance().schedule(m_robotContainer.m_shooterSystem.startFlywheelDefaultRPM());
@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
         // Extend the intake to lower the hopper enough to go underneath the trench
         // NOTE: Extend intake fully in auto, due to bug not allowing you to move it
         // during auto without interrupting the auto
-        CommandScheduler.getInstance().schedule(m_robotContainer.m_linearIntakeSubsystem.extend());
+        CommandScheduler.getInstance().schedule(m_robotContainer.m_intakeSystem.extend());
     }
 
     @Override
@@ -72,7 +72,7 @@ public class Robot extends TimedRobot {
         }
 
         // Check the linear intake position and set the encoder position accordingly
-        m_robotContainer.calibrateLinearIntakePosition();
+        m_robotContainer.m_intakeSystem.calibrateLinearIntakePosition();
 
         CommandScheduler.getInstance().schedule(m_robotContainer.stopAllSubsystems());
         m_robotContainer.driveAngularVelocity.driveToPoseEnabled(false);
@@ -81,7 +81,7 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().schedule(m_robotContainer.m_shooterSystem.startFlywheelDefaultRPM());
 
         // Extend the intake to lower the hopper enough to go underneath the trench
-        CommandScheduler.getInstance().schedule(m_robotContainer.m_linearIntakeSubsystem.midpoint());
+        CommandScheduler.getInstance().schedule(m_robotContainer.m_intakeSystem.midpoint());
         try {
             m_robotContainer.getDashboardSubsystem().setInactiveFirst(DriverStation.getGameSpecificMessage().charAt(0));
         } catch (IndexOutOfBoundsException e) {

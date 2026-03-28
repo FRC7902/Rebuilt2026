@@ -13,165 +13,162 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.AutoConstants.Position;
 import frc.robot.subsystems.IndexerSystem;
+import frc.robot.subsystems.IntakeSystem;
 import frc.robot.subsystems.ShooterSystem;
 import frc.robot.subsystems.SwerveSystem;
-import frc.robot.subsystems.intake.IntakeRollerSubsystem;
-import frc.robot.subsystems.intake.LinearIntakeSubsystem;
 
 public class Autos {
 
-    private final RobotContainer m_robotContainer;
+        private final RobotContainer m_robotContainer;
 
-    private final IndexerSystem m_indexerSystem;
-    private final IntakeRollerSubsystem m_intakeRollerSubsystem;
-    private final LinearIntakeSubsystem m_linearIntakeSubsystem;
-    private final ShooterSystem m_shooterSystem;
-    private final SwerveSystem m_swerveSystem;
+        private final IndexerSystem m_indexerSystem;
+        private final IntakeSystem m_intakeSystem;
+        private final ShooterSystem m_shooterSystem;
+        private final SwerveSystem m_swerveSystem;
 
-    public Autos(RobotContainer robotContainer) {
-        m_robotContainer = robotContainer;
+        public Autos(RobotContainer robotContainer) {
+                m_robotContainer = robotContainer;
 
-        m_indexerSystem = robotContainer.m_indexerSystem;
-        m_intakeRollerSubsystem = robotContainer.m_intakeRollerSubsystem;
-        m_linearIntakeSubsystem = robotContainer.m_linearIntakeSubsystem;
-        m_shooterSystem = robotContainer.m_shooterSystem;
-        m_swerveSystem = robotContainer.m_swerveSystem;
+                m_indexerSystem = robotContainer.m_indexerSystem;
+                m_intakeSystem = robotContainer.m_intakeSystem;
+                m_shooterSystem = robotContainer.m_shooterSystem;
+                m_swerveSystem = robotContainer.m_swerveSystem;
 
-        if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
-            StructArrayPublisher<Pose2d> waypointPositions = NetworkTableInstance.getDefault()
-                    .getStructArrayTopic("Waypoint Positions", Pose2d.struct)
-                    .publish();
+                if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
+                        StructArrayPublisher<Pose2d> waypointPositions = NetworkTableInstance.getDefault()
+                                        .getStructArrayTopic("Waypoint Positions", Pose2d.struct)
+                                        .publish();
 
-            Position[] waypointSelection = {
-                    Position.STARTING_LINE_RIGHT,
-                    Position.NEUTRAL_RIGHT_1,
-                    Position.NEUTRAL_RIGHT_2,
-                    Position.NEUTRAL_RIGHT_3,
-                    Position.ALLIANCE_RIGHT_1
-            };
+                        Position[] waypointSelection = {
+                                        Position.STARTING_LINE_RIGHT,
+                                        Position.NEUTRAL_RIGHT_1,
+                                        Position.NEUTRAL_RIGHT_2,
+                                        Position.NEUTRAL_RIGHT_3,
+                                        Position.ALLIANCE_RIGHT_1
+                        };
 
-            waypointPositions.accept(
-                    java.util.Arrays.stream(waypointSelection)
-                            .map(AutoConstants.positionToPose::get)
-                            .toArray(Pose2d[]::new));
+                        waypointPositions.accept(
+                                        java.util.Arrays.stream(waypointSelection)
+                                                        .map(AutoConstants.positionToPose::get)
+                                                        .toArray(Pose2d[]::new));
+                }
         }
-    }
 
-    private Command driveToWaypoint(Pose2d waypoint) {
-        return new InstantCommand(
-                () -> m_swerveSystem.setDriveToWaypoint(waypoint))
+        private Command driveToWaypoint(Pose2d waypoint) {
+                return new InstantCommand(
+                                () -> m_swerveSystem.setDriveToWaypoint(waypoint))
 
-                // Wait until the robot is within the specified default tolerances of the
-                // waypoint
-                .andThen(Commands.waitUntil(
-                        m_swerveSystem::isAtWaypoint));
-    }
+                                // Wait until the robot is within the specified default tolerances of the
+                                // waypoint
+                                .andThen(Commands.waitUntil(
+                                                m_swerveSystem::isAtWaypoint));
+        }
 
-    private Command driveToWaypoint(Pose2d waypoint, Angle angleTolerance) {
-        return new InstantCommand(
-                () -> m_swerveSystem.setDriveToWaypoint(waypoint))
+        private Command driveToWaypoint(Pose2d waypoint, Angle angleTolerance) {
+                return new InstantCommand(
+                                () -> m_swerveSystem.setDriveToWaypoint(waypoint))
 
-                // Wait until the robot is within the specified angle tolerance of the waypoint
-                .andThen(
-                        Commands.waitUntil(
-                                () -> m_swerveSystem.isAtWaypoint(
-                                        AutoConstants.DEFAULT_WAYPOINT_TOLERANCE,
-                                        angleTolerance.in(Degrees))));
-    }
+                                // Wait until the robot is within the specified angle tolerance of the waypoint
+                                .andThen(
+                                                Commands.waitUntil(
+                                                                () -> m_swerveSystem.isAtWaypoint(
+                                                                                AutoConstants.DEFAULT_WAYPOINT_TOLERANCE,
+                                                                                angleTolerance.in(Degrees))));
+        }
 
-    private Command driveToWaypoint(Position position) {
-        return driveToWaypoint(AutoConstants.positionToPose.get(position));
-    }
+        private Command driveToWaypoint(Position position) {
+                return driveToWaypoint(AutoConstants.positionToPose.get(position));
+        }
 
-    private Command driveToWaypoint(Position position, Angle angleTolerance) {
-        return driveToWaypoint(AutoConstants.positionToPose.get(position), angleTolerance);
-    }
+        private Command driveToWaypoint(Position position, Angle angleTolerance) {
+                return driveToWaypoint(AutoConstants.positionToPose.get(position), angleTolerance);
+        }
 
-    private Command resetOdometry(Pose2d waypoint) {
-        return Commands.runOnce(() -> m_swerveSystem.resetOdometry(waypoint));
-    }
+        private Command resetOdometry(Pose2d waypoint) {
+                return Commands.runOnce(() -> m_swerveSystem.resetOdometry(waypoint));
+        }
 
-    private Command resetOdometry(Position position) {
-        return resetOdometry(AutoConstants.positionToPose.get(position));
-    }
+        private Command resetOdometry(Position position) {
+                return resetOdometry(AutoConstants.positionToPose.get(position));
+        }
 
-    public Command rightNeutralAuto() {
+        public Command rightNeutralAuto() {
 
-        // TODO: Add alliance flipping util
+                // TODO: Add alliance flipping util
 
-        return new SequentialCommandGroup(
-                resetOdometry(Position.STARTING_LINE_RIGHT),
-                new InstantCommand(
-                        () -> m_robotContainer.driveAngularVelocity.driveToPoseEnabled(true)),
+                return new SequentialCommandGroup(
+                                resetOdometry(Position.STARTING_LINE_RIGHT),
+                                new InstantCommand(
+                                                () -> m_robotContainer.driveAngularVelocity.driveToPoseEnabled(true)),
 
-                driveToWaypoint(Position.NEUTRAL_RIGHT_1),
+                                driveToWaypoint(Position.NEUTRAL_RIGHT_1),
 
-                // Commands.parallel(
-                // m_linearIntakeSubsystem.extend(),
-                m_intakeRollerSubsystem.intake(),
-                // ),
-
-                // Drive to center of field
-                driveToWaypoint(Position.NEUTRAL_RIGHT_2),
-
-                driveToWaypoint(Position.NEUTRAL_RIGHT_3)
-                        .deadlineFor(
-                                // m_linearIntakeSubsystem.midpoint().andThen(
                                 // Commands.parallel(
-                                m_intakeRollerSubsystem.stop(),
-                                m_indexerSystem.stop()
-                        // ))
-                        ),
+                                // m_intakeSystem.extend(),
+                                m_intakeSystem.intake(),
+                                // ),
 
-                m_indexerSystem.stop(),
+                                // Drive to center of field
+                                driveToWaypoint(Position.NEUTRAL_RIGHT_2),
 
-                // Get in shooting position
-                driveToWaypoint(Position.ALLIANCE_RIGHT_1),
+                                driveToWaypoint(Position.NEUTRAL_RIGHT_3)
+                                                .deadlineFor(
+                                                                // m_intakeSystem.midpoint().andThen(
+                                                                // Commands.parallel(
+                                                                m_intakeSystem.stopRoller(),
+                                                                m_indexerSystem.stop()
+                                                // ))
+                                                ),
 
-                // Shoot for 5s
-                Commands.deadline(
-                        Commands.waitSeconds(4),
-                        driveToWaypoint(Position.ALLIANCE_RIGHT_1),
-                        m_shooterSystem.aimAndShootIgnoreCheck(
-                                m_swerveSystem::getDistanceToTarget),
-                        m_indexerSystem.run(),
-                        m_intakeRollerSubsystem.intake()
-                // m_linearIntakeSubsystem.shuffle()
-                ),
+                                m_indexerSystem.stop(),
 
-                // Drive past trench (close to bump) and extend/run intake
-                driveToWaypoint(Position.NEUTRAL_RIGHT_4).deadlineFor(
-                        m_shooterSystem.stopShooting(),
-                        m_indexerSystem.stop(),
-                        m_intakeRollerSubsystem.stop()
-                // m_linearIntakeSubsystem.midpoint()
-                ),
+                                // Get in shooting position
+                                driveToWaypoint(Position.ALLIANCE_RIGHT_1),
 
-                driveToWaypoint(Position.NEUTRAL_RIGHT_5).deadlineFor(
-                        // m_linearIntakeSubsystem.extend(),
-                        m_intakeRollerSubsystem.intake(),
-                        m_indexerSystem.run()),
+                                // Shoot for 5s
+                                Commands.deadline(
+                                                Commands.waitSeconds(4),
+                                                driveToWaypoint(Position.ALLIANCE_RIGHT_1),
+                                                m_shooterSystem.aimAndShootIgnoreCheck(
+                                                                m_swerveSystem::getDistanceToTarget),
+                                                m_indexerSystem.run(),
+                                                m_intakeSystem.intake()
+                                // m_intakeSystem.shuffle()
+                                ),
 
-                driveToWaypoint(Position.NEUTRAL_RIGHT_6),
+                                // Drive past trench (close to bump) and extend/run intake
+                                driveToWaypoint(Position.NEUTRAL_RIGHT_4).deadlineFor(
+                                                m_shooterSystem.stopShooting(),
+                                                m_indexerSystem.stop(),
+                                                m_intakeSystem.stopRoller()
+                                // m_intakeSystem.midpoint()
+                                ),
 
-                driveToWaypoint(Position.NEUTRAL_RIGHT_4).deadlineFor(
-                        // m_linearIntakeSubsystem.midpoint().andThen(Commands.parallel(
-                        m_intakeRollerSubsystem.stop(),
-                        m_indexerSystem.stop()
-                // ))
-                ),
+                                driveToWaypoint(Position.NEUTRAL_RIGHT_5).deadlineFor(
+                                                // m_intakeSystem.extend(),
+                                                m_intakeSystem.intake(),
+                                                m_indexerSystem.run()),
 
-                driveToWaypoint(Position.ALLIANCE_RIGHT_1),
+                                driveToWaypoint(Position.NEUTRAL_RIGHT_6),
 
-                Commands.parallel(
-                        driveToWaypoint(Position.ALLIANCE_RIGHT_1),
-                        m_shooterSystem.aimAndShootIgnoreCheck(
-                                m_swerveSystem::getDistanceToTarget),
-                        m_indexerSystem.run(),
-                        m_intakeRollerSubsystem.intake()
-                // m_linearIntakeSubsystem.shuffle()
-                ));
+                                driveToWaypoint(Position.NEUTRAL_RIGHT_4).deadlineFor(
+                                                // m_intakeSystem.midpoint().andThen(Commands.parallel(
+                                                m_intakeSystem.stopRoller(),
+                                                m_indexerSystem.stop()
+                                // ))
+                                ),
 
-    }
+                                driveToWaypoint(Position.ALLIANCE_RIGHT_1),
+
+                                Commands.parallel(
+                                                driveToWaypoint(Position.ALLIANCE_RIGHT_1),
+                                                m_shooterSystem.aimAndShootIgnoreCheck(
+                                                                m_swerveSystem::getDistanceToTarget),
+                                                m_indexerSystem.run(),
+                                                m_intakeSystem.intake()
+                                // m_intakeSystem.shuffle()
+                                ));
+
+        }
 
 }
