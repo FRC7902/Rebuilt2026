@@ -29,17 +29,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.MechanismPositionConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.FlywheelConstants;
 import frc.robot.Constants.ShooterConstants.ShooterZone;
-import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.FlyWheelConfig;
-import yams.mechanisms.config.MechanismPositionConfig;
 import yams.mechanisms.velocity.FlyWheel;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
-import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class FlywheelSubsystem extends SubsystemBase {
@@ -59,50 +55,17 @@ public class FlywheelSubsystem extends SubsystemBase {
         m_leaderMotor = new TalonFX(FlywheelConstants.LEADER_MOTOR_CAN_ID);
         m_followerMotor = new TalonFX(FlywheelConstants.FOLLOWER_MOTOR_CAN_ID);
 
-        SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
-                .withClosedLoopController(
-                        FlywheelConstants.PID_kP,
-                        FlywheelConstants.PID_kI,
-                        FlywheelConstants.PID_kD,
-                        FlywheelConstants.MAX_VELOCITY_RPM,
-                        FlywheelConstants.MAX_ACCELERATION_RPS2)
-                .withSimClosedLoopController(
-                        FlywheelConstants.SIM_PID_kP,
-                        FlywheelConstants.SIM_PID_kI,
-                        FlywheelConstants.SIM_PID_kD,
-                        FlywheelConstants.MAX_VELOCITY_RPM,
-                        FlywheelConstants.MAX_ACCELERATION_RPS2)
-                .withGearing(new MechanismGearing(FlywheelConstants.GEARBOX))
-                .withIdleMode(FlywheelConstants.IDLE_MODE) // Keep spinning even if not powered
-                .withTelemetry("FlywheelMotor", Constants.TELEMETRY_VERBOSITY)
-                .withStatorCurrentLimit(FlywheelConstants.STATOR_CURRENT_LIMIT_AMPS)
-                .withSupplyCurrentLimit(FlywheelConstants.SUPPLY_CURRENT_LIMIT_AMPS)
-                .withMotorInverted(FlywheelConstants.LEADER_MOTOR_INVERTED)
-                .withClosedLoopRampRate(FlywheelConstants.CLOSED_LOOP_RAMP_RATE_SEC)
-                .withOpenLoopRampRate(FlywheelConstants.OPEN_LOOP_RAMP_RATE_SEC)
-                .withFeedforward(FlywheelConstants.FEEDFORWARD)
-                .withSimFeedforward(FlywheelConstants.SIM_FEEDFORWARD)
-                .withControlMode(ControlMode.CLOSED_LOOP)
-                .withFollowers(Pair.of(m_followerMotor, FlywheelConstants.FOLLOWER_MOTOR_INVERTED))
-                .withMomentOfInertia(FlywheelConstants.MOI);
+        SmartMotorControllerConfig smcConfig = FlywheelConstants.SMC_CONFIG
+                .apply(new SmartMotorControllerConfig(this))
+                .withFollowers(Pair.of(m_followerMotor, FlywheelConstants.FOLLOWER_MOTOR_INVERTED));
 
         m_smartMotorController = new TalonFXWrapper(
                 m_leaderMotor,
                 FlywheelConstants.MOTOR,
                 smcConfig);
 
-        MechanismPositionConfig robotToMechanism = new MechanismPositionConfig()
-                .withMaxRobotHeight(MechanismPositionConstants.ROBOT_MAX_HEIGHT)
-                .withMaxRobotLength(MechanismPositionConstants.ROBOT_MAX_LENGTH)
-                .withRelativePosition(FlywheelConstants.RELATIVE_POSITION);
-
-        FlyWheelConfig flywheelConfig = new FlyWheelConfig(m_smartMotorController)
-                .withDiameter(FlywheelConstants.DIAMETER_INCHES)
-                .withMOI(FlywheelConstants.MOI)
-                .withTelemetry("FlywheelMech", Constants.TELEMETRY_VERBOSITY)
-                .withSoftLimit(FlywheelConstants.SOFT_LIMIT_RPM.times(-1), FlywheelConstants.SOFT_LIMIT_RPM)
-                .withSpeedometerSimulation(FlywheelConstants.SIM_MAX_VELOCITY_RPM)
-                .withMechanismPositionConfig(robotToMechanism);
+        FlyWheelConfig flywheelConfig = FlywheelConstants.FLYWHEEL_CONFIG
+                .apply(new FlyWheelConfig(m_smartMotorController));
 
         m_flywheel = new FlyWheel(flywheelConfig);
     }
@@ -114,7 +77,7 @@ public class FlywheelSubsystem extends SubsystemBase {
      */
     public Command sysId() {
         return m_flywheel.sysId(
-                Volts.of(12), Volts.of(1).per(Second), Second.of(10))
+                        Volts.of(12), Volts.of(1).per(Second), Second.of(10))
                 .beforeStarting(
                         () -> SignalLogger.start())
                 .finallyDo(() -> SignalLogger.stop());
@@ -131,7 +94,7 @@ public class FlywheelSubsystem extends SubsystemBase {
 
     /**
      * Gets the current flywheel velocity.
-     * 
+     *
      * @return the current linear velocity
      */
     public LinearVelocity getLinearVelocity() {
@@ -172,7 +135,7 @@ public class FlywheelSubsystem extends SubsystemBase {
     /**
      * Starts the flywheel spinning at the default RPM, the speed at which it
      * should spin when the shooter is not actively shooting.
-     * 
+     *
      * @return a Command that starts the flywheel at the default RPM when executed
      */
     public Command setDefaultRPM() {
@@ -241,7 +204,7 @@ public class FlywheelSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("FlywheelMech/velocity (RPM)", getAngularVelocity().in(RPM));
         SmartDashboard.putNumber("FlywheelMech/setpoint (RPM)",
                 getSetpointVelocity().map(
-                        setpoint -> setpoint.in(RPM) * FlywheelConstants.GEARBOX.getOutputToInputConversionFactor())
+                                setpoint -> setpoint.in(RPM) * FlywheelConstants.GEARBOX.getOutputToInputConversionFactor())
                         .orElse(Double.NaN));
     }
 

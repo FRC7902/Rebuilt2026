@@ -20,11 +20,17 @@ import frc.robot.Constants.IndexerConstants;
  */
 public class IndexerSubsystem extends SubsystemBase {
 
-    /** TalonFX motor controller for the indexer. */
+    /**
+     * TalonFX motor controller for the indexer.
+     */
     private final TalonFX m_motor;
-    /** Base configuration for the motor controller. */
+    /**
+     * Base configuration for the motor controller.
+     */
     private final TalonFXConfiguration m_motorConfig;
-    /** Output configuration for neutral mode and output behavior. */
+    /**
+     * Output configuration for neutral mode and output behavior.
+     */
     private final MotorOutputConfigs m_motorOutputConfig;
 
     private double m_targetSpeed = Double.NaN;

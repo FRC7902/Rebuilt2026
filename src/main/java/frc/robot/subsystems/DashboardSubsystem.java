@@ -16,7 +16,9 @@ public class DashboardSubsystem extends SubsystemBase {
     private double timeLeft;
     private double previousTime;
 
-    /** Creates a new DashboardSubsystem. */
+    /**
+     * Creates a new DashboardSubsystem.
+     */
     public DashboardSubsystem() {
         color = Color.BOTH;
         timeLeft = 0;

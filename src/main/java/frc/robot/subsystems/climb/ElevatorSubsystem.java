@@ -15,7 +15,6 @@ import java.util.Optional;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -29,15 +28,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ClimbConstants.ElevatorConstants;
-import frc.robot.Constants.MechanismPositionConstants;
 import frc.robot.Robot;
 import yams.mechanisms.config.ElevatorConfig;
-import yams.mechanisms.config.MechanismPositionConfig;
 import yams.mechanisms.positional.Elevator;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
-import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
-import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class ElevatorSubsystem extends SubsystemBase {
@@ -57,85 +52,21 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_leaderMotor = new TalonFX(ElevatorConstants.LEADER_MOTOR_CAN_ID);
         m_followerMotor = new TalonFX(ElevatorConstants.FOLLOWER_MOTOR_CAN_ID);
 
-        SmartMotorControllerConfig followerMotorSMCConfig = new SmartMotorControllerConfig(this)
-                .withMotorInverted(true)
-                .withIdleMode(MotorMode.BRAKE)
-                .withControlMode(ControlMode.CLOSED_LOOP)
-                .withMechanismCircumference(
-                        ElevatorConstants.CHAIN_PITCH.times(ElevatorConstants.TOOTH_COUNT))
-                .withGearing(ElevatorConstants.GEARBOX)
-                .withStatorCurrentLimit(ElevatorConstants.STATOR_CURRENT_LIMIT)
-                .withSupplyCurrentLimit(ElevatorConstants.SUPPLY_CURRENT_LIMIT)
-                .withClosedLoopRampRate(ElevatorConstants.CLOSED_LOOP_RAMP_RATE)
-                .withOpenLoopRampRate(ElevatorConstants.OPEN_LOOP_RAMP_RATE)
-                .withTelemetry("FollowerElevatorMotor", Constants.TELEMETRY_VERBOSITY)
-                .withClosedLoopController(
-                        ElevatorConstants.PID_kP,
-                        ElevatorConstants.PID_kI,
-                        ElevatorConstants.PID_kD,
-                        ElevatorConstants.MAX_VELOCITY,
-                        ElevatorConstants.MAX_ACCELERATION)
-                .withSimClosedLoopController(
-                        ElevatorConstants.SIM_PID_kP,
-                        ElevatorConstants.SIM_PID_kI,
-                        ElevatorConstants.SIM_PID_kD,
-                        ElevatorConstants.MAX_VELOCITY,
-                        ElevatorConstants.MAX_ACCELERATION)
-                .withFeedforward(new ElevatorFeedforward(
-                        ElevatorConstants.FEEDFORWARD_kS,
-                        ElevatorConstants.FEEDFORWARD_kG,
-                        ElevatorConstants.FEEDFORWARD_kV,
-                        ElevatorConstants.FEEDFORWARD_kA))
-                .withSoftLimit(ElevatorConstants.SOFT_LOWER_LIMIT, ElevatorConstants.SOFT_UPPER_LIMIT);
+        SmartMotorControllerConfig followerMotorSMCConfig = ElevatorConstants.FOLLOWER_SMC_CONFIG
+                .apply(new SmartMotorControllerConfig(this));
 
         m_followerSmartMotorController = new TalonFXWrapper(m_followerMotor, ElevatorConstants.FOLLOWER_MOTOR,
                 followerMotorSMCConfig);
 
-        m_leaderMotorSMCConfig = new SmartMotorControllerConfig(this)
-                .withMotorInverted(false)
-                .withIdleMode(MotorMode.BRAKE)
-                .withControlMode(ControlMode.CLOSED_LOOP)
-                .withMechanismCircumference(
-                        ElevatorConstants.CHAIN_PITCH.times(ElevatorConstants.TOOTH_COUNT))
-                .withGearing(ElevatorConstants.GEARBOX)
-                .withStatorCurrentLimit(ElevatorConstants.STATOR_CURRENT_LIMIT)
-                .withSupplyCurrentLimit(ElevatorConstants.SUPPLY_CURRENT_LIMIT)
-                .withClosedLoopRampRate(ElevatorConstants.CLOSED_LOOP_RAMP_RATE)
-                .withOpenLoopRampRate(ElevatorConstants.OPEN_LOOP_RAMP_RATE)
-                .withTelemetry("LeaderElevatorMotor", Constants.TELEMETRY_VERBOSITY)
-                .withClosedLoopController(
-                        ElevatorConstants.PID_kP,
-                        ElevatorConstants.PID_kI,
-                        ElevatorConstants.PID_kD,
-                        ElevatorConstants.MAX_VELOCITY,
-                        ElevatorConstants.MAX_ACCELERATION)
-                .withSimClosedLoopController(
-                        ElevatorConstants.SIM_PID_kP,
-                        ElevatorConstants.SIM_PID_kI,
-                        ElevatorConstants.SIM_PID_kD,
-                        ElevatorConstants.MAX_VELOCITY,
-                        ElevatorConstants.MAX_ACCELERATION)
-                .withFeedforward(new ElevatorFeedforward(
-                        ElevatorConstants.FEEDFORWARD_kS,
-                        ElevatorConstants.FEEDFORWARD_kG,
-                        ElevatorConstants.FEEDFORWARD_kV,
-                        ElevatorConstants.FEEDFORWARD_kA))
-                .withSoftLimit(ElevatorConstants.SOFT_LOWER_LIMIT, ElevatorConstants.SOFT_UPPER_LIMIT)
+        m_leaderMotorSMCConfig = ElevatorConstants.LEADER_SMC_CONFIG
+                .apply(new SmartMotorControllerConfig(this))
                 .withLooselyCoupledFollowers(m_followerSmartMotorController);
 
         m_leaderSmartMotorController = new TalonFXWrapper(m_leaderMotor, ElevatorConstants.LEADER_MOTOR,
                 m_leaderMotorSMCConfig);
 
-        MechanismPositionConfig m_robotToMechanism = new MechanismPositionConfig()
-                .withMaxRobotHeight(MechanismPositionConstants.ROBOT_MAX_HEIGHT)
-                .withMaxRobotLength(MechanismPositionConstants.ROBOT_MAX_LENGTH)
-                .withRelativePosition(ElevatorConstants.RELATIVE_POSITION);
-
-        ElevatorConfig climbConfig = new ElevatorConfig(m_leaderSmartMotorController)
-                .withMass(ElevatorConstants.MASS)
-                .withTelemetry("Elevator", Constants.TELEMETRY_VERBOSITY)
-                .withHardLimits(ElevatorConstants.HARD_LOWER_LIMIT, ElevatorConstants.HARD_UPPER_LIMIT)
-                .withMechanismPositionConfig(m_robotToMechanism);
+        ElevatorConfig climbConfig = ElevatorConstants.ELEVATOR_CONFIG
+                .apply(new ElevatorConfig(m_leaderSmartMotorController));
 
         if (Robot.isSimulation()) {
             climbConfig.withStartingHeight(ElevatorConstants.STARTING_HEIGHT);
@@ -151,7 +82,7 @@ public class ElevatorSubsystem extends SubsystemBase {
      */
     public Command sysId() {
         return m_climb.sysId(
-                Volts.of(6), Volts.of(1).per(Second), Second.of(15))
+                        Volts.of(6), Volts.of(1).per(Second), Second.of(15))
                 .beforeStarting(
                         () -> SignalLogger.start())
                 .finallyDo(() -> SignalLogger.stop());
@@ -181,7 +112,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                                 .gte(threshold) &&
                                 m_leaderSmartMotorController.getMechanismVelocity().abs(
                                         DegreesPerSecond) <= velocityThreshold
-                                                .in(DegreesPerSecond)))
+                                        .in(DegreesPerSecond)))
                 .finallyDo(() -> {
                     m_leaderSmartMotorController.setEncoderPosition(limitHit);
                     m_leaderSmartMotorController.startClosedLoopController();

@@ -27,12 +27,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants.FeederConstants;
-import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.velocity.FlyWheel;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
-import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class FeederSubsystem extends SubsystemBase {
@@ -49,42 +47,15 @@ public class FeederSubsystem extends SubsystemBase {
         m_motor = new TalonFX(FeederConstants.MOTOR_CAN_ID);
         m_beamBreak = new DigitalInput(FeederConstants.BEAM_BREAK_DIO_PORT);
 
-        SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
-                .withClosedLoopController(
-                        FeederConstants.PID_kP,
-                        FeederConstants.PID_kI,
-                        FeederConstants.PID_kD,
-                        FeederConstants.MAX_VELOCITY_RPM,
-                        FeederConstants.MAX_ACCELERATION_RPS2)
-                .withSimClosedLoopController(
-                        FeederConstants.SIM_PID_kP,
-                        FeederConstants.SIM_PID_kI,
-                        FeederConstants.SIM_PID_kD,
-                        FeederConstants.MAX_VELOCITY_RPM,
-                        FeederConstants.MAX_ACCELERATION_RPS2)
-                .withGearing(new MechanismGearing(FeederConstants.GEARBOX))
-                .withIdleMode(FeederConstants.IDLE_MODE) // Keep spinning even if not powered
-                .withTelemetry("FeederMotor", Constants.TELEMETRY_VERBOSITY)
-                .withStatorCurrentLimit(FeederConstants.STATOR_CURRENT_LIMIT_AMPS)
-                .withMotorInverted(FeederConstants.MOTOR_INVERTED)
-                .withClosedLoopRampRate(FeederConstants.CLOSED_LOOP_RAMP_RATE_SEC)
-                .withOpenLoopRampRate(FeederConstants.OPEN_LOOP_RAMP_RATE_SEC)
-                .withFeedforward(FeederConstants.FEEDFORWARD)
-                .withSimFeedforward(FeederConstants.SIM_FEEDFORWARD)
-                .withControlMode(ControlMode.CLOSED_LOOP)
-                .withMomentOfInertia(FeederConstants.MOI);
+        SmartMotorControllerConfig smcConfig = FeederConstants.SMC_CONFIG.apply(new SmartMotorControllerConfig(this));
 
         m_smartMotorController = new TalonFXWrapper(
                 m_motor,
                 FeederConstants.MOTOR,
                 smcConfig);
 
-        FlyWheelConfig feederConfig = new FlyWheelConfig(m_smartMotorController)
-                .withDiameter(FeederConstants.DIAMETER_INCHES)
-                .withMOI(FeederConstants.MOI)
-                .withTelemetry("FeederMech", Constants.TELEMETRY_VERBOSITY)
-                .withSoftLimit(FeederConstants.SOFT_LIMIT_RPM.times(-1), FeederConstants.SOFT_LIMIT_RPM)
-                .withSpeedometerSimulation(FeederConstants.SIM_MAX_VELOCITY_RPM);
+        FlyWheelConfig feederConfig = FeederConstants.FLYWHEEL_CONFIG
+                .apply(new FlyWheelConfig(m_smartMotorController));
 
         m_feeder = new FlyWheel(feederConfig);
     }
@@ -96,7 +67,7 @@ public class FeederSubsystem extends SubsystemBase {
      */
     public Command sysId() {
         return m_feeder.sysId(
-                Volts.of(12), Volts.of(3).per(Second), Second.of(10))
+                        Volts.of(12), Volts.of(3).per(Second), Second.of(10))
                 .beforeStarting(
                         () -> SignalLogger.start())
                 .finallyDo(() -> SignalLogger.stop());
@@ -113,7 +84,7 @@ public class FeederSubsystem extends SubsystemBase {
 
     /**
      * Gets the current flywheel velocity.
-     * 
+     *
      * @return the current linear velocity
      */
     public LinearVelocity getLinearVelocity() {
@@ -179,7 +150,7 @@ public class FeederSubsystem extends SubsystemBase {
     /**
      * Checks if the beam break sensor is triggered, indicating that a ball is
      * present in the feeder.
-     * 
+     *
      * @return true if the beam is broken, false otherwise
      */
     public boolean isBeamBroken() {
@@ -198,7 +169,7 @@ public class FeederSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("FeederMech/velocity (RPM)", getAngularVelocity().in(RPM));
             SmartDashboard.putNumber("FeederMech/setpoint (RPM)",
                     getSetpointVelocity().map(
-                            setpoint -> setpoint.in(RPM) * FeederConstants.GEARBOX.getOutputToInputConversionFactor())
+                                    setpoint -> setpoint.in(RPM) * FeederConstants.GEARBOX.getOutputToInputConversionFactor())
                             .orElse(Double.NaN));
         }
     }

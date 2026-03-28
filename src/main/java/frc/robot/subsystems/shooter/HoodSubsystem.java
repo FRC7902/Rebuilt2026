@@ -27,17 +27,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants.HoodConstants;
 import frc.robot.Constants.ShooterConstants.ShooterZone;
-import frc.robot.Constants.MechanismPositionConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Robot;
-import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ArmConfig;
-import yams.mechanisms.config.MechanismPositionConfig;
 import yams.mechanisms.positional.Arm;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
-import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
-import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class HoodSubsystem extends SubsystemBase {
@@ -56,30 +51,7 @@ public class HoodSubsystem extends SubsystemBase {
         m_motor = new TalonFX(HoodConstants.MOTOR_CAN_ID);
         // m_encoder = new CANcoder(HoodConstants.ENCODER_CAN_ID);
 
-        SmartMotorControllerConfig m_smcConfig = new SmartMotorControllerConfig(this)
-                .withClosedLoopController(
-                        HoodConstants.PID_kP,
-                        HoodConstants.PID_kI,
-                        HoodConstants.PID_kD,
-                        HoodConstants.MAX_VELOCITY_RPM,
-                        HoodConstants.MAX_ACCELERATION_RPS2)
-                .withSimClosedLoopController(
-                        HoodConstants.SIM_PID_kP,
-                        HoodConstants.SIM_PID_kI,
-                        HoodConstants.SIM_PID_kD,
-                        HoodConstants.MAX_VELOCITY_RPM,
-                        HoodConstants.MAX_ACCELERATION_RPS2)
-                .withGearing(new MechanismGearing(HoodConstants.GEARBOX))
-                .withIdleMode(MotorMode.COAST)
-                .withTelemetry("HoodMotor", Constants.TELEMETRY_VERBOSITY)
-                .withStatorCurrentLimit(HoodConstants.STATOR_CURRENT_LIMIT)
-                .withSupplyCurrentLimit(HoodConstants.SUPPLY_CURRENT_LIMIT)
-                .withMotorInverted(false)
-                .withClosedLoopRampRate(HoodConstants.CLOSED_LOOP_RAMP_RATE_SEC)
-                .withOpenLoopRampRate(HoodConstants.OPEN_LOOP_RAMP_RATE_SEC)
-                .withFeedforward(HoodConstants.FEEDFORWARD)
-                .withSimFeedforward(HoodConstants.SIM_FEEDFORWARD)
-                .withControlMode(ControlMode.CLOSED_LOOP);
+        SmartMotorControllerConfig m_smcConfig = HoodConstants.SMC_CONFIG.apply(new SmartMotorControllerConfig(this));
         // .withExternalEncoder(m_encoder)
         // .withExternalEncoderInverted(HoodConstants.EXTERNAL_ENCODER_INVERTED)
         // .withExternalEncoderGearing(HoodConstants.EXTERNAL_ENCODER_GEARING)
@@ -91,20 +63,9 @@ public class HoodSubsystem extends SubsystemBase {
                 HoodConstants.MOTOR,
                 m_smcConfig);
 
-        MechanismPositionConfig m_robotToMechanism = new MechanismPositionConfig()
-                .withMaxRobotHeight(MechanismPositionConstants.ROBOT_MAX_HEIGHT)
-                .withMaxRobotLength(MechanismPositionConstants.ROBOT_MAX_LENGTH)
-                .withRelativePosition(HoodConstants.RELATIVE_POSITION);
-
         // The Hood can be modeled as an arm since it has a gravitational force acting
         // on it
-        ArmConfig m_hoodConfig = new ArmConfig(m_smartMotorController)
-                .withTelemetry("HoodMech", Constants.TELEMETRY_VERBOSITY)
-                .withMechanismPositionConfig(m_robotToMechanism)
-                .withSoftLimits(HoodConstants.SOFT_LIMIT_MIN, HoodConstants.SOFT_LIMIT_MAX)
-                .withHardLimit(HoodConstants.HARD_LIMIT_MIN, HoodConstants.HARD_LIMIT_MAX)
-                .withLength(HoodConstants.LENGTH)
-                .withMass(HoodConstants.MASS);
+        ArmConfig m_hoodConfig = HoodConstants.ARM_CONFIG.apply(new ArmConfig(m_smartMotorController));
 
         if (Robot.isSimulation()) {
             m_hoodConfig.withStartingPosition(HoodConstants.SOFT_LIMIT_MIN);
@@ -122,7 +83,7 @@ public class HoodSubsystem extends SubsystemBase {
      */
     public Command sysId() {
         return m_hood.sysId(
-                Volts.of(1), Volts.of(0.5).per(Second), Second.of(2.5))
+                        Volts.of(1), Volts.of(0.5).per(Second), Second.of(2.5))
                 .beforeStarting(
                         () -> SignalLogger.start())
                 .finallyDo(() -> SignalLogger.stop());
@@ -223,7 +184,7 @@ public class HoodSubsystem extends SubsystemBase {
 
     /**
      * Move the hood up and down.
-     * 
+     *
      * @param dutyCycle [-1, 1] speed to set the hood to.
      * @return the command that sets the duty cycle
      */
@@ -235,7 +196,7 @@ public class HoodSubsystem extends SubsystemBase {
     /**
      * Lowers the hood to the default angle, to avoid hitting the hood on the trench
      * when not shooting.
-     * 
+     *
      * @return the command that lowers the hood
      */
     public Command lowerHood() {

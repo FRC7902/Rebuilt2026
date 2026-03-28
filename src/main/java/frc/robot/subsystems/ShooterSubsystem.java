@@ -44,7 +44,7 @@ public class ShooterSubsystem extends SubsystemBase {
     /**
      * Checks if the shooter is ready to shoot by verifying that the hood is at the
      * correct angle and the flywheel is at the target RPM.
-     * 
+     *
      * @return true if the shooter is ready to shoot, false otherwise
      */
     public boolean isShooterReady() {
@@ -75,9 +75,8 @@ public class ShooterSubsystem extends SubsystemBase {
      * @param isAutoAimReady   a supplier that indicates whether the chassis'
      *                         auto-aiming
      *                         is ready
-     * 
      * @return a Command that performs the aiming and shooting sequence when
-     *         executed
+     * executed
      */
     // public Command aimAndShoot(Supplier<Distance> getDistanceToTarget,
     // Supplier<Boolean> isAutoAimReady) {
@@ -95,21 +94,20 @@ public class ShooterSubsystem extends SubsystemBase {
     // () -> isAutoAimReady.get() && isShooterReady()).repeatedly())
     // .withName("SHTR - Aim and Shoot");
     // }
-
     public Command aimAndShoot(Supplier<Distance> getDistanceToTarget, Supplier<Boolean> isAutoAimReady,
-            boolean stationaryShooting, Supplier<Boolean> isFeeding) {
+                               boolean stationaryShooting, Supplier<Boolean> isFeeding) {
         return Commands.parallel(
-                m_hoodSubsystem.setAngle(() -> {
-                    Distance distance = getDistanceToTarget.get();
-                    ShooterZone zone = m_hoodSubsystem.getSpeedZone(distance);
-                    return m_hoodSubsystem.getAngleToTarget(distance, zone);
-                }),
-                m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
-                stationaryShooting ? Commands.sequence(
-                        Commands.waitSeconds(0.25),
-                        Commands.waitUntil(() -> isAutoAimReady.get() && isShooterReady(isFeeding.get()))
-                                .andThen(m_feederSubsystem.feed()))
-                        : new ConditionalCommand(
+                        m_hoodSubsystem.setAngle(() -> {
+                            Distance distance = getDistanceToTarget.get();
+                            ShooterZone zone = m_hoodSubsystem.getSpeedZone(distance);
+                            return m_hoodSubsystem.getAngleToTarget(distance, zone);
+                        }),
+                        m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
+                        stationaryShooting ? Commands.sequence(
+                                Commands.waitSeconds(0.25),
+                                Commands.waitUntil(() -> isAutoAimReady.get() && isShooterReady(isFeeding.get()))
+                                        .andThen(m_feederSubsystem.feed()))
+                                : new ConditionalCommand(
                                 m_feederSubsystem.feed(),
                                 m_feederSubsystem.stop(),
                                 () -> isAutoAimReady.get() && isShooterReady(isFeeding.get())).repeatedly())
@@ -118,14 +116,14 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public Command aimAndShootIgnoreCheck(Supplier<Distance> getDistanceToTarget, Time delayBeforeShooting) {
         return Commands.parallel(
-                m_hoodSubsystem.setAngle(() -> {
-                    Distance distance = getDistanceToTarget.get();
-                    ShooterZone zone = m_hoodSubsystem.getSpeedZone(distance);
-                    return m_hoodSubsystem.getAngleToTarget(distance, zone);
-                }),
-                m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
-                new WaitCommand(delayBeforeShooting).andThen(
-                        m_feederSubsystem.feed()))
+                        m_hoodSubsystem.setAngle(() -> {
+                            Distance distance = getDistanceToTarget.get();
+                            ShooterZone zone = m_hoodSubsystem.getSpeedZone(distance);
+                            return m_hoodSubsystem.getAngleToTarget(distance, zone);
+                        }),
+                        m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
+                        new WaitCommand(delayBeforeShooting).andThen(
+                                m_feederSubsystem.feed()))
                 .withName("SHTR - Aim and Shoot");
     }
 
@@ -154,7 +152,7 @@ public class ShooterSubsystem extends SubsystemBase {
     /**
      * Stops the shooting process by lowering the hood, setting the flywheel to its
      * default RPM, and stopping the feeder.
-     * 
+     *
      * @return a Command that stops the shooting process when executed
      */
     public Command stopShooting() {
@@ -172,15 +170,15 @@ public class ShooterSubsystem extends SubsystemBase {
     /**
      * Stops the shooting process by lowering the hood, setting the flywheel to its
      * default RPM, and optionally stopping the feeder.
-     * 
+     *
      * @param stopFeeder whether to stop the feeder
      * @return a Command that stops the shooting process when executed
      */
     public Command stopShooting(boolean stopFeeder, boolean stopFlywheel) {
         return Commands.parallel(
-                m_hoodSubsystem.lowerHood(),
-                stopFeeder ? m_feederSubsystem.stop() : Commands.none(),
-                stopFlywheel ? m_flywheelSubsystem.stop() : m_flywheelSubsystem.setDefaultRPM())
+                        m_hoodSubsystem.lowerHood(),
+                        stopFeeder ? m_feederSubsystem.stop() : Commands.none(),
+                        stopFlywheel ? m_flywheelSubsystem.stop() : m_flywheelSubsystem.setDefaultRPM())
                 .withName("SHTR - Stop Shooting");
     }
 
@@ -192,7 +190,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * Feeds fuel into the shooter until fuel is detected by the beam break sensor,
      * then reverses the feeder until the fuel is no longer detected, effectively
      * positioning fuel correctly in the feeder for shooting.
-     * 
+     *
      * @return a Command that performs the fuel storing sequence when executed
      */
     public Command storeFuel() {
@@ -211,7 +209,7 @@ public class ShooterSubsystem extends SubsystemBase {
     /**
      * Starts the flywheel spinning at its default RPM, the speed at which it should
      * spin when the shooter is not actively shooting
-     * 
+     *
      * @return a Command that starts the flywheel at its default RPM when executed
      */
     public Command startFlywheelDefaultRPM() {

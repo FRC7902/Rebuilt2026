@@ -37,7 +37,9 @@ import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.Rebu
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 
 public class SimSubsystem extends SubsystemBase {
-    /** Creates a new FuelSimSubsystem. */
+    /**
+     * Creates a new FuelSimSubsystem.
+     */
     private final IntakeSimulation intakeSimulation;
 
     public SimSubsystem(AbstractDriveTrainSimulation driveTrainSimulation) {
@@ -68,8 +70,8 @@ public class SimSubsystem extends SubsystemBase {
     }
 
     public Command shootFuel(Supplier<LinearVelocity> flywheelLinearVelocity, Supplier<Pose2d> robotPose,
-            Supplier<ChassisSpeeds> chassisSpeedsFieldRelative, Supplier<Rotation2d> heading,
-            Supplier<Angle> hoodAngle) {
+                             Supplier<ChassisSpeeds> chassisSpeedsFieldRelative, Supplier<Rotation2d> heading,
+                             Supplier<Angle> hoodAngle) {
 
         return Commands.runOnce(
                 () -> {

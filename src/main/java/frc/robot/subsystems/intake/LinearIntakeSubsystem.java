@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.intake;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
@@ -29,14 +28,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants.LinearIntakeConstants;
-import frc.robot.Constants.MechanismPositionConstants;
-import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ElevatorConfig;
-import yams.mechanisms.config.MechanismPositionConfig;
 import yams.mechanisms.positional.Elevator;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
-import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class LinearIntakeSubsystem extends SubsystemBase {
@@ -58,54 +53,15 @@ public class LinearIntakeSubsystem extends SubsystemBase {
         m_motor = new TalonFX(LinearIntakeConstants.MOTOR_CAN_ID);
         m_motor.getConfigurator().apply(new TalonFXConfiguration());
 
-        m_smcConfig = new SmartMotorControllerConfig(this)
-                .withMechanismCircumference(LinearIntakeConstants.MOTOR_CIRCUMFERENCE)
-                .withClosedLoopController(
-                        LinearIntakeConstants.PID_kP,
-                        LinearIntakeConstants.PID_kI,
-                        LinearIntakeConstants.PID_kD,
-                        LinearIntakeConstants.MAX_VELOCITY,
-                        LinearIntakeConstants.MAX_ACCELERATION)
-                .withSimClosedLoopController(
-                        LinearIntakeConstants.SIM_PID_kP,
-                        LinearIntakeConstants.SIM_PID_kI,
-                        LinearIntakeConstants.SIM_PID_kD,
-                        LinearIntakeConstants.MAX_VELOCITY,
-                        LinearIntakeConstants.MAX_ACCELERATION)
-                .withSoftLimit(
-                        LinearIntakeConstants.SOFT_LIMIT_MIN,
-                        LinearIntakeConstants.SOFT_LIMIT_MAX)
-                .withGearing(new MechanismGearing(LinearIntakeConstants.GEARBOX))
-                .withIdleMode(LinearIntakeConstants.IDLE_MODE)
-                .withTelemetry("LinearIntakeMotor", Constants.TELEMETRY_VERBOSITY)
-                .withStatorCurrentLimit(LinearIntakeConstants.STATOR_CURRENT_LIMIT)
-                .withSupplyCurrentLimit(LinearIntakeConstants.SUPPLY_CURRENT_LIMIT)
-                .withMotorInverted(LinearIntakeConstants.INVERT_MOTOR)
-                .withClosedLoopRampRate(LinearIntakeConstants.CLOSED_LOOP_RAMP_RATE)
-                .withOpenLoopRampRate(LinearIntakeConstants.OPEN_LOOP_RAMP_RATE)
-                .withFeedforward(LinearIntakeConstants.FEEDFORWARD)
-                .withSimFeedforward(LinearIntakeConstants.SIM_FEEDFORWARD)
-                .withControlMode(ControlMode.CLOSED_LOOP);
+        m_smcConfig = LinearIntakeConstants.SMC_CONFIG.apply(new SmartMotorControllerConfig());
 
         m_smartMotorController = new TalonFXWrapper(
                 m_motor,
                 LinearIntakeConstants.MOTOR,
                 m_smcConfig);
 
-        MechanismPositionConfig m_robotToMechanism = new MechanismPositionConfig()
-                .withMaxRobotHeight(MechanismPositionConstants.ROBOT_MAX_HEIGHT)
-                .withMaxRobotLength(MechanismPositionConstants.ROBOT_MAX_LENGTH)
-                .withRelativePosition(LinearIntakeConstants.RELATIVE_POSITION);
-
-        ElevatorConfig linearConfig = new ElevatorConfig(m_smartMotorController)
-                .withHardLimits(
-                        LinearIntakeConstants.HARD_LIMIT_MIN,
-                        LinearIntakeConstants.HARD_LIMIT_MAX)
-                .withTelemetry("LinearIntakeMech", Constants.TELEMETRY_VERBOSITY)
-                .withMechanismPositionConfig(m_robotToMechanism)
-                .withAngle(LinearIntakeConstants.MECHANISM_ANGLE)
-                .withMass(LinearIntakeConstants.MECHANISM_MASS)
-                .withHorizontalElevator();
+        ElevatorConfig linearConfig = LinearIntakeConstants.ELEVATOR_CONFIG
+                .apply(new ElevatorConfig(m_smartMotorController));
 
         if (RobotBase.isSimulation()) {
             linearConfig.withStartingHeight(LinearIntakeConstants.RETRACTED_POSITION);
@@ -128,7 +84,7 @@ public class LinearIntakeSubsystem extends SubsystemBase {
 
     public Command sysId() {
         return m_linearIntake.sysId(
-                Volts.of(2), Volts.of(0.5).per(Second), Second.of(10))
+                        Volts.of(2), Volts.of(0.5).per(Second), Second.of(10))
                 .beforeStarting(SignalLogger::start)
                 .finallyDo(SignalLogger::stop);
     }
@@ -169,7 +125,7 @@ public class LinearIntakeSubsystem extends SubsystemBase {
         }
 
         return getSetpoint().map(
-                setpoint -> setpoint.isNear(m_linearIntake.getHeight(), LinearIntakeConstants.POSITION_TARGET_ERROR))
+                        setpoint -> setpoint.isNear(m_linearIntake.getHeight(), LinearIntakeConstants.POSITION_TARGET_ERROR))
                 .orElse(false);
     }
 
@@ -196,14 +152,14 @@ public class LinearIntakeSubsystem extends SubsystemBase {
                         new ConditionalCommand(
                                 // Full hopper (which intake cannot close past midpoint)
                                 Commands.sequence(
-                                        setPosition(LinearIntakeConstants.SHUFFLE_FURTHEST_POSITION).withTimeout(0.25),
-                                        setPosition(LinearIntakeConstants.EXTENDED_POSITION).withTimeout(0.25))
+                                                setPosition(LinearIntakeConstants.SHUFFLE_FURTHEST_POSITION).withTimeout(0.25),
+                                                setPosition(LinearIntakeConstants.EXTENDED_POSITION).withTimeout(0.25))
                                         .repeatedly(),
                                 // Not full hopper (which intake can close past midpoint, so shuffle closer to
                                 // midpoint)
                                 Commands.sequence(
-                                        setPosition(LinearIntakeConstants.SHUFFLE_FAR_POSITION).withTimeout(0.25),
-                                        setPosition(LinearIntakeConstants.MIDPOINT_POSITION).withTimeout(0.25))
+                                                setPosition(LinearIntakeConstants.SHUFFLE_FAR_POSITION).withTimeout(0.25),
+                                                setPosition(LinearIntakeConstants.MIDPOINT_POSITION).withTimeout(0.25))
                                         .repeatedly(),
                                 () -> getPosition().gt(
                                         LinearIntakeConstants.MIDPOINT_POSITION
@@ -213,8 +169,8 @@ public class LinearIntakeSubsystem extends SubsystemBase {
                 setPosition(LinearIntakeConstants.SHUFFLE_FAR_POSITION).withTimeout(0.5),
                 setPosition(LinearIntakeConstants.SHUFFLE_CLOSE_POSITION).withTimeout(0.5),
                 Commands.sequence(
-                        midpoint().withTimeout(0.5),
-                        retract().withTimeout(0.5))
+                                midpoint().withTimeout(0.5),
+                                retract().withTimeout(0.5))
                         .repeatedly());
     }
 
