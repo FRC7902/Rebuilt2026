@@ -50,7 +50,7 @@ import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.Rebu
 
 public class RobotContainer {
 
-    final CommandXboxController m_driverController = new CommandXboxController(Constants.DRIVER_CONTROLLER_PORT);
+    public final CommandXboxController m_driverController = new CommandXboxController(Constants.DRIVER_CONTROLLER_PORT);
 
     // private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
     public final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
@@ -257,7 +257,7 @@ public class RobotContainer {
             m_swerveSubsystem::getCurrentZone);
 
     private void configureBindings() {
-        m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity);
+        // m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity);
 
         BooleanSupplier isIdle = () -> Math.abs(m_driverController.getLeftX()) < OperatorConstants.DEADBAND
                 && Math.abs(m_driverController.getLeftY()) < OperatorConstants.DEADBAND
@@ -399,9 +399,15 @@ public class RobotContainer {
                         .unless(m_driverController.leftTrigger()::getAsBoolean));
         m_driverController.rightBumper()
                 .onTrue(m_linearIntakeSubsystem.shuffle()
-                        .unless(m_driverController.leftTrigger()::getAsBoolean))
+                        .unless(m_driverController.leftTrigger()::getAsBoolean)
+                )
                 .onFalse(m_linearIntakeSubsystem.midpoint()
-                        .unless(m_driverController.leftTrigger()::getAsBoolean));
+                        .unless(m_driverController.leftTrigger()::getAsBoolean)
+                );
+
+        m_driverController.b()
+                .onTrue(m_linearIntakeSubsystem.shuffle())
+                .onFalse(m_linearIntakeSubsystem.midpoint());
 
         // Extend intake, expand hopper, and run intake rollers
         m_driverController.leftTrigger()

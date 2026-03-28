@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.MatchConstants;
 
 public class DashboardSubsystem extends SubsystemBase {
@@ -68,5 +69,7 @@ public class DashboardSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         getAllianceShift();
+        // Checks
+        // SmartDashboard.putBoolean("Left Trigger", RobotContainer.m_driverController.leftTrigger().getAsBoolean());
     }
 }
