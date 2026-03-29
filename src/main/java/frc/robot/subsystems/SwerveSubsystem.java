@@ -16,6 +16,8 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -24,6 +26,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
@@ -829,6 +833,14 @@ public class SwerveSubsystem extends SubsystemBase {
     private double m_lastFrontLLTimestamp = 0;
     private double m_lastLeftLLTimestamp = 0;
 
+    private Matrix<N3, N1> getDynamicStdDev(PoseEstimate estimate, double baseSD) {
+        double dist = estimate.avgTagDist;
+        double tagCountMultiplier = estimate.tagCount > 1 ? 1 : 0.5;
+        double multiplier = (1.0 + 0.1 * Math.pow(dist, 2)) * tagCountMultiplier;
+
+        return VecBuilder.fill(baseSD * multiplier, baseSD * multiplier, 9999999);
+    }
+
     private double updateLimelight(
             Limelight limelight,
             LimelightPoseEstimator llPoseEst,
@@ -862,10 +874,9 @@ public class SwerveSubsystem extends SubsystemBase {
                         poseEstimate.getAvgTagAmbiguity() < 0.1 && // TODO: Tune this lower if ambiguity still causes bad readings
                         poseEstimate.tagCount > 1) {
                     if (llTimestamp != poseEstimate.timestampSeconds) {
-                        // var stdDevScale = Math.pow(poseEstimate.avgTagDist, 2.0) /
-                        // poseEstimate.tagCount;
+//                        var stdDevScale = Math.pow(poseEstimate.avgTagDist, 2.0) / poseEstimate.tagCount;
                         swerveDrive.addVisionMeasurement(estimatorPose,
-                                poseEstimate.timestampSeconds);
+                                poseEstimate.timestampSeconds, getDynamicStdDev(poseEstimate, 0.3));
                         return poseEstimate.timestampSeconds;
                     }
                 }
