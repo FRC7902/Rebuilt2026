@@ -11,7 +11,6 @@ import static edu.wpi.first.units.Units.Meters;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -20,18 +19,15 @@ import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -64,7 +60,7 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     private final SwerveDrive swerveDrive;
 
-    private Limelight m_frontLimeight;
+    private Limelight m_frontLimelight;
     private LimelightPoseEstimator m_frontLimelightPoseEstimator;
     private Limelight m_leftLimelight;
     private LimelightPoseEstimator m_leftLimelightPoseEstimator;
@@ -126,8 +122,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void setupLimelight() {
         swerveDrive.stopOdometryThread();
-        m_frontLimeight = new Limelight("limelight-b");
-        m_frontLimeight
+        m_frontLimelight = new Limelight("limelight-b");
+        m_frontLimelight
                 .getSettings()
                 .withPipelineIndex(0)
                 // TODO: Add camera offset here
@@ -140,7 +136,7 @@ public class SwerveSubsystem extends SubsystemBase {
                 // /// Roll, Pitch, Yaw
                 // .withAprilTagIdFilter(List.of(17, 18, 19, 20, 21, 22, 6, 7, 8, 9, 10, 11))
                 .save();
-        m_frontLimelightPoseEstimator = m_frontLimeight.createPoseEstimator(EstimationMode.MEGATAG2); // TODO: Try MT1
+        m_frontLimelightPoseEstimator = m_frontLimelight.createPoseEstimator(EstimationMode.MEGATAG2); // TODO: Try MT1
 
         m_leftLimelight = new Limelight("limelight-a");
         m_leftLimelight
@@ -879,7 +875,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public void periodic() {
         swerveDrive.updateOdometry();
 
-        m_lastFrontLLTimestamp = updateLimelight(m_frontLimeight, m_frontLimelightPoseEstimator, m_lastFrontLLTimestamp,
+        m_lastFrontLLTimestamp = updateLimelight(m_frontLimelight, m_frontLimelightPoseEstimator, m_lastFrontLLTimestamp,
                 SwerveConstants.FRONT_LIMELIGHT_CAMERA_YAW_OFFSET, "limelight-b");
         m_lastLeftLLTimestamp = updateLimelight(m_leftLimelight, m_leftLimelightPoseEstimator, m_lastLeftLLTimestamp,
                 SwerveConstants.LEFT_LIMELIGHT_CAMERA_YAW_OFFSET, "limelight-a");
