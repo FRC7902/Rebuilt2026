@@ -40,12 +40,8 @@ import frc.robot.Constants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.FieldConstants;
 import limelight.Limelight;
-import limelight.networktables.AngularVelocity3d;
-import limelight.networktables.LimelightPoseEstimator;
+import limelight.networktables.*;
 import limelight.networktables.LimelightPoseEstimator.EstimationMode;
-import limelight.networktables.LimelightResults;
-import limelight.networktables.Orientation3d;
-import limelight.networktables.PoseEstimate;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -84,8 +80,8 @@ public class SwerveSubsystem extends SubsystemBase {
                 Meter.of(4)),
                 Rotation2d.fromDegrees(0))
                 : new Pose2d(new Translation2d(Meter.of(16),
-                        Meter.of(4)),
-                        Rotation2d.fromDegrees(180));
+                Meter.of(4)),
+                Rotation2d.fromDegrees(180));
         // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
         // objects being created.
         SwerveDriveTelemetry.verbosity = Constants.SWERVE_TELEMETRY_VERBOSITY;
@@ -99,16 +95,16 @@ public class SwerveSubsystem extends SubsystemBase {
             throw new RuntimeException(e);
         }
         swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot
-                                                 // via angle.
+        // via angle.
         swerveDrive.setCosineCompensator(false);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation
-                                                // for simulations since it causes discrepancies not seen in real life.
+        // for simulations since it causes discrepancies not seen in real life.
         swerveDrive.setAngularVelocityCompensation(true,
                 true,
                 0.1); // Correct for skew that gets worse as angular velocity increases. Start with a
-                      // coefficient of 0.1.
+        // coefficient of 0.1.
         swerveDrive.setModuleEncoderAutoSynchronize(false,
                 1); // Enable if you want to resynchronize your absolute encoders and motor encoders
-                    // periodically when they are not moving.
+        // periodically when they are not moving.
         // swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used
         // over the internal encoder and push the offsets onto it. Throws warning if not
         // possible
@@ -126,6 +122,7 @@ public class SwerveSubsystem extends SubsystemBase {
         m_frontLimelight
                 .getSettings()
                 .withPipelineIndex(0)
+                .withImuMode(LimelightSettings.ImuMode.ExternalImu)
                 // TODO: Add camera offset here
                 // .withCameraOffset(
                 // new Pose3d(
@@ -142,6 +139,7 @@ public class SwerveSubsystem extends SubsystemBase {
         m_leftLimelight
                 .getSettings()
                 .withPipelineIndex(0)
+                .withImuMode(LimelightSettings.ImuMode.ExternalImu)
                 // .withCameraOffset(
                 // new Pose3d( // TODO: Give the right offset here
                 // Units.inchesToMeters(0),
@@ -194,7 +192,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * ends.
      *
      * @return a Command that tells the robot to drive forward until the command
-     *         ends
+     * ends
      */
     public Command driveForward() {
         return run(() -> {
@@ -205,9 +203,9 @@ public class SwerveSubsystem extends SubsystemBase {
     /**
      * Returns a Command that tells the robot to drive backward until the command
      * ends.
-     * 
+     *
      * @return a Command that tells the robot to drive backward until the command
-     *         ends
+     * ends
      */
     public Command driveBackward() {
         return run(() -> {
@@ -217,7 +215,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     /**
      * Returns a Command that tells the robot to drive left until the command ends.
-     * 
+     *
      * @return a Command that tells the robot to drive left until the command ends
      */
     public Command driveLeft() {
@@ -228,7 +226,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     /**
      * Returns a Command that tells the robot to drive right until the command ends.
-     * 
+     *
      * @return a Command that tells the robot to drive right until the command ends
      */
     public Command driveRight() {
@@ -266,12 +264,12 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return Drive command.
      */
     public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY,
-            DoubleSupplier angularRotationX) {
+                                DoubleSupplier angularRotationX) {
         return run(() -> {
             // Make the robot move
             swerveDrive.drive(SwerveMath.scaleTranslation(new Translation2d(
-                    translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
-                    translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()), 0.8),
+                            translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
+                            translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()), 0.8),
                     Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(),
                     true,
                     false);
@@ -291,7 +289,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return Drive command.
      */
     public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier headingX,
-            DoubleSupplier headingY) {
+                                DoubleSupplier headingY) {
         // swerveDrive.setHeadingCorrection(true); // Normally you would want heading
         // correction for this kind of control.
         return run(() -> {
@@ -440,7 +438,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * Checks if the alliance is red, defaults to false if alliance isn't available.
      *
      * @return true if the red alliance, false if blue. Defaults to false if none is
-     *         available.
+     * available.
      */
     public boolean isRedAlliance() {
         var alliance = DriverStation.getAlliance();
@@ -592,7 +590,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * Follows the given swerve sample by calculating the necessary chassis speeds
      * and
      * commanding them to the drive.
-     * 
+     *
      * @param sample The swerve sample containing the desired velocities and
      *               heading.
      */
@@ -624,7 +622,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     /**
      * Gets the current zone of the robot based on its position on the field.
-     * 
+     *
      * @return The current zone of the robot as a Zone enum.
      */
     public Zone getCurrentZone() {
@@ -706,7 +704,7 @@ public class SwerveSubsystem extends SubsystemBase {
     /**
      * Gets the target translation for auto-aiming based on the current zone and
      * alliance.
-     * 
+     *
      * @return The target translation for auto-aiming.
      */
     private Translation2d getAutoAimTarget() {
@@ -771,7 +769,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * heading
      * to the target rotation for auto-aiming, and checking if the angle error is
      * within a certain tolerance.
-     * 
+     *
      * @return true if the robot is on target for auto-aiming, false otherwise
      */
     public boolean isAutoAimOnTarget() {
@@ -784,7 +782,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     /**
      * Gets the target rotation for auto-aiming.
-     * 
+     *
      * @return The target rotation for auto-aiming.
      */
     public Rotation2d getAutoAimHeading() {
@@ -850,13 +848,18 @@ public class SwerveSubsystem extends SubsystemBase {
         Optional<LimelightResults> results = limelight.getLatestResults();
         if (results.isPresent() && poseEstimates.isPresent()) {
             LimelightResults result = results.get();
+
             PoseEstimate poseEstimate = poseEstimates.get();
             if (result.valid) {
                 Pose2d estimatorPose = poseEstimate.pose.toPose2d();
                 swerveDrive.field.getObject("Vision").setPose(estimatorPose);
                 SmartDashboard.putNumber("LimelightTuning/" + llname + "/ambiguity", poseEstimate.getAvgTagAmbiguity());
-                if (poseEstimate.getAvgTagAmbiguity() < 0.1 && // TODO: Tune this lower if ambiguity still causes bad
-                                                               // readings
+
+                Pose2d usefulPose = result.getBotPose2d(DriverStation.Alliance.Blue);
+                double distanceToPose = usefulPose.getTranslation().getDistance(usefulPose.getTranslation());
+
+                if (distanceToPose < 0.5 &&
+                        poseEstimate.getAvgTagAmbiguity() < 0.1 && // TODO: Tune this lower if ambiguity still causes bad readings
                         poseEstimate.tagCount > 1) {
                     if (llTimestamp != poseEstimate.timestampSeconds) {
                         // var stdDevScale = Math.pow(poseEstimate.avgTagDist, 2.0) /
