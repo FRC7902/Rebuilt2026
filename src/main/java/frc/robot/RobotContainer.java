@@ -340,7 +340,8 @@ public class RobotContainer {
                         .unless(m_driverController.leftTrigger()::getAsBoolean));
         m_driverController.rightTrigger()
                 .onTrue(m_linearIntakeSubsystem.shuffle()
-                        .unless(m_driverController.leftTrigger()::getAsBoolean))
+                        // .unless(m_driverController.leftTrigger()::getAsBoolean)
+                )
                 .onFalse(m_linearIntakeSubsystem.midpoint()
                         .unless(m_driverController.leftTrigger()::getAsBoolean));
 
@@ -399,7 +400,7 @@ public class RobotContainer {
                         .unless(m_driverController.leftTrigger()::getAsBoolean));
         m_driverController.rightBumper()
                 .onTrue(m_linearIntakeSubsystem.shuffle()
-                        .unless(m_driverController.leftTrigger()::getAsBoolean)
+                        // .unless(m_driverController.leftTrigger()::getAsBoolean)
                 )
                 .onFalse(m_linearIntakeSubsystem.midpoint()
                         .unless(m_driverController.leftTrigger()::getAsBoolean)
