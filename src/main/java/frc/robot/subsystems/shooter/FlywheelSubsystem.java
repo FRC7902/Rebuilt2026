@@ -17,6 +17,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.Pair;
@@ -84,7 +86,8 @@ public class FlywheelSubsystem extends SubsystemBase {
                 .withSimFeedforward(FlywheelConstants.SIM_FEEDFORWARD)
                 .withControlMode(ControlMode.CLOSED_LOOP)
                 .withFollowers(Pair.of(m_followerMotor, FlywheelConstants.FOLLOWER_MOTOR_INVERTED))
-                .withMomentOfInertia(FlywheelConstants.MOI);
+                .withMomentOfInertia(FlywheelConstants.MOI)
+                .withVendorControlRequest(new VelocityTorqueCurrentFOC(0));
 
         m_smartMotorController = new TalonFXWrapper(
                 m_leaderMotor,
