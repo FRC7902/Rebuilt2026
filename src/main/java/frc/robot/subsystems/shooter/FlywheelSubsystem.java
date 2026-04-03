@@ -3,139 +3,91 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.subsystems.shooter;
 
-import static edu.wpi.first.units.Units.FeetPerSecond;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.MechanismPositionConstants;
-import frc.robot.Constants.ShooterConstants;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ShooterConstants.FlywheelConstants;
-import frc.robot.Constants.ShooterConstants.ShooterZone;
-import yams.gearing.MechanismGearing;
-import yams.mechanisms.config.FlyWheelConfig;
-import yams.mechanisms.config.MechanismPositionConfig;
-import yams.mechanisms.velocity.FlyWheel;
-import yams.motorcontrollers.SmartMotorController;
-import yams.motorcontrollers.SmartMotorControllerConfig;
-import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
-import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class FlywheelSubsystem extends SubsystemBase {
 
-    private final TalonFX m_leaderMotor;
-    private final TalonFX m_followerMotor;
+    private final TalonFX m_leaderMotor = new TalonFX(FlywheelConstants.LEADER_MOTOR_CAN_ID);;
+    private final TalonFX m_followerMotor = new TalonFX(FlywheelConstants.FOLLOWER_MOTOR_CAN_ID);
 
-    private final SmartMotorController m_smartMotorController;
+    private final DutyCycleOut m_dutyCycle = new DutyCycleOut(0);
+    private final VelocityTorqueCurrentFOC m_velocityTorque = new VelocityTorqueCurrentFOC(0).withSlot(0);
+    private final NeutralOut m_brake = new NeutralOut();
 
-    private final FlyWheel m_flywheel;
-
-    private final Debouncer m_atRPMDebouncer = new Debouncer(
-            FlywheelConstants.AT_RPM_DEBOUNCE_TIME.in(Seconds),
-            Debouncer.DebounceType.kRising);
+    private final VoltageOut m_sysIdControl = new VoltageOut(0);
+    private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
+            new SysIdRoutine.Config(
+                    null, // Use default ramp rate (1 V/s)
+                    Volts.of(12), // Reduce dynamic voltage to 4 to prevent brownout
+                    null, // Use default timeout (10 s)
+                          // Log state with Phoenix SignalLogger class
+                    state -> SignalLogger.writeString("state", state.toString())),
+            new SysIdRoutine.Mechanism(
+                    volts -> m_leaderMotor.setControl(m_sysIdControl.withOutput(volts)),
+                    null,
+                    this));
 
     public FlywheelSubsystem() {
-        m_leaderMotor = new TalonFX(FlywheelConstants.LEADER_MOTOR_CAN_ID);
-        m_followerMotor = new TalonFX(FlywheelConstants.FOLLOWER_MOTOR_CAN_ID);
+        TalonFXConfiguration configs = new TalonFXConfiguration();
 
-        SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
-                .withClosedLoopController(
-                        FlywheelConstants.PID_kP,
-                        FlywheelConstants.PID_kI,
-                        FlywheelConstants.PID_kD,
-                        FlywheelConstants.MAX_VELOCITY_RPM,
-                        FlywheelConstants.MAX_ACCELERATION_RPS2)
-                .withSimClosedLoopController(
-                        FlywheelConstants.SIM_PID_kP,
-                        FlywheelConstants.SIM_PID_kI,
-                        FlywheelConstants.SIM_PID_kD,
-                        FlywheelConstants.MAX_VELOCITY_RPM,
-                        FlywheelConstants.MAX_ACCELERATION_RPS2)
-                .withGearing(new MechanismGearing(FlywheelConstants.GEARBOX))
-                .withIdleMode(FlywheelConstants.IDLE_MODE) // Keep spinning even if not powered
-                .withTelemetry("FlywheelMotor", Constants.TELEMETRY_VERBOSITY)
-                .withStatorCurrentLimit(FlywheelConstants.STATOR_CURRENT_LIMIT_AMPS)
-                .withSupplyCurrentLimit(FlywheelConstants.SUPPLY_CURRENT_LIMIT_AMPS)
-                .withMotorInverted(FlywheelConstants.LEADER_MOTOR_INVERTED)
-                .withClosedLoopRampRate(FlywheelConstants.CLOSED_LOOP_RAMP_RATE_SEC)
-                .withOpenLoopRampRate(FlywheelConstants.OPEN_LOOP_RAMP_RATE_SEC)
-                .withFeedforward(FlywheelConstants.FEEDFORWARD)
-                .withSimFeedforward(FlywheelConstants.SIM_FEEDFORWARD)
-                .withControlMode(ControlMode.CLOSED_LOOP)
-                .withFollowers(Pair.of(m_followerMotor, FlywheelConstants.FOLLOWER_MOTOR_INVERTED))
-                .withMomentOfInertia(FlywheelConstants.MOI);
+        // Only need kP and kS when using TorqueCurrentFOC
 
-        m_smartMotorController = new TalonFXWrapper(
-                m_leaderMotor,
-                FlywheelConstants.MOTOR,
-                smcConfig);
+        configs.Slot0.kP = FlywheelConstants.PID_kP;
+        configs.Slot0.kS = FlywheelConstants.FF_kS;
 
-        MechanismPositionConfig robotToMechanism = new MechanismPositionConfig()
-                .withMaxRobotHeight(MechanismPositionConstants.ROBOT_MAX_HEIGHT)
-                .withMaxRobotLength(MechanismPositionConstants.ROBOT_MAX_LENGTH)
-                .withRelativePosition(FlywheelConstants.RELATIVE_POSITION);
+        configs.TorqueCurrent.withPeakForwardTorqueCurrent(FlywheelConstants.STATOR_CURRENT_LIMIT_AMPS)
+                .withPeakReverseTorqueCurrent(Amps.of(FlywheelConstants.STATOR_CURRENT_LIMIT_AMPS.in(Amps) * -1));
 
-        FlyWheelConfig flywheelConfig = new FlyWheelConfig(m_smartMotorController)
-                .withDiameter(FlywheelConstants.DIAMETER_INCHES)
-                .withMOI(FlywheelConstants.MOI)
-                .withTelemetry("FlywheelMech", Constants.TELEMETRY_VERBOSITY)
-                .withSoftLimit(FlywheelConstants.SOFT_LIMIT_RPM.times(-1), FlywheelConstants.SOFT_LIMIT_RPM)
-                .withSpeedometerSimulation(FlywheelConstants.SIM_MAX_VELOCITY_RPM)
-                .withMechanismPositionConfig(robotToMechanism);
+        /* Retry config apply up to 5 times, report if failure */
+        StatusCode status = StatusCode.StatusCodeNotInitialized;
+        for (int i = 0; i < 5; ++i) {
+            status = m_leaderMotor.getConfigurator().apply(configs);
+            if (status.isOK())
+                break;
+        }
+        if (!status.isOK()) {
+            System.out.println("Could not apply configs, error code: " + status.toString());
+        }
 
-        m_flywheel = new FlyWheel(flywheelConfig);
+        m_followerMotor.setControl(new Follower(m_leaderMotor.getDeviceID(), MotorAlignmentValue.Opposed));
     }
 
     /**
-     * Creates a SysId characterization command for the flywheel.
-     *
-     * @return the SysId command
-     */
-    public Command sysId() {
-        return m_flywheel.sysId(
-                Volts.of(12), Volts.of(1).per(Second), Second.of(10))
-                .beforeStarting(
-                        () -> SignalLogger.start())
-                .finallyDo(() -> SignalLogger.stop());
-    }
-
-    /**
-     * Gets the current flywheel velocity.
-     *
-     * @return the current angular velocity
-     */
-    public AngularVelocity getAngularVelocity() {
-        return m_flywheel.getSpeed();
-    }
-
-    /**
-     * Gets the current flywheel velocity.
+     * Creates a command to set the flywheel motor output as a percentage of maximum
+     * voltage.
      * 
-     * @return the current linear velocity
+     * @param dutyCycle the percentage of maximum voltage to apply to the flywheel
+     *                  motors (between -1.0 and 1.0)
+     * @return the command that sets the flywheel motor output to the specified duty
+     *         cycle
      */
-    public LinearVelocity getLinearVelocity() {
-        return m_flywheel.getLinearVelocity();
+    public Command setDutyCycle(double dutyCycle) {
+        return new InstantCommand(() -> m_leaderMotor.setControl(m_dutyCycle.withOutput(dutyCycle)));
     }
 
     /**
@@ -145,7 +97,8 @@ public class FlywheelSubsystem extends SubsystemBase {
      * @return the command that sets flywheel speed
      */
     public Command setSpeed(AngularVelocity speed) {
-        return m_flywheel.setSpeed(speed);
+        return new InstantCommand(
+                () -> m_leaderMotor.setControl(m_velocityTorque.withVelocity(speed)));
     }
 
     /**
@@ -155,109 +108,134 @@ public class FlywheelSubsystem extends SubsystemBase {
      * @return the command that sets flywheel speed
      */
     public Command setSpeed(Supplier<AngularVelocity> speed) {
-        return m_flywheel.setSpeed(speed);
+        return new InstantCommand(() -> m_leaderMotor.setControl(m_velocityTorque.withVelocity(speed.get())));
     }
 
     /**
-     * Creates a command to set the flywheel speed based on linear velocity.
-     *
-     * @param speed the desired linear velocity
-     * @return the command that sets flywheel speed
-     */
-    public Command setSpeed(LinearVelocity speed) {
-        return m_flywheel.setSpeed(RotationsPerSecond
-                .of(speed.in(MetersPerSecond) / FlywheelConstants.DIAMETER_INCHES.times(Math.PI).in(Meters)));
-    }
-
-    /**
-     * Starts the flywheel spinning at the default RPM, the speed at which it
-     * should spin when the shooter is not actively shooting.
+     * Creates a command to stop the flywheel by setting the motor output to zero.
      * 
-     * @return a Command that starts the flywheel at the default RPM when executed
+     * @return the command that stops the flywheel
      */
-    public Command setDefaultRPM() {
-        return setSpeed(FlywheelConstants.DEFAULT_VELOCITY);
+    public Command stop() {
+        return new InstantCommand(() -> m_leaderMotor.setControl(m_brake));
     }
 
-    public Optional<AngularVelocity> getSetpointVelocity() {
-        Optional<AngularVelocity> setpoint = m_smartMotorController.getMechanismSetpointVelocity();
+    /**
+     * Creates a SysId characterization command for the flywheel.
+     *
+     * @return the SysId command
+     */
+    public Command sysId() {
+        return Commands.sequence(
+                m_sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+                m_sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
+                m_sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward),
+                m_sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse))
+                .beforeStarting(
+                        new InstantCommand(() -> {
+                            BaseStatusSignal.setUpdateFrequencyForAll(250,
+                                    m_leaderMotor.getPosition(),
+                                    m_leaderMotor.getVelocity(),
+                                    m_leaderMotor.getMotorVoltage());
 
-        if (!setpoint.isPresent())
-            return Optional.empty();
+                            m_leaderMotor.optimizeBusUtilization();
 
-        // Convert from output to input velocity for comparison with actual velocity
-        return Optional.of(setpoint.get().times(FlywheelConstants.GEARBOX.getInputToOutputConversionFactor()));
+                            SignalLogger.start();
+                        }))
+                .finallyDo(
+                        () -> {
+                            SignalLogger.stop();
+                            BaseStatusSignal.setUpdateFrequencyForAll(50,
+                                    m_leaderMotor.getPosition(),
+                                    m_leaderMotor.getVelocity(),
+                                    m_leaderMotor.getMotorVoltage());
+
+                            m_leaderMotor.resetSignalFrequencies();
+                        });
+    }
+
+    /**
+     * Gets the current flywheel velocity.
+     *
+     * @return the current angular velocity
+     */
+    public AngularVelocity getAngularVelocity() {
+        return m_leaderMotor.getVelocity().getValue();
+    }
+
+    // /**
+    // * Gets the current flywheel velocity.
+    // *
+    // * @return the current linear velocity
+    // */
+    // public LinearVelocity getLinearVelocity() {
+    // throw new UnsupportedOperationException("getLinearVelocity is not implemented
+    // yet");
+    // }
+
+    // /**
+    // * Creates a command to set the flywheel speed based on linear velocity.
+    // *
+    // * @param speed the desired linear velocity
+    // * @return the command that sets flywheel speed
+    // */
+    // public Command setSpeed(LinearVelocity speed) {
+    // throw new UnsupportedOperationException("setSpeed with LinearVelocity
+    // parameter is not implemented yet");
+    // }
+
+    // /**
+    // * Starts the flywheel spinning at the default RPM, the speed at which it
+    // * should spin when the shooter is not actively shooting.
+    // *
+    // * @return a Command that starts the flywheel at the default RPM when executed
+    // */
+    // public Command setDefaultRPM() {
+    // return setSpeed(FlywheelConstants.DEFAULT_VELOCITY);
+    // }
+
+    public AngularVelocity getSetpointVelocity() {
+        return m_velocityTorque.getVelocityMeasure();
     }
 
     public boolean isAtTargetRPM() {
-        Optional<AngularVelocity> setpoint = getSetpointVelocity();
+        AngularVelocity target = m_velocityTorque.getVelocityMeasure();
+        AngularVelocity current = m_leaderMotor.getVelocity().getValue();
 
-        if (!setpoint.isPresent())
-            return false;
-
-        return m_atRPMDebouncer.calculate(
-                setpoint.get().times(FlywheelConstants.GEARBOX.getOutputToInputConversionFactor()).isNear(
-                        getAngularVelocity(),
-                        FlywheelConstants.RPM_TARGET_ERROR));
+        return current.isNear(target, FlywheelConstants.RPM_TARGET_ERROR);
     }
 
     public boolean isAtTargetRPM(boolean isFeeding) {
-        Optional<AngularVelocity> setpoint = getSetpointVelocity();
-
-        if (!setpoint.isPresent())
-            return false;
+        AngularVelocity target = m_velocityTorque.getVelocityMeasure();
+        AngularVelocity current = getAngularVelocity();
 
         if (isFeeding) {
-            return m_atRPMDebouncer.calculate(
-                    setpoint.get().times(FlywheelConstants.GEARBOX.getOutputToInputConversionFactor()).isNear(
-                            getAngularVelocity(),
-                            FlywheelConstants.RPM_TARGET_ERROR_WHILE_FEEDING));
+            return current.isNear(target, FlywheelConstants.RPM_TARGET_ERROR_WHILE_FEEDING);
+        } else {
+            return current.isNear(target, FlywheelConstants.RPM_TARGET_ERROR);
         }
-
-        return m_atRPMDebouncer.calculate(
-                setpoint.get().times(FlywheelConstants.GEARBOX.getOutputToInputConversionFactor()).isNear(
-                        getAngularVelocity(),
-                        FlywheelConstants.RPM_TARGET_ERROR));
     }
 
-    public Command stop() {
-        return this.runOnce(() -> {
-            m_smartMotorController.stopClosedLoopController();
-            m_smartMotorController.setDutyCycle(0);
-        });
-    }
+    // public AngularVelocity getTargetVelocity(Distance distanceToTarget) {
+    // throw new UnsupportedOperationException("getTargetVelocity is not implemented
+    // yet");
+    // }
 
     /**
      * Updates flywheel telemetry.
      */
     @Override
     public void periodic() {
-        m_flywheel.updateTelemetry();
-
-        if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
-            SmartDashboard.putNumber("FlywheelMech/linearVelocity (fps)", getLinearVelocity().in(FeetPerSecond));
-        }
+        // if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
+        // SmartDashboard.putNumber("FlywheelMech/linearVelocity (fps)",
+        // getLinearVelocity().in(FeetPerSecond));
+        // }
 
         SmartDashboard.putNumber("FlywheelMech/velocity (RPM)", getAngularVelocity().in(RPM));
-        SmartDashboard.putNumber("FlywheelMech/setpoint (RPM)",
-                getSetpointVelocity().map(
-                        setpoint -> setpoint.in(RPM) * FlywheelConstants.GEARBOX.getOutputToInputConversionFactor())
-                        .orElse(Double.NaN));
+        SmartDashboard.putNumber("FlywheelMech/setpoint (RPM)", getSetpointVelocity().in(RPM));
     }
 
     @Override
     public void simulationPeriodic() {
-        // Run the flywheel simulation step
-        m_flywheel.simIterate();
-    }
-
-    public AngularVelocity getTargetVelocity(Distance distanceToTarget) {
-        ShooterZone zone = ShooterConstants.MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE.entrySet().stream()
-                .filter(entry -> distanceToTarget.in(Meters) >= entry.getKey().in(Meters))
-                .max((a, b) -> Double.compare(a.getKey().in(Meters), b.getKey().in(Meters)))
-                .map(Map.Entry::getValue)
-                .orElse(ShooterZone.ZONE_1);
-        return ShooterConstants.SHOOTER_MIN_DISTANCE_TO_FLYWHEEL_RPM.getOrDefault(zone,
-                FlywheelConstants.DEFAULT_VELOCITY);
     }
 }
