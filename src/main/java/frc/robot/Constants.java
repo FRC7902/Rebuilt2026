@@ -261,7 +261,8 @@ public final class Constants {
 
         public static final class FlywheelConstants {
             public static final int LEADER_MOTOR_CAN_ID = 20;
-            public static final int FOLLOWER_MOTOR_CAN_ID = 21;
+            public static final int FOLLOWER_MOTOR_1_CAN_ID = 24;
+            public static final int FOLLOWER_MOTOR_2_CAN_ID = 25; // TODO
 
             public static final DCMotor MOTOR = DCMotor.getKrakenX60Foc(2);
             public static final GearBox GEARBOX = GearBox.fromStages("18:24");
@@ -269,7 +270,8 @@ public final class Constants {
             public static final MotorMode IDLE_MODE = MotorMode.COAST;
 
             public static final boolean LEADER_MOTOR_INVERTED = false; // TODO
-            public static final boolean FOLLOWER_MOTOR_INVERTED = true;
+            public static final boolean FOLLOWER_MOTOR_1_INVERTED = true;
+            public static final boolean FOLLOWER_MOTOR_2_INVERTED = true;
 
             public static final Distance DIAMETER_INCHES = Inches.of(3);
             public static final MomentOfInertia MOI = KilogramSquareMeters.of(0.0006438072);

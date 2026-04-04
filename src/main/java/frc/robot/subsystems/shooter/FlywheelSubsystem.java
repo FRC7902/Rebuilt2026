@@ -47,7 +47,8 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 public class FlywheelSubsystem extends SubsystemBase {
 
     private final TalonFX m_leaderMotor;
-    private final TalonFX m_followerMotor;
+    private final TalonFX m_followerMotor1;
+    private final TalonFX m_followerMotor2;
 
     private final SmartMotorController m_smartMotorController;
 
@@ -59,7 +60,8 @@ public class FlywheelSubsystem extends SubsystemBase {
 
     public FlywheelSubsystem() {
         m_leaderMotor = new TalonFX(FlywheelConstants.LEADER_MOTOR_CAN_ID);
-        m_followerMotor = new TalonFX(FlywheelConstants.FOLLOWER_MOTOR_CAN_ID);
+        m_followerMotor1 = new TalonFX(FlywheelConstants.FOLLOWER_MOTOR_1_CAN_ID);
+        m_followerMotor2 = new TalonFX(FlywheelConstants.FOLLOWER_MOTOR_2_CAN_ID);
 
         SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
                 .withClosedLoopController(
@@ -85,7 +87,8 @@ public class FlywheelSubsystem extends SubsystemBase {
                 .withFeedforward(FlywheelConstants.FEEDFORWARD)
                 .withSimFeedforward(FlywheelConstants.SIM_FEEDFORWARD)
                 .withControlMode(ControlMode.CLOSED_LOOP)
-                .withFollowers(Pair.of(m_followerMotor, FlywheelConstants.FOLLOWER_MOTOR_INVERTED))
+                .withFollowers(Pair.of(m_followerMotor1, FlywheelConstants.FOLLOWER_MOTOR_1_INVERTED),
+                        Pair.of(m_followerMotor2, FlywheelConstants.FOLLOWER_MOTOR_2_INVERTED))
                 .withMomentOfInertia(FlywheelConstants.MOI)
                 .withVendorControlRequest(new VelocityTorqueCurrentFOC(0));
 
