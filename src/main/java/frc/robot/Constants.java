@@ -262,7 +262,7 @@ public final class Constants {
         public static final class FlywheelConstants {
             public static final int LEADER_MOTOR_CAN_ID = 20;
             public static final int FOLLOWER_MOTOR_1_CAN_ID = 24;
-            public static final int FOLLOWER_MOTOR_2_CAN_ID = 25; // TODO
+            public static final int FOLLOWER_MOTOR_2_CAN_ID = 25;
 
             public static final DCMotor MOTOR = DCMotor.getKrakenX60Foc(2);
             public static final GearBox GEARBOX = GearBox.fromStages("20:24");
