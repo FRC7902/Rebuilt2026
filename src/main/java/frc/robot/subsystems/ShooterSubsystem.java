@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.Supplier;
@@ -252,6 +253,10 @@ public class ShooterSubsystem extends SubsystemBase {
     public Angle getHoodSetpointAngle() {
         // TODO: Change `orElse()` statement default
         return m_hoodSubsystem.getAngleSetpoint().orElse(Degrees.of(0));
+    }
+
+    public Command reverseFlywheel() {
+        return m_flywheelSubsystem.setSpeed(RPM.of(-1000));
     }
 
     @Override
