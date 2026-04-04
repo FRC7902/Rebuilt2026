@@ -232,7 +232,7 @@ public final class Constants {
                         Map.entry(ShooterZone.ZONE_1, RPM.of(4000)),
                         Map.entry(ShooterZone.ZONE_2, RPM.of(4775)),
                         Map.entry(ShooterZone.ZONE_3, RPM.of(6700)),
-                        Map.entry(ShooterZone.ZONE_4, RPM.of(7650)));
+                        Map.entry(ShooterZone.ZONE_4, FlywheelConstants.SOFT_LIMIT_RPM));
 
         public static final Map<Distance, ShooterZone> MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE = Map
                 .ofEntries(
