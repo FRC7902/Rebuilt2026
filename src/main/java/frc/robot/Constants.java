@@ -119,7 +119,7 @@ public final class Constants {
         public static class IntakeRollerConstants {
             public static final int MOTOR_PWM_ID = 1; // TODO
 
-            public static final double SPEED = 1.0;
+            public static final double SPEED = 0.5;
         }
 
         public static class LinearIntakeConstants {
@@ -287,9 +287,9 @@ public final class Constants {
             public static final double SIM_PID_kI = 0.0; // TODO
             public static final double SIM_PID_kD = 0.0; // TODO
 
-            public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.19871,
-                    0.10262,
-                    0.010003);
+            public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.135,
+                    0.10055,
+                    0.01137);
             public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(0.24,
                     0.09, 0.007553); // TODO
 
@@ -555,8 +555,8 @@ public final class Constants {
 
     // Consider setting to LOW or MEDIUM for competition to reduce network traffic
     // Set the telemetry verbosity for YAMS subsystems
-    public static final SmartMotorControllerConfig.TelemetryVerbosity TELEMETRY_VERBOSITY = SmartMotorControllerConfig.TelemetryVerbosity.LOW;
+    public static final SmartMotorControllerConfig.TelemetryVerbosity TELEMETRY_VERBOSITY = SmartMotorControllerConfig.TelemetryVerbosity.HIGH;
 
     public static final SwerveDriveTelemetry.TelemetryVerbosity SWERVE_TELEMETRY_VERBOSITY = SwerveDriveTelemetry.TelemetryVerbosity.POSE;
-    public static final boolean TELEMETRY = false; // Set to false for competition to reduce network traffic
+    public static final boolean TELEMETRY = true; // Set to false for competition to reduce network traffic
 }
