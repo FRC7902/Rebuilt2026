@@ -317,13 +317,15 @@ public class RobotContainer {
                 .and(isControllingDriveTrigger)
                 .onTrue(m_shooterSubsystem.aimAndShoot(
                         () -> m_swerveSubsystem.getDistanceToTarget(true),
-                        m_swerveSubsystem::isAutoAimOnTarget, false, m_swerveSubsystem::isInAllianceZone)
+                        m_swerveSubsystem::isAutoAimOnTarget, false,
+                        m_swerveSubsystem::isInAllianceZone)
                         .beforeStarting(m_shooterSubsystem.stopFeeder()));
         m_driverController.R2()
                 .and(isControllingDriveTrigger.negate())
                 .onTrue(m_shooterSubsystem.aimAndShoot(
                         () -> m_swerveSubsystem.getDistanceToTarget(true),
-                        m_swerveSubsystem::isAutoAimOnTarget, true, m_swerveSubsystem::isInAllianceZone)
+                        m_swerveSubsystem::isAutoAimOnTarget, true,
+                        m_swerveSubsystem::isInAllianceZone)
                         .beforeStarting(m_shooterSubsystem.stopFeeder()));
         // Stop shooter subsystem
         m_driverController.R2()
@@ -342,8 +344,11 @@ public class RobotContainer {
                 .onFalse(m_intakeRollerSubsystem.stop()
                         .unless(m_driverController.L2()::getAsBoolean));
         m_driverController.R2()
-                .onTrue(m_linearIntakeSubsystem.shuffle()
-                        .unless(m_driverController.L2()::getAsBoolean))
+                .onTrue(
+                        Commands.sequence(
+                                Commands.waitSeconds(2),
+                                m_linearIntakeSubsystem.retract())
+                                .unless(m_driverController.L2()::getAsBoolean))
                 .onFalse(m_linearIntakeSubsystem.midpoint()
                         .unless(m_driverController.L2()::getAsBoolean));
 
@@ -401,8 +406,12 @@ public class RobotContainer {
                 .onFalse(m_indexerSubsystem.stop()
                         .unless(m_driverController.L2()::getAsBoolean));
         m_driverController.R1()
-                .onTrue(m_linearIntakeSubsystem.shuffle()
-                        .unless(m_driverController.L2()::getAsBoolean))
+                .onTrue(
+                        Commands.sequence(
+                                Commands.waitSeconds(2),
+                                m_linearIntakeSubsystem.retract())
+                                .beforeStarting(Commands.waitSeconds(3))
+                                .unless(m_driverController.L2()::getAsBoolean))
                 .onFalse(m_linearIntakeSubsystem.midpoint()
                         .unless(m_driverController.L2()::getAsBoolean));
 
