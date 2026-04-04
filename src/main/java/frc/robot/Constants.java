@@ -265,7 +265,7 @@ public final class Constants {
             public static final int FOLLOWER_MOTOR_2_CAN_ID = 25; // TODO
 
             public static final DCMotor MOTOR = DCMotor.getKrakenX60Foc(2);
-            public static final GearBox GEARBOX = GearBox.fromStages("18:24");
+            public static final GearBox GEARBOX = GearBox.fromStages("20:24");
 
             public static final MotorMode IDLE_MODE = MotorMode.COAST;
 
@@ -296,14 +296,14 @@ public final class Constants {
             public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25);
             public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25);
 
-            public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(8000);
-            public static final AngularVelocity SIM_MAX_VELOCITY_RPM = RPM.of(8000);
+            public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(6960);
+            public static final AngularVelocity SIM_MAX_VELOCITY_RPM = RPM.of(6960);
             public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond
                     .of(173);
 
-            public static final AngularVelocity SOFT_LIMIT_RPM = RPM.of(8000); // TODO
+            public static final AngularVelocity SOFT_LIMIT_RPM = RPM.of(6960);
 
-            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(4000);;
+            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(4000);
 
             public static final AngularVelocity RPM_TARGET_ERROR = RPM.of(100);
             public static final AngularVelocity RPM_TARGET_ERROR_WHILE_FEEDING = RPM.of(250);
