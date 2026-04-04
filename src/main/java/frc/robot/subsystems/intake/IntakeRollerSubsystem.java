@@ -44,10 +44,10 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     }
 
     public Command intake() {
-        return this.runOnce(() -> setSpeed(IntakeRollerConstants.SPEED));
+        return this.runOnce(() -> setSpeed(-IntakeRollerConstants.SPEED));
     }
 
     public Command outtake() {
-        return this.runOnce(() -> setSpeed(-IntakeRollerConstants.SPEED));
+        return this.runOnce(() -> setSpeed(IntakeRollerConstants.SPEED));
     }
 }

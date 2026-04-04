@@ -90,7 +90,8 @@ public class FlywheelSubsystem extends SubsystemBase {
                 .withFollowers(Pair.of(m_followerMotor1, FlywheelConstants.FOLLOWER_MOTOR_1_INVERTED),
                         Pair.of(m_followerMotor2, FlywheelConstants.FOLLOWER_MOTOR_2_INVERTED))
                 .withMomentOfInertia(FlywheelConstants.MOI)
-                .withVendorControlRequest(new VelocityTorqueCurrentFOC(0));
+                // .withVendorControlRequest(new VelocityTorqueCurrentFOC(0))
+                ;
 
         m_smartMotorController = new TalonFXWrapper(
                 m_leaderMotor,

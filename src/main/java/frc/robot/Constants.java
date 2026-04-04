@@ -119,7 +119,7 @@ public final class Constants {
         public static class IntakeRollerConstants {
             public static final int MOTOR_PWM_ID = 1; // TODO
 
-            public static final double SPEED = 0.5; // TODO
+            public static final double SPEED = 1.0;
         }
 
         public static class LinearIntakeConstants {
@@ -288,8 +288,8 @@ public final class Constants {
             public static final double SIM_PID_kD = 0.0; // TODO
 
             public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.19871,
-                    0.0,
-                    0.0);
+                    0.10262,
+                    0.010003);
             public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(0.24,
                     0.09, 0.007553); // TODO
 
