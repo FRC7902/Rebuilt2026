@@ -259,6 +259,8 @@ public class RobotContainer {
             m_swerveSubsystem::getCurrentZone);
 
     private void configureBindings() {
+
+        m_driverController.cross().whileTrue(m_shooterSubsystem.flywheelSysId());
         m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity);
 
         BooleanSupplier isIdle = () -> Math.abs(m_driverController.getLeftX()) < OperatorConstants.DEADBAND &&

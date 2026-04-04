@@ -265,7 +265,7 @@ public final class Constants {
             public static final int FOLLOWER_MOTOR_2_CAN_ID = 25; // TODO
 
             public static final DCMotor MOTOR = DCMotor.getKrakenX60Foc(2);
-            public static final GearBox GEARBOX = GearBox.fromStages("18:24");
+            public static final GearBox GEARBOX = GearBox.fromStages("20:24");
 
             public static final MotorMode IDLE_MODE = MotorMode.COAST;
 
@@ -287,23 +287,23 @@ public final class Constants {
             public static final double SIM_PID_kI = 0.0; // TODO
             public static final double SIM_PID_kD = 0.0; // TODO
 
-            public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.23709,
-                    0.090625,
-                    0.0090964);
+            public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.19871,
+                    0.0,
+                    0.0);
             public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(0.24,
                     0.09, 0.007553); // TODO
 
             public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25);
             public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25);
 
-            public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(8000);
-            public static final AngularVelocity SIM_MAX_VELOCITY_RPM = RPM.of(8000);
+            public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(6960);
+            public static final AngularVelocity SIM_MAX_VELOCITY_RPM = RPM.of(6960);
             public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond
                     .of(173);
 
-            public static final AngularVelocity SOFT_LIMIT_RPM = RPM.of(8000); // TODO
+            public static final AngularVelocity SOFT_LIMIT_RPM = RPM.of(6960);
 
-            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(4000);;
+            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(4000);
 
             public static final AngularVelocity RPM_TARGET_ERROR = RPM.of(100);
             public static final AngularVelocity RPM_TARGET_ERROR_WHILE_FEEDING = RPM.of(250);
