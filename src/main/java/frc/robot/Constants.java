@@ -194,22 +194,22 @@ public final class Constants {
                 .ofEntries(
                         // 3500 RPM
                         Map.entry(ShooterZone.ZONE_1, Map.ofEntries(
-                                Map.entry(Meter.of(1.6110), Degrees.of(15)),
-                                Map.entry(Meter.of(1.9917), Degrees.of(18)),
-                                Map.entry(Meter.of(2.3893), Degrees.of(23))
+                                Map.entry(Meter.of(1.6110), Degrees.of(14.4)),
+                                Map.entry(Meter.of(1.9917), Degrees.of(17.05)),
+                                Map.entry(Meter.of(2.3893), Degrees.of(21.97))
 
                         )),
                         // 4000 RPM
                         Map.entry(ShooterZone.ZONE_2, Map.ofEntries(
-                                Map.entry(Meter.of(3.65), Degrees.of(25)),
-                                Map.entry(Meter.of(3.8718), Degrees.of(29.5)),
-                                Map.entry(Meter.of(3.9895), Degrees.of(32.5)))),
+                                Map.entry(Meter.of(3.65), Degrees.of(24)),
+                                Map.entry(Meter.of(3.8718), Degrees.of(28.47)),
+                                Map.entry(Meter.of(3.9895), Degrees.of(31.46)))),
                         // 4250
                         Map.entry(ShooterZone.ZONE_3, Map.ofEntries(
-                                Map.entry(Meter.of(4.4034), Degrees.of(26)),
-                                Map.entry(Meter.of(4.4520), Degrees.of(28)),
-                                Map.entry(Meter.of(4.6569), Degrees.of(30)),
-                                Map.entry(Meter.of(4.7916), Degrees.of(32)))),
+                                Map.entry(Meter.of(4.4034), Degrees.of(24.96)),
+                                Map.entry(Meter.of(4.4520), Degrees.of(27.16)),
+                                Map.entry(Meter.of(4.6569), Degrees.of(29.53)),
+                                Map.entry(Meter.of(4.7916), Degrees.of(30.94)))),
 
                         // Make everything >11m at max angle
                         // TODO: Could probably change this to one entry (requires testing)
