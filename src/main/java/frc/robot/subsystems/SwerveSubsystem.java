@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
@@ -786,7 +787,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public void periodic() {
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
             SmartDashboard.putNumber("swerve/autoAimHeading", getAutoAimHeading().getDegrees());
-            SmartDashboard.putNumber("swerve/currentHeading", getHeading().getDegrees());
+            SmartDashboard.putNumber("swerve/currentHeading", getHeading().getDegrees() - 90);
             SmartDashboard.putBoolean("swerve/isAutoAimReady", isAutoAimOnTarget());
             SmartDashboard.putNumber("swerve/distToWaypoint (m)",
                     m_driveToWaypoint.minus(getPose()).getTranslation().getNorm());
