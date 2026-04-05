@@ -192,19 +192,19 @@ public final class Constants {
 
         public static final Map<ShooterZone, Map<Distance, Angle>> SHOOTER_DISTANCE_TO_HOOD_ANGLE = Map
                 .ofEntries(
-                        // 3500 RPM
+                        // 3600 RPM
                         Map.entry(ShooterZone.ZONE_1, Map.ofEntries(
                                 Map.entry(Meter.of(1.6110), Degrees.of(14.4)),
                                 Map.entry(Meter.of(1.9917), Degrees.of(17.05)),
                                 Map.entry(Meter.of(2.3893), Degrees.of(21.97))
 
                         )),
-                        // 4000 RPM
+                        // 4100 RPM
                         Map.entry(ShooterZone.ZONE_2, Map.ofEntries(
                                 Map.entry(Meter.of(3.65), Degrees.of(24)),
                                 Map.entry(Meter.of(3.8718), Degrees.of(28.47)),
                                 Map.entry(Meter.of(3.9895), Degrees.of(31.46)))),
-                        // 4250
+                        // 4365
                         Map.entry(ShooterZone.ZONE_3, Map.ofEntries(
                                 Map.entry(Meter.of(4.4034), Degrees.of(24.96)),
                                 Map.entry(Meter.of(4.4520), Degrees.of(27.16)),
@@ -222,9 +222,9 @@ public final class Constants {
 
         public static final Map<ShooterZone, AngularVelocity> SHOOTER_MIN_DISTANCE_TO_FLYWHEEL_RPM = Map
                 .ofEntries(
-                        Map.entry(ShooterZone.ZONE_1, RPM.of(3500)),
-                        Map.entry(ShooterZone.ZONE_2, RPM.of(4000)),
-                        Map.entry(ShooterZone.ZONE_3, RPM.of(4250)),
+                        Map.entry(ShooterZone.ZONE_1, RPM.of(3600)),
+                        Map.entry(ShooterZone.ZONE_2, RPM.of(4100)),
+                        Map.entry(ShooterZone.ZONE_3, RPM.of(4365)),
                         Map.entry(ShooterZone.ZONE_4, FlywheelConstants.SOFT_LIMIT_RPM));
 
         public static final Map<Distance, ShooterZone> MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE = Map
@@ -280,7 +280,7 @@ public final class Constants {
             public static final double SIM_PID_kI = 0.0; // TODO
             public static final double SIM_PID_kD = 0.0; // TODO
 
-            public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.135,
+            public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.0025,
                     0.10055,
                     0.01137);
             public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(0.24,
@@ -294,9 +294,10 @@ public final class Constants {
             public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond
                     .of(173);
 
-            public static final AngularVelocity SOFT_LIMIT_RPM = RPM.of(6960);
+            public static final AngularVelocity SOFT_LIMIT_RPM = RPM.of(6600); // Theoretical limit of 6960 RPM, true
+                                                                               // max of 6600 RPM
 
-            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(3500);
+            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(3600);
 
             public static final AngularVelocity RPM_TARGET_ERROR = RPM.of(100);
             public static final AngularVelocity RPM_TARGET_ERROR_WHILE_FEEDING = RPM.of(250);
