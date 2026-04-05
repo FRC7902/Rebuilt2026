@@ -115,7 +115,7 @@ public class ShooterSubsystem extends SubsystemBase {
                                                 m_feederSubsystem.reverse().withTimeout(0.25),
                                                 m_feederSubsystem.feed())))
         // : Commands.sequence(
-        // m_feederSubsystem.reverse().withTimeout(1),
+        // m_feederSubsystem.reverse().withTimeout(0.25),
         // new ConditionalCommand(
         // m_feederSubsystem.feed(),
         // m_feederSubsystem.stop(),
