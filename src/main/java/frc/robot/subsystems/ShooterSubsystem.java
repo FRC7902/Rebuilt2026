@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.Supplier;
@@ -105,22 +106,22 @@ public class ShooterSubsystem extends SubsystemBase {
                     return m_hoodSubsystem.getAngleToTarget(distance, zone);
                 }),
                 m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
-                stationaryShooting ? Commands.sequence(
+                // stationaryShooting ?
+                Commands.sequence(
                         Commands.waitSeconds(0.25),
                         m_feederSubsystem.stop(),
                         Commands.waitUntil(() -> isAutoAimReady.get() && isShooterReady(isFeeding.get()))
                                 .andThen(
                                         Commands.sequence(
-                                                m_feederSubsystem.reverse(),
-                                                Commands.waitSeconds(0.25),
+                                                m_feederSubsystem.reverse().withTimeout(0.25),
                                                 m_feederSubsystem.feed())))
-                        : Commands.sequence(
-                                m_feederSubsystem.reverse(),
-                                Commands.waitSeconds(0.25),
-                                new ConditionalCommand(
-                                        m_feederSubsystem.feed(),
-                                        m_feederSubsystem.stop(),
-                                        () -> isAutoAimReady.get() && isShooterReady(isFeeding.get())).repeatedly()))
+        // : Commands.sequence(
+        // m_feederSubsystem.reverse().withTimeout(0.25),
+        // new ConditionalCommand(
+        // m_feederSubsystem.feed(),
+        // m_feederSubsystem.stop(),
+        // () -> isAutoAimReady.get() && isShooterReady(isFeeding.get())).repeatedly())
+        )
                 .withName("SHTR - Aim and Shoot Stationary");
     }
 
@@ -252,6 +253,10 @@ public class ShooterSubsystem extends SubsystemBase {
     public Angle getHoodSetpointAngle() {
         // TODO: Change `orElse()` statement default
         return m_hoodSubsystem.getAngleSetpoint().orElse(Degrees.of(0));
+    }
+
+    public Command reverseFlywheel() {
+        return m_flywheelSubsystem.setSpeed(RPM.of(-1000));
     }
 
     @Override

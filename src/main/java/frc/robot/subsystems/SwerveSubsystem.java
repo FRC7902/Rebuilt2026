@@ -793,6 +793,7 @@ public class SwerveSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("swerve/rotToWaypoint (deg)",
                     m_driveToWaypoint.getRotation().minus(getPose().getRotation()).getDegrees());
             SmartDashboard.putBoolean("swerve/isAtWaypoint", isAtWaypoint());
+            SmartDashboard.putNumber("swerve/distToTarget", getDistanceToTarget().in(Meters));
         }
     }
 

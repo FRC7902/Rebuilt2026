@@ -119,7 +119,7 @@ public final class Constants {
         public static class IntakeRollerConstants {
             public static final int MOTOR_PWM_ID = 1; // TODO
 
-            public static final double SPEED = 1.0;
+            public static final double SPEED = 0.5;
         }
 
         public static class LinearIntakeConstants {
@@ -232,7 +232,7 @@ public final class Constants {
                         Map.entry(ShooterZone.ZONE_1, RPM.of(4000)),
                         Map.entry(ShooterZone.ZONE_2, RPM.of(4775)),
                         Map.entry(ShooterZone.ZONE_3, RPM.of(6700)),
-                        Map.entry(ShooterZone.ZONE_4, RPM.of(7650)));
+                        Map.entry(ShooterZone.ZONE_4, FlywheelConstants.SOFT_LIMIT_RPM));
 
         public static final Map<Distance, ShooterZone> MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE = Map
                 .ofEntries(
@@ -262,7 +262,7 @@ public final class Constants {
         public static final class FlywheelConstants {
             public static final int LEADER_MOTOR_CAN_ID = 20;
             public static final int FOLLOWER_MOTOR_1_CAN_ID = 24;
-            public static final int FOLLOWER_MOTOR_2_CAN_ID = 25; // TODO
+            public static final int FOLLOWER_MOTOR_2_CAN_ID = 25;
 
             public static final DCMotor MOTOR = DCMotor.getKrakenX60Foc(2);
             public static final GearBox GEARBOX = GearBox.fromStages("20:24");
@@ -287,9 +287,9 @@ public final class Constants {
             public static final double SIM_PID_kI = 0.0; // TODO
             public static final double SIM_PID_kD = 0.0; // TODO
 
-            public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.19871,
-                    0.10262,
-                    0.010003);
+            public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.135,
+                    0.10055,
+                    0.01137);
             public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(0.24,
                     0.09, 0.007553); // TODO
 
