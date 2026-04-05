@@ -20,6 +20,7 @@ import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.filter.Debouncer;
@@ -92,6 +93,10 @@ public class FlywheelSubsystem extends SubsystemBase {
                 .withMomentOfInertia(FlywheelConstants.MOI)
         // .withVendorControlRequest(new VelocityTorqueCurrentFOC(0))
         ;
+
+        // Apply coast mode to follower motors
+        m_followerMotor1.setNeutralMode(NeutralModeValue.Coast);
+        m_followerMotor2.setNeutralMode(NeutralModeValue.Coast);
 
         m_smartMotorController = new TalonFXWrapper(
                 m_leaderMotor,
