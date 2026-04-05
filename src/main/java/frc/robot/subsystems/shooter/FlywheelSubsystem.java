@@ -212,6 +212,9 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
     private boolean calculateDebounce(AngularVelocity setpoint, AngularVelocity targetError) {
+        // TODO: Change debouncer to be `kFalling` and remove the negations once the
+        // debouncer is fixed to debounce when the condition becomes true instead of
+        // false
         return !m_atRPMDebouncer.calculate(
                 !setpoint.times(FlywheelConstants.GEARBOX.getOutputToInputConversionFactor()).isNear(
                         getAngularVelocity(),
