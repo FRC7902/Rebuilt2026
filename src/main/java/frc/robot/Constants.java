@@ -296,7 +296,7 @@ public final class Constants {
 
             public static final AngularVelocity SOFT_LIMIT_RPM = RPM.of(6960);
 
-            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(4000);
+            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(3500);
 
             public static final AngularVelocity RPM_TARGET_ERROR = RPM.of(100);
             public static final AngularVelocity RPM_TARGET_ERROR_WHILE_FEEDING = RPM.of(250);
@@ -319,18 +319,18 @@ public final class Constants {
             public static final Current STATOR_CURRENT_LIMIT = Amps.of(40);
             public static final Current SUPPLY_CURRENT_LIMIT = Amps.of(40);
 
-            public static final double PID_kP = 35.673;
+            public static final double PID_kP = 200;
             public static final double PID_kI = 0.0;
-            public static final double PID_kD = 5.251;
+            public static final double PID_kD = 11.443;
 
             public static final double SIM_PID_kP = 16; // TODO
             public static final double SIM_PID_kI = 7; // TODO
             public static final double SIM_PID_kD = 1; // TODO
 
             public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(
-                    0.25399,
-                    11.909,
-                    0.44218);
+                    0.78,
+                    8.146,
+                    0.669);
             public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(
                     0,
                     0,
