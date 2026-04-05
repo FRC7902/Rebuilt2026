@@ -192,31 +192,24 @@ public final class Constants {
 
         public static final Map<ShooterZone, Map<Distance, Angle>> SHOOTER_DISTANCE_TO_HOOD_ANGLE = Map
                 .ofEntries(
-                        // 4000 RPM
+                        // 3500 RPM
                         Map.entry(ShooterZone.ZONE_1, Map.ofEntries(
-                                Map.entry(Meter.of(1.6698), Degrees.of(14.0 - 5.5)),
-                                Map.entry(Meter.of(1.9717), Degrees.of(17.5 - 5.5)),
-                                Map.entry(Meter.of(2.19499), Degrees.of(20.0 - 5.5)),
-                                Map.entry(Meter.of(2.4258), Degrees.of(22.5 - 5.5)),
-                                Map.entry(Meter.of(2.62955), Degrees.of(24.0 - 5.5)),
-                                Map.entry(Meter.of(2.802), Degrees.of(27.5 - 5.5)),
-                                Map.entry(Meter.of(2.9945), Degrees.of(30.0 - 5.5)),
-                                Map.entry(Meter.of(3.531), Degrees.of(36.0 - 5.5)),
-                                Map.entry(Meter.of(3.2396), Degrees.of(33.0 - 5.5))
+                                Map.entry(Meter.of(1.6110), Degrees.of(15)),
+                                Map.entry(Meter.of(1.9917), Degrees.of(18)),
+                                Map.entry(Meter.of(2.3893), Degrees.of(23))
 
                         )),
-                        // 4775 RPM
+                        // 4000 RPM
                         Map.entry(ShooterZone.ZONE_2, Map.ofEntries(
-                                Map.entry(Meter.of(3.6212), Degrees.of(24.5 - 5.5)),
-                                Map.entry(Meter.of(4.0396), Degrees.of(27.2 - 5.5)),
-                                Map.entry(Meter.of(4.3405), Degrees.of(30.0 - 5.5)),
-                                Map.entry(Meter.of(4.660), Degrees.of(34.0 - 5.5)))),
-
+                                Map.entry(Meter.of(3.65), Degrees.of(25)),
+                                Map.entry(Meter.of(3.8718), Degrees.of(29.5)),
+                                Map.entry(Meter.of(3.9895), Degrees.of(32.5)))),
+                        // 4250
                         Map.entry(ShooterZone.ZONE_3, Map.ofEntries(
-                                Map.entry(Meter.of(7.5783), Degrees.of(25)),
-                                Map.entry(Meter.of(8.658), Degrees.of(35)),
-                                Map.entry(Meter.of(9.9129), Degrees.of(42)),
-                                Map.entry(Meter.of(10.1536), Degrees.of(42)))),
+                                Map.entry(Meter.of(4.4034), Degrees.of(26)),
+                                Map.entry(Meter.of(4.4520), Degrees.of(28)),
+                                Map.entry(Meter.of(4.6569), Degrees.of(30)),
+                                Map.entry(Meter.of(4.7916), Degrees.of(32)))),
 
                         // Make everything >11m at max angle
                         // TODO: Could probably change this to one entry (requires testing)
@@ -229,17 +222,17 @@ public final class Constants {
 
         public static final Map<ShooterZone, AngularVelocity> SHOOTER_MIN_DISTANCE_TO_FLYWHEEL_RPM = Map
                 .ofEntries(
-                        Map.entry(ShooterZone.ZONE_1, RPM.of(4000)),
-                        Map.entry(ShooterZone.ZONE_2, RPM.of(4775)),
-                        Map.entry(ShooterZone.ZONE_3, RPM.of(6700)),
+                        Map.entry(ShooterZone.ZONE_1, RPM.of(3500)),
+                        Map.entry(ShooterZone.ZONE_2, RPM.of(4000)),
+                        Map.entry(ShooterZone.ZONE_3, RPM.of(4250)),
                         Map.entry(ShooterZone.ZONE_4, FlywheelConstants.SOFT_LIMIT_RPM));
 
         public static final Map<Distance, ShooterZone> MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE = Map
                 .ofEntries(
                         Map.entry(Meters.of(0), ShooterZone.ZONE_1),
-                        Map.entry(Meters.of(3.6212), ShooterZone.ZONE_2),
-                        Map.entry(Meters.of(8.2705), ShooterZone.ZONE_3),
-                        Map.entry(Meters.of(12.40575), ShooterZone.ZONE_4));
+                        Map.entry(Meters.of(3), ShooterZone.ZONE_2),
+                        Map.entry(Meters.of(4.2), ShooterZone.ZONE_3),
+                        Map.entry(Meters.of(8.2705), ShooterZone.ZONE_4));
 
         public static final Map<ShooterZone, InterpolatingDoubleTreeMap> SHOOTER_DISTANCE_TO_HOOD_ANGLE_INTERPOLATION = Map
                 .ofEntries(
