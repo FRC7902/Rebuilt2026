@@ -211,12 +211,15 @@ public class FlywheelSubsystem extends SubsystemBase {
         return Optional.of(setpoint.get().times(FlywheelConstants.GEARBOX.getInputToOutputConversionFactor()));
     }
 
-    private boolean calculateDebounce(Optional<AngularVelocity> setpoint, AngularVelocity targetError) {
+    private boolean calculateDebounce(AngularVelocity setpoint, AngularVelocity targetError) {
+        // TODO: Change debouncer to be `kFalling` and remove the negations once the
+        // debouncer is fixed to debounce when the condition becomes true instead of
+        // false
         return !m_atRPMDebouncer.calculate(
-                !setpoint.get().times(FlywheelConstants.GEARBOX.getOutputToInputConversionFactor()).isNear(
+                !setpoint.times(FlywheelConstants.GEARBOX.getOutputToInputConversionFactor()).isNear(
                         getAngularVelocity(),
                         targetError));
-    } 
+    }
 
     public boolean isAtTargetRPM() {
         Optional<AngularVelocity> setpoint = getSetpointVelocity();
@@ -224,7 +227,7 @@ public class FlywheelSubsystem extends SubsystemBase {
         if (!setpoint.isPresent())
             return false;
 
-        return calculateDebounce(setpoint, FlywheelConstants.RPM_TARGET_ERROR);
+        return calculateDebounce(setpoint.get(), FlywheelConstants.RPM_TARGET_ERROR);
     }
 
     public boolean isAtTargetRPM(boolean isFeeding) {
@@ -234,10 +237,10 @@ public class FlywheelSubsystem extends SubsystemBase {
             return false;
 
         if (isFeeding) {
-            return calculateDebounce(setpoint, FlywheelConstants.RPM_TARGET_ERROR_WHILE_FEEDING);
+            return calculateDebounce(setpoint.get(), FlywheelConstants.RPM_TARGET_ERROR_WHILE_FEEDING);
         }
 
-        return calculateDebounce(setpoint, FlywheelConstants.RPM_TARGET_ERROR);
+        return calculateDebounce(setpoint.get(), FlywheelConstants.RPM_TARGET_ERROR);
     }
 
     public Command stop() {
