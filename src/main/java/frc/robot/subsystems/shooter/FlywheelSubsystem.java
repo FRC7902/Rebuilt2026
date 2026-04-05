@@ -217,8 +217,8 @@ public class FlywheelSubsystem extends SubsystemBase {
         if (!setpoint.isPresent())
             return false;
 
-        return m_atRPMDebouncer.calculate(
-                setpoint.get().times(FlywheelConstants.GEARBOX.getOutputToInputConversionFactor()).isNear(
+        return !m_atRPMDebouncer.calculate(
+                !setpoint.get().times(FlywheelConstants.GEARBOX.getOutputToInputConversionFactor()).isNear(
                         getAngularVelocity(),
                         FlywheelConstants.RPM_TARGET_ERROR));
     }
