@@ -161,8 +161,19 @@ public class FeederSubsystem extends SubsystemBase {
         return Optional.of(setpoint.get().times(FeederConstants.GEARBOX.getInputToOutputConversionFactor()));
     }
 
+    /**
+     * Set the dutycycle of the feeder.
+     *
+     * @param dutyCycle DutyCycle to set.
+     * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
+     */
+    public Command set(double dutyCycle) {
+        return m_feeder.set(dutyCycle);
+    }
+
     public Command feed() {
-        return setSpeed(FeederConstants.FEEDER_SPEED);
+        // return setSpeed(FeederConstants.FEEDER_SPEED);
+        return set(1.0); // Feed at full power
     }
 
     public Command reverse() {
