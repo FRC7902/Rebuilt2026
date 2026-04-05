@@ -271,7 +271,7 @@ public class RobotContainer {
         Trigger isIdleTrigger = new Trigger(isIdle);
 
         m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyroWithAlliance)));
-        m_driverController.create().onTrue(m_swerveSubsystem.centerModulesCommand());
+        m_driverController.create().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
         m_driverController.create().onTrue(m_shooterSubsystem.reverseFlywheel());
         m_driverController.create().onFalse(m_shooterSubsystem.stopShooting());
