@@ -256,7 +256,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public Command reverseFlywheel() {
-        return m_flywheelSubsystem.setSpeed(RPM.of(-1000));
+        return m_flywheelSubsystem.set(-1);
     }
 
     @Override

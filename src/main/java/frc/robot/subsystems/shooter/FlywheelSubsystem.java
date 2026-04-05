@@ -90,8 +90,8 @@ public class FlywheelSubsystem extends SubsystemBase {
                 .withFollowers(Pair.of(m_followerMotor1, FlywheelConstants.FOLLOWER_MOTOR_1_INVERTED),
                         Pair.of(m_followerMotor2, FlywheelConstants.FOLLOWER_MOTOR_2_INVERTED))
                 .withMomentOfInertia(FlywheelConstants.MOI)
-                // .withVendorControlRequest(new VelocityTorqueCurrentFOC(0))
-                ;
+        // .withVendorControlRequest(new VelocityTorqueCurrentFOC(0))
+        ;
 
         m_smartMotorController = new TalonFXWrapper(
                 m_leaderMotor,
@@ -174,6 +174,16 @@ public class FlywheelSubsystem extends SubsystemBase {
     public Command setSpeed(LinearVelocity speed) {
         return m_flywheel.setSpeed(RotationsPerSecond
                 .of(speed.in(MetersPerSecond) / FlywheelConstants.DIAMETER_INCHES.times(Math.PI).in(Meters)));
+    }
+
+    /**
+     * Set the dutycycle of the shooter.
+     *
+     * @param dutyCycle DutyCycle to set.
+     * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
+     */
+    public Command set(double dutyCycle) {
+        return m_flywheel.set(dutyCycle);
     }
 
     /**
