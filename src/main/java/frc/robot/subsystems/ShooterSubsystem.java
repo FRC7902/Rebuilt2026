@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.Supplier;
@@ -266,6 +265,8 @@ public class ShooterSubsystem extends SubsystemBase {
             SmartDashboard.putBoolean("isFlywheelReady", m_flywheelSubsystem.isAtTargetRPM());
             SmartDashboard.putBoolean("isHoodReady (feeding)", m_hoodSubsystem.isAtTargetAngle(true));
             SmartDashboard.putBoolean("isFlywheelReady (feeding)", m_flywheelSubsystem.isAtTargetRPM(true));
+            SmartDashboard.putBoolean("isShooterReady", isShooterReady());
+            SmartDashboard.putBoolean("isShooterReady (feeding)", isShooterReady(true));
         }
     }
 

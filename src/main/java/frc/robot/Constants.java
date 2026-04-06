@@ -192,31 +192,24 @@ public final class Constants {
 
         public static final Map<ShooterZone, Map<Distance, Angle>> SHOOTER_DISTANCE_TO_HOOD_ANGLE = Map
                 .ofEntries(
-                        // 4000 RPM
+                        // 3600 RPM
                         Map.entry(ShooterZone.ZONE_1, Map.ofEntries(
-                                Map.entry(Meter.of(1.6698), Degrees.of(14.0 - 5.5)),
-                                Map.entry(Meter.of(1.9717), Degrees.of(17.5 - 5.5)),
-                                Map.entry(Meter.of(2.19499), Degrees.of(20.0 - 5.5)),
-                                Map.entry(Meter.of(2.4258), Degrees.of(22.5 - 5.5)),
-                                Map.entry(Meter.of(2.62955), Degrees.of(24.0 - 5.5)),
-                                Map.entry(Meter.of(2.802), Degrees.of(27.5 - 5.5)),
-                                Map.entry(Meter.of(2.9945), Degrees.of(30.0 - 5.5)),
-                                Map.entry(Meter.of(3.531), Degrees.of(36.0 - 5.5)),
-                                Map.entry(Meter.of(3.2396), Degrees.of(33.0 - 5.5))
+                                Map.entry(Meter.of(1.6110), Degrees.of(14.4)),
+                                Map.entry(Meter.of(1.9917), Degrees.of(17.05)),
+                                Map.entry(Meter.of(2.3893), Degrees.of(21.97))
 
                         )),
-                        // 4775 RPM
+                        // 4100 RPM
                         Map.entry(ShooterZone.ZONE_2, Map.ofEntries(
-                                Map.entry(Meter.of(3.6212), Degrees.of(24.5 - 5.5)),
-                                Map.entry(Meter.of(4.0396), Degrees.of(27.2 - 5.5)),
-                                Map.entry(Meter.of(4.3405), Degrees.of(30.0 - 5.5)),
-                                Map.entry(Meter.of(4.660), Degrees.of(34.0 - 5.5)))),
-
+                                Map.entry(Meter.of(3.65), Degrees.of(24)),
+                                Map.entry(Meter.of(3.8718), Degrees.of(28.47)),
+                                Map.entry(Meter.of(3.9895), Degrees.of(31.46)))),
+                        // 4365
                         Map.entry(ShooterZone.ZONE_3, Map.ofEntries(
-                                Map.entry(Meter.of(7.5783), Degrees.of(25)),
-                                Map.entry(Meter.of(8.658), Degrees.of(35)),
-                                Map.entry(Meter.of(9.9129), Degrees.of(42)),
-                                Map.entry(Meter.of(10.1536), Degrees.of(42)))),
+                                Map.entry(Meter.of(4.4034), Degrees.of(24.96)),
+                                Map.entry(Meter.of(4.4520), Degrees.of(27.16)),
+                                Map.entry(Meter.of(4.6569), Degrees.of(29.53)),
+                                Map.entry(Meter.of(4.7916), Degrees.of(30.94)))),
 
                         // Make everything >11m at max angle
                         // TODO: Could probably change this to one entry (requires testing)
@@ -229,17 +222,17 @@ public final class Constants {
 
         public static final Map<ShooterZone, AngularVelocity> SHOOTER_MIN_DISTANCE_TO_FLYWHEEL_RPM = Map
                 .ofEntries(
-                        Map.entry(ShooterZone.ZONE_1, RPM.of(4000)),
-                        Map.entry(ShooterZone.ZONE_2, RPM.of(4775)),
-                        Map.entry(ShooterZone.ZONE_3, RPM.of(6700)),
+                        Map.entry(ShooterZone.ZONE_1, RPM.of(3600)),
+                        Map.entry(ShooterZone.ZONE_2, RPM.of(4100)),
+                        Map.entry(ShooterZone.ZONE_3, RPM.of(4365)),
                         Map.entry(ShooterZone.ZONE_4, FlywheelConstants.SOFT_LIMIT_RPM));
 
         public static final Map<Distance, ShooterZone> MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE = Map
                 .ofEntries(
                         Map.entry(Meters.of(0), ShooterZone.ZONE_1),
-                        Map.entry(Meters.of(3.6212), ShooterZone.ZONE_2),
-                        Map.entry(Meters.of(8.2705), ShooterZone.ZONE_3),
-                        Map.entry(Meters.of(12.40575), ShooterZone.ZONE_4));
+                        Map.entry(Meters.of(3), ShooterZone.ZONE_2),
+                        Map.entry(Meters.of(4.2), ShooterZone.ZONE_3),
+                        Map.entry(Meters.of(8.2705), ShooterZone.ZONE_4));
 
         public static final Map<ShooterZone, InterpolatingDoubleTreeMap> SHOOTER_DISTANCE_TO_HOOD_ANGLE_INTERPOLATION = Map
                 .ofEntries(
@@ -287,7 +280,7 @@ public final class Constants {
             public static final double SIM_PID_kI = 0.0; // TODO
             public static final double SIM_PID_kD = 0.0; // TODO
 
-            public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.135,
+            public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.0025,
                     0.10055,
                     0.01137);
             public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(0.24,
@@ -301,9 +294,10 @@ public final class Constants {
             public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond
                     .of(173);
 
-            public static final AngularVelocity SOFT_LIMIT_RPM = RPM.of(6960);
+            public static final AngularVelocity SOFT_LIMIT_RPM = RPM.of(6600); // Theoretical limit of 6960 RPM, true
+                                                                               // max of 6600 RPM
 
-            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(4000);
+            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(3600);
 
             public static final AngularVelocity RPM_TARGET_ERROR = RPM.of(100);
             public static final AngularVelocity RPM_TARGET_ERROR_WHILE_FEEDING = RPM.of(250);
@@ -326,18 +320,18 @@ public final class Constants {
             public static final Current STATOR_CURRENT_LIMIT = Amps.of(40);
             public static final Current SUPPLY_CURRENT_LIMIT = Amps.of(40);
 
-            public static final double PID_kP = 35.673;
+            public static final double PID_kP = 200;
             public static final double PID_kI = 0.0;
-            public static final double PID_kD = 5.251;
+            public static final double PID_kD = 11.443;
 
             public static final double SIM_PID_kP = 16; // TODO
             public static final double SIM_PID_kI = 7; // TODO
             public static final double SIM_PID_kD = 1; // TODO
 
             public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(
-                    0.25399,
-                    11.909,
-                    0.44218);
+                    0.78,
+                    8.146,
+                    0.669);
             public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(
                     0,
                     0,

@@ -271,7 +271,7 @@ public class RobotContainer {
         Trigger isIdleTrigger = new Trigger(isIdle);
 
         m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyroWithAlliance)));
-        m_driverController.create().onTrue(m_swerveSubsystem.centerModulesCommand());
+        m_driverController.create().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
         m_driverController.create().onTrue(m_shooterSubsystem.reverseFlywheel());
         m_driverController.create().onFalse(m_shooterSubsystem.stopShooting());
@@ -323,14 +323,14 @@ public class RobotContainer {
                 .onTrue(m_shooterSubsystem.aimAndShoot(
                         () -> m_swerveSubsystem.getDistanceToTarget(true),
                         m_swerveSubsystem::isAutoAimOnTarget, false,
-                        m_swerveSubsystem::isInAllianceZone)
+                        () -> !m_swerveSubsystem.isInAllianceZone())
                         .beforeStarting(m_shooterSubsystem.stopFeeder()));
         m_driverController.R2()
                 .and(isControllingDriveTrigger.negate())
                 .onTrue(m_shooterSubsystem.aimAndShoot(
                         () -> m_swerveSubsystem.getDistanceToTarget(true),
                         m_swerveSubsystem::isAutoAimOnTarget, true,
-                        m_swerveSubsystem::isInAllianceZone)
+                        () -> !m_swerveSubsystem.isInAllianceZone())
                         .beforeStarting(m_shooterSubsystem.stopFeeder()));
         // Stop shooter subsystem
         m_driverController.R2()
