@@ -291,4 +291,46 @@ public class Choreo {
                 m_swerveSubsystem.stop(),
                 m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
     }
+		public Command bumpSweepRight() {
+			return Commands.sequence(
+					m_autoFactory.resetOdometry("RightBumpSweep"),
+					m_autoFactory.trajectoryCmd("RightBumpSweep"),
+					m_autoFactory.trajectoryCmd("RightBumpSweepReturn"),
+					m_swerveSubsystem.stop(),
+					// TODO: Tune timing of these waits and commands
+					Commands.waitSeconds(4.5).deadlineFor(
+							m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
+							m_shooterSubsystem.aimAndShootIgnoreCheck(
+									() -> m_swerveSubsystem.getDistanceToTarget(true))),
+					m_swerveSubsystem.stop(),
+					m_autoFactory.trajectoryCmd("RightBumpClimb").deadlineFor(
+							m_intakeRollerSubsystem.stop(),
+							m_indexerSubsystem.stop(),
+							m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
+							m_linearIntakeSubsystem.retract()),
+					m_swerveSubsystem.stop(),
+					m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT)
+			);
+		}
+	public Command bumpSweepLeft(){
+		return Commands.sequence(
+				m_autoFactory.resetOdometry("LeftBumpSweep"),
+				m_autoFactory.trajectoryCmd("LeftBumpSweep"),
+				m_autoFactory.trajectoryCmd("LeftBumpSweepReturn"),
+				m_swerveSubsystem.stop(),
+				// TODO: Tune timing of these waits and commands
+				Commands.waitSeconds(4.5).deadlineFor(
+						m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
+						m_shooterSubsystem.aimAndShootIgnoreCheck(
+								() -> m_swerveSubsystem.getDistanceToTarget(true))),
+				m_swerveSubsystem.stop(),
+				m_autoFactory.trajectoryCmd("LeftBumpClimb").deadlineFor(
+						m_intakeRollerSubsystem.stop(),
+						m_indexerSubsystem.stop(),
+						m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
+						m_linearIntakeSubsystem.retract()),
+				m_swerveSubsystem.stop(),
+				m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT)
+		);
+	}
 }

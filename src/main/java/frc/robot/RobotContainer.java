@@ -168,6 +168,9 @@ public class RobotContainer {
         }
 
         autoChooser = new AutoChooser();
+				
+				autoChooser.addCmd("Right - Bump sweep and climb", m_choreo::bumpSweepRight);
+				autoChooser.addCmd("Left - Bump sweep and climb", m_choreo::bumpSweepLeft);
 
         autoChooser.addCmd("Anywhere - Shoot pre-load", m_choreo::shootPreloadAuto);
         autoChooser.addCmd("Right - Sweep once", m_choreo::rightNeutralAutoSweepOnce);
