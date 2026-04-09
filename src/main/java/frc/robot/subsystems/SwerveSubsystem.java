@@ -6,15 +6,19 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -23,7 +27,10 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -37,7 +44,9 @@ import frc.robot.AutoConstants;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.FieldConstants;
-import limelight.networktables.PoseEstimate;
+import limelight.Limelight;
+import limelight.networktables.*;
+import limelight.networktables.LimelightPoseEstimator.EstimationMode;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -52,8 +61,10 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     private final SwerveDrive swerveDrive;
 
-    private PoseEstimate poseEstimateMt2;
-    private PoseEstimate poseEstimateMt1;
+    private Limelight m_frontLimelight;
+    private LimelightPoseEstimator m_frontLimelightPoseEstimator;
+    private Limelight m_leftLimelight;
+    private LimelightPoseEstimator m_leftLimelightPoseEstimator;
 
     private Rotation2d autoAimTargetRotation = new Rotation2d();
 
@@ -74,8 +85,8 @@ public class SwerveSubsystem extends SubsystemBase {
                 Meter.of(4)),
                 Rotation2d.fromDegrees(0))
                 : new Pose2d(new Translation2d(Meter.of(16),
-                        Meter.of(4)),
-                        Rotation2d.fromDegrees(180));
+                Meter.of(4)),
+                Rotation2d.fromDegrees(180));
         // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
         // objects being created.
         SwerveDriveTelemetry.verbosity = Constants.SWERVE_TELEMETRY_VERBOSITY;
@@ -89,16 +100,16 @@ public class SwerveSubsystem extends SubsystemBase {
             throw new RuntimeException(e);
         }
         swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot
-                                                 // via angle.
+        // via angle.
         swerveDrive.setCosineCompensator(false);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation
-                                                // for simulations since it causes discrepancies not seen in real life.
+        // for simulations since it causes discrepancies not seen in real life.
         swerveDrive.setAngularVelocityCompensation(true,
                 true,
                 0.1); // Correct for skew that gets worse as angular velocity increases. Start with a
-                      // coefficient of 0.1.
+        // coefficient of 0.1.
         swerveDrive.setModuleEncoderAutoSynchronize(false,
                 1); // Enable if you want to resynchronize your absolute encoders and motor encoders
-                    // periodically when they are not moving.
+        // periodically when they are not moving.
         // swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used
         // over the internal encoder and push the offsets onto it. Throws warning if not
         // possible
@@ -106,6 +117,43 @@ public class SwerveSubsystem extends SubsystemBase {
         m_driveToWaypoint = getPose();
 
         m_choreoControllerHeading.enableContinuousInput(-Math.PI, Math.PI);
+
+        setupLimelight();
+    }
+
+    public void setupLimelight() {
+        swerveDrive.stopOdometryThread();
+        m_frontLimelight = new Limelight("limelight-b");
+        m_frontLimelight
+                .getSettings()
+                .withPipelineIndex(0)
+                .withImuMode(LimelightSettings.ImuMode.ExternalImu)
+                // TODO: Add camera offset here
+                // .withCameraOffset(
+                // new Pose3d(
+                // Units.inchesToMeters(-12),
+                // Units.inchesToMeters(-12),
+                // Units.inchesToMeters(10),
+                // new Rotation3d(0, Units.degreesToRadians(45), Units.degreesToRadians(180))))
+                // /// Roll, Pitch, Yaw
+                // .withAprilTagIdFilter(List.of(17, 18, 19, 20, 21, 22, 6, 7, 8, 9, 10, 11))
+                .save();
+        m_frontLimelightPoseEstimator = m_frontLimelight.createPoseEstimator(EstimationMode.MEGATAG2); // TODO: Try MT1
+
+        m_leftLimelight = new Limelight("limelight-a");
+        m_leftLimelight
+                .getSettings()
+                .withPipelineIndex(0)
+                .withImuMode(LimelightSettings.ImuMode.ExternalImu)
+                // .withCameraOffset(
+                // new Pose3d( // TODO: Give the right offset here
+                // Units.inchesToMeters(0),
+                // Units.inchesToMeters(0),
+                // Units.inchesToMeters(20.5),
+                // new Rotation3d(0, Units.degreesToRadians(45), 0))) /// Roll, Pitch, Yaw
+                // .withAprilTagIdFilter(List.of(17, 18, 19, 20, 21, 22, 6, 7, 8, 9, 10, 11))
+                .save();
+        m_leftLimelightPoseEstimator = m_leftLimelight.createPoseEstimator(EstimationMode.MEGATAG2); // TODO: Try MT1
     }
 
     /**
@@ -149,7 +197,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * ends.
      *
      * @return a Command that tells the robot to drive forward until the command
-     *         ends
+     * ends
      */
     public Command driveForward() {
         return run(() -> {
@@ -160,9 +208,9 @@ public class SwerveSubsystem extends SubsystemBase {
     /**
      * Returns a Command that tells the robot to drive backward until the command
      * ends.
-     * 
+     *
      * @return a Command that tells the robot to drive backward until the command
-     *         ends
+     * ends
      */
     public Command driveBackward() {
         return run(() -> {
@@ -172,7 +220,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     /**
      * Returns a Command that tells the robot to drive left until the command ends.
-     * 
+     *
      * @return a Command that tells the robot to drive left until the command ends
      */
     public Command driveLeft() {
@@ -183,7 +231,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     /**
      * Returns a Command that tells the robot to drive right until the command ends.
-     * 
+     *
      * @return a Command that tells the robot to drive right until the command ends
      */
     public Command driveRight() {
@@ -221,12 +269,12 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return Drive command.
      */
     public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY,
-            DoubleSupplier angularRotationX) {
+                                DoubleSupplier angularRotationX) {
         return run(() -> {
             // Make the robot move
             swerveDrive.drive(SwerveMath.scaleTranslation(new Translation2d(
-                    translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
-                    translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()), 0.8),
+                            translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
+                            translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()), 0.8),
                     Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(),
                     true,
                     false);
@@ -246,7 +294,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return Drive command.
      */
     public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier headingX,
-            DoubleSupplier headingY) {
+                                DoubleSupplier headingY) {
         // swerveDrive.setHeadingCorrection(true); // Normally you would want heading
         // correction for this kind of control.
         return run(() -> {
@@ -395,7 +443,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * Checks if the alliance is red, defaults to false if alliance isn't available.
      *
      * @return true if the red alliance, false if blue. Defaults to false if none is
-     *         available.
+     * available.
      */
     public boolean isRedAlliance() {
         var alliance = DriverStation.getAlliance();
@@ -547,7 +595,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * Follows the given swerve sample by calculating the necessary chassis speeds
      * and
      * commanding them to the drive.
-     * 
+     *
      * @param sample The swerve sample containing the desired velocities and
      *               heading.
      */
@@ -579,7 +627,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     /**
      * Gets the current zone of the robot based on its position on the field.
-     * 
+     *
      * @return The current zone of the robot as a Zone enum.
      */
     public Zone getCurrentZone() {
@@ -661,7 +709,7 @@ public class SwerveSubsystem extends SubsystemBase {
     /**
      * Gets the target translation for auto-aiming based on the current zone and
      * alliance.
-     * 
+     *
      * @return The target translation for auto-aiming.
      */
     private Translation2d getAutoAimTarget() {
@@ -726,7 +774,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * heading
      * to the target rotation for auto-aiming, and checking if the angle error is
      * within a certain tolerance.
-     * 
+     *
      * @return true if the robot is on target for auto-aiming, false otherwise
      */
     public boolean isAutoAimOnTarget() {
@@ -739,7 +787,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     /**
      * Gets the target rotation for auto-aiming.
-     * 
+     *
      * @return The target rotation for auto-aiming.
      */
     public Rotation2d getAutoAimHeading() {
@@ -783,8 +831,70 @@ public class SwerveSubsystem extends SubsystemBase {
                 && Math.abs(rotationError.getDegrees()) < rotationToleranceDegrees;
     }
 
+    private double m_lastFrontLLTimestamp = 0;
+    private double m_lastLeftLLTimestamp = 0;
+
+    private Matrix<N3, N1> getDynamicStdDev(PoseEstimate estimate, double baseSD) {
+        double dist = estimate.avgTagDist;
+        double tagCountMultiplier = estimate.tagCount > 1 ? 1 : 0.5;
+        double multiplier = (1.0 + 0.1 * Math.pow(dist, 2)) * tagCountMultiplier;
+
+        return VecBuilder.fill(baseSD * multiplier, baseSD * multiplier, 9999999);
+    }
+
+    private double updateLimelight(
+            Limelight limelight,
+            LimelightPoseEstimator llPoseEst,
+            double llTimestamp,
+            Angle cameraYaw,
+            String llname) {
+        limelight
+                .getSettings()
+                .withRobotOrientation(
+                        new Orientation3d(
+                                new Rotation3d(swerveDrive.getOdometryHeading().rotateBy(new Rotation2d(cameraYaw))),
+                                new AngularVelocity3d(DegreesPerSecond.of(0), DegreesPerSecond.of(0),
+                                        DegreesPerSecond.of(0))))
+                .save();
+
+        Optional<PoseEstimate> poseEstimates = llPoseEst.getPoseEstimate();
+        Optional<LimelightResults> results = limelight.getLatestResults();
+        if (results.isPresent() && poseEstimates.isPresent()) {
+            LimelightResults result = results.get();
+
+            PoseEstimate poseEstimate = poseEstimates.get();
+            if (result.valid) {
+                Pose2d estimatorPose = poseEstimate.pose.toPose2d();
+                swerveDrive.field.getObject("Vision").setPose(estimatorPose);
+                SmartDashboard.putNumber("LimelightTuning/" + llname + "/ambiguity", poseEstimate.getAvgTagAmbiguity());
+
+                Pose2d usefulPose = result.getBotPose2d(DriverStation.Alliance.Blue);
+                double distanceToPose = usefulPose.getTranslation().getDistance(usefulPose.getTranslation());
+
+                if (distanceToPose < 0.5 &&
+                        poseEstimate.getAvgTagAmbiguity() < 0.1 && // TODO: Tune this lower if ambiguity still causes bad readings
+                        poseEstimate.tagCount > 1) {
+                    if (llTimestamp != poseEstimate.timestampSeconds) {
+//                        var stdDevScale = Math.pow(poseEstimate.avgTagDist, 2.0) / poseEstimate.tagCount;
+                        swerveDrive.addVisionMeasurement(estimatorPose,
+                                poseEstimate.timestampSeconds, getDynamicStdDev(poseEstimate, 0.3));
+                        return poseEstimate.timestampSeconds;
+                    }
+                }
+            }
+        }
+        return llTimestamp;
+    }
+
     @Override
     public void periodic() {
+        swerveDrive.updateOdometry();
+
+        m_lastFrontLLTimestamp = updateLimelight(m_frontLimelight, m_frontLimelightPoseEstimator, m_lastFrontLLTimestamp,
+                SwerveConstants.FRONT_LIMELIGHT_CAMERA_YAW_OFFSET, "limelight-b");
+        m_lastLeftLLTimestamp = updateLimelight(m_leftLimelight, m_leftLimelightPoseEstimator, m_lastLeftLLTimestamp,
+                SwerveConstants.LEFT_LIMELIGHT_CAMERA_YAW_OFFSET, "limelight-a");
+
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
             SmartDashboard.putNumber("swerve/autoAimHeading", getAutoAimHeading().getDegrees());
             SmartDashboard.putNumber("swerve/currentHeading", getHeading().getDegrees() - 90);
