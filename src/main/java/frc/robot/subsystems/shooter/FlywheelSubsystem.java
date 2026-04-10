@@ -261,8 +261,8 @@ public class FlywheelSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("FlywheelMech/linearVelocity (fps)", getLinearVelocity().in(FeetPerSecond));
         }
 
-        SmartDashboard.putNumber("FlywheelMech/velocity (RPM)", getAngularVelocity().in(RPM));
-        SmartDashboard.putNumber("FlywheelMech/setpoint (RPM)",
+        SmartDashboard.putNumber("FlywheelMech/FlywheelVelocity (RPM)", getAngularVelocity().in(RPM));
+        SmartDashboard.putNumber("FlywheelMech/FlywheelSetpoint (RPM)",
                 getSetpointVelocity().map(
                         setpoint -> setpoint.in(RPM) * FlywheelConstants.GEARBOX.getOutputToInputConversionFactor())
                         .orElse(Double.NaN));

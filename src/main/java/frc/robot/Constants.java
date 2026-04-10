@@ -175,7 +175,8 @@ public final class Constants {
             public static final Distance SHUFFLE_FAR_POSITION = MIDPOINT_POSITION.plus(Meters.of(0.05));
             public static final Distance SHUFFLE_FURTHEST_POSITION = EXTENDED_POSITION
                     .minus(Meters.of(0.05));
-            public static final Distance SHUFFLE_CLOSE_TO_RETRACT_POSITION = RETRACTED_POSITION.plus(Meters.of(0.05));
+            public static final Distance SHUFFLE_CLOSE_TO_RETRACT_POSITION = RETRACTED_POSITION
+                    .plus(Meters.of(0.05));
 
             public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(12),
                     Inches.of(0),
@@ -299,7 +300,7 @@ public final class Constants {
                                                                                // RPM, true
                                                                                // max of 6600 RPM
 
-            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(3600);
+            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(0);
 
             public static final AngularVelocity RPM_TARGET_ERROR = RPM.of(100);
             public static final AngularVelocity RPM_TARGET_ERROR_WHILE_FEEDING = RPM.of(250);
@@ -351,8 +352,8 @@ public final class Constants {
             public static final Angle HARD_LIMIT_MIN = Degrees.of(0);
             public static final Angle HARD_LIMIT_MAX = Degrees.of(42.1875);
 
-            public static final Angle DEFAULT_ANGLE = Degrees.of(8);
-            public static final Angle LOWER_HOOD_ANGLE = Degrees.of(15);
+            public static final Angle DEFAULT_ANGLE = Degrees.of(0);
+            public static final Angle LOWER_HOOD_ANGLE = Degrees.of(0);
 
             public static final Distance LENGTH = Inches.of(8.5);
             public static final Mass MASS = Pounds.of(4.39);
@@ -554,5 +555,5 @@ public final class Constants {
     public static final SmartMotorControllerConfig.TelemetryVerbosity TELEMETRY_VERBOSITY = SmartMotorControllerConfig.TelemetryVerbosity.LOW;
 
     public static final SwerveDriveTelemetry.TelemetryVerbosity SWERVE_TELEMETRY_VERBOSITY = SwerveDriveTelemetry.TelemetryVerbosity.POSE;
-    public static final boolean TELEMETRY = false; // Set to false for competition to reduce network traffic
+    public static final boolean TELEMETRY = true; // Set to false for competition to reduce network traffic
 }
