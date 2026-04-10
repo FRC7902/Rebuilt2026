@@ -208,7 +208,10 @@ public class LinearIntakeSubsystem extends SubsystemBase {
                                 () -> getPosition().gt(
                                         LinearIntakeConstants.MIDPOINT_POSITION
                                                 .plus(LinearIntakeConstants.POSITION_TARGET_ERROR)))),
-                retract());
+                Commands.sequence(
+                        retract().withTimeout(0.5),
+                        setPosition(LinearIntakeConstants.SHUFFLE_CLOSE_TO_RETRACT_POSITION).withTimeout(0.5))
+                        .repeatedly());
     }
 
     public Command set(double dutycycle) {

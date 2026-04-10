@@ -175,6 +175,7 @@ public final class Constants {
             public static final Distance SHUFFLE_FAR_POSITION = MIDPOINT_POSITION.plus(Meters.of(0.05));
             public static final Distance SHUFFLE_FURTHEST_POSITION = EXTENDED_POSITION
                     .minus(Meters.of(0.05));
+            public static final Distance SHUFFLE_CLOSE_TO_RETRACT_POSITION = RETRACTED_POSITION.plus(Meters.of(0.05));
 
             public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(12),
                     Inches.of(0),
@@ -294,7 +295,8 @@ public final class Constants {
             public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond
                     .of(173);
 
-            public static final AngularVelocity SOFT_LIMIT_RPM = RPM.of(6600); // Theoretical limit of 6960 RPM, true
+            public static final AngularVelocity SOFT_LIMIT_RPM = RPM.of(6600); // Theoretical limit of 6960
+                                                                               // RPM, true
                                                                                // max of 6600 RPM
 
             public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(3600);
