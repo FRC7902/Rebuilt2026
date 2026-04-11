@@ -275,12 +275,7 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
     public AngularVelocity getTargetVelocity(Distance distanceToTarget) {
-        ShooterZone zone = ShooterConstants.MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE.entrySet().stream()
-                .filter(entry -> distanceToTarget.in(Meters) >= entry.getKey().in(Meters))
-                .max((a, b) -> Double.compare(a.getKey().in(Meters), b.getKey().in(Meters)))
-                .map(Map.Entry::getValue)
-                .orElse(ShooterZone.ZONE_1);
-        return ShooterConstants.SHOOTER_MIN_DISTANCE_TO_FLYWHEEL_RPM.getOrDefault(zone,
-                FlywheelConstants.DEFAULT_VELOCITY);
+        AngularVelocity target = RPM.of(ShooterConstants.createRPMInterpolationMap().get(distanceToTarget.in(Meters)));
+        return target != null ? target : FlywheelConstants.DEFAULT_VELOCITY;
     }
 }
