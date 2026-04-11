@@ -58,6 +58,7 @@ public final class Constants {
         public static final double MAX_SPEED = Units.feetToMeters(16); // TODO: Try increasing this to see if it
                                                                        // does
                                                                        // anything
+        public static final double DRIVER_TRANSLATION_STICK_CURVE_EXPONENT = 2.0;
 
         public static final double AUTO_AIM_VELOCITY_COMPENSATION_FACTOR = 1.2; // TODO
         public static final Angle AUTO_AIM_ANGLE_TARGET_ERROR = Degrees.of(5); // TODO
@@ -175,7 +176,8 @@ public final class Constants {
             public static final Distance SHUFFLE_FAR_POSITION = MIDPOINT_POSITION.plus(Meters.of(0.05));
             public static final Distance SHUFFLE_FURTHEST_POSITION = EXTENDED_POSITION
                     .minus(Meters.of(0.05));
-            public static final Distance SHUFFLE_CLOSE_TO_RETRACT_POSITION = RETRACTED_POSITION.plus(Meters.of(0.05));
+            public static final Distance SHUFFLE_CLOSE_TO_RETRACT_POSITION = RETRACTED_POSITION
+                    .plus(Meters.of(0.05));
 
             public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(12),
                     Inches.of(0),
