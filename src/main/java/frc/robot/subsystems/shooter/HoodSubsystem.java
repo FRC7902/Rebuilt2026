@@ -109,9 +109,6 @@ public class HoodSubsystem extends SubsystemBase {
         if (Robot.isSimulation()) {
             m_hoodConfig.withStartingPosition(HoodConstants.SOFT_LIMIT_MIN);
         }
-
-        // TODO: Add MOI?
-
         m_hood = new Arm(m_hoodConfig);
     }
 

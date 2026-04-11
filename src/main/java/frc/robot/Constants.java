@@ -111,13 +111,13 @@ public final class Constants {
         public static final int MOTOR_STATOR_CURRENT_LIMIT = 40;
         public static final int MOTOR_SUPPLY_CURRENT_LIMIT = 40;
 
-        public static final double INDEXER_FULL_SPEED = 1; // TODO
-        public static final double INDEXER_HALF_SPEED = 0; // TODO
+        public static final double INDEXER_FULL_SPEED = 1; 
+        public static final double INDEXER_HALF_SPEED = 0; 
     }
 
     public static class IntakeConstants {
         public static class IntakeRollerConstants {
-            public static final int MOTOR_PWM_ID = 1; // TODO
+            public static final int MOTOR_PWM_ID = 1;
 
             public static final double SPEED = 0.5;
         }
@@ -152,8 +152,8 @@ public final class Constants {
             public static final ElevatorFeedforward SIM_FEEDFORWARD = new ElevatorFeedforward(0.0, 0.0,
                     0.0, 0.0);
 
-            public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(2); // TODO
-            public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(6.5); // TODO
+            public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(2);
+            public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(6.5);
 
             public static final Time CLOSED_LOOP_RAMP_RATE = Seconds.of(0.25);
             public static final Time OPEN_LOOP_RAMP_RATE = Seconds.of(0.25);
@@ -218,8 +218,7 @@ public final class Constants {
                                 Map.entry(Meter.of(11), HoodConstants.SOFT_LIMIT_MAX),
                                 Map.entry(Meter.of(12), HoodConstants.SOFT_LIMIT_MAX),
                                 Map.entry(Meter.of(13), HoodConstants.SOFT_LIMIT_MAX),
-                                Map.entry(Meter.of(14),
-                                        HoodConstants.SOFT_LIMIT_MAX))));
+                                Map.entry(Meter.of(14), HoodConstants.SOFT_LIMIT_MAX))));
 
         public static final Map<ShooterZone, AngularVelocity> SHOOTER_MIN_DISTANCE_TO_FLYWHEEL_RPM = Map
                 .ofEntries(
@@ -263,7 +262,7 @@ public final class Constants {
 
             public static final MotorMode IDLE_MODE = MotorMode.COAST;
 
-            public static final boolean LEADER_MOTOR_INVERTED = false; // TODO
+            public static final boolean LEADER_MOTOR_INVERTED = false;
             public static final boolean FOLLOWER_MOTOR_1_INVERTED = true;
             public static final boolean FOLLOWER_MOTOR_2_INVERTED = true;
 
@@ -285,7 +284,7 @@ public final class Constants {
                     0.10055,
                     0.01137);
             public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(0.24,
-                    0.09, 0.007553); // TODO
+                    0.09, 0.007553);
 
             public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25);
             public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25);

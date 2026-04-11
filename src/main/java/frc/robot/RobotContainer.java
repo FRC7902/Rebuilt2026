@@ -90,8 +90,8 @@ public class RobotContainer {
     public SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
             () -> m_driverController.getLeftY() * -1,
             () -> m_driverController.getLeftX() * -1)
-            .withControllerRotationAxis(() -> m_driverController.getRightX() * -1) // TODO: Check if * -1 is
-                                                                                   // needed IRL
+            .withControllerRotationAxis(() -> m_driverController.getRightX() * -1)
+                                                                        
             .deadband(OperatorConstants.DEADBAND)
             .scaleTranslation(1.0)
             .allianceRelativeControl(true);
@@ -283,7 +283,6 @@ public class RobotContainer {
 
         Trigger isClimberUp = new Trigger(m_elevatorSubsystem::isClimberUp);
 
-        // TODO: Check if aiming
         isClimberUp.and(
                 m_driverController.R2().negate()).onTrue(
                         new InstantCommand(() -> {
@@ -435,12 +434,10 @@ public class RobotContainer {
                 .and(m_driverController.L2().negate()) // Not intaking
 
                 // Extend intake, reverse indexer and intake rollers at the same time
-                .onTrue(Commands.sequence( // TODO: Check if sequence is needed, or if parallel alone is
-                                           // fine
+                .onTrue(Commands.parallel(
                         m_linearIntakeSubsystem.extend(),
-                        Commands.parallel(
-                                m_indexerSubsystem.reverse(),
-                                m_intakeRollerSubsystem.outtake())))
+                        m_indexerSubsystem.reverse(),
+                        m_intakeRollerSubsystem.outtake()))
 
                 // Retract intake, then stop indexer and intake rollers
                 .onFalse(
