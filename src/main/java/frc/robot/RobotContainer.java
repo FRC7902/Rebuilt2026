@@ -82,6 +82,7 @@ public class RobotContainer {
 
     private final AutoChooser autoChooser;
     private final Choreo m_choreo = new Choreo(this);
+    private final Autos m_autos = new Autos(this);
 
     /**
      * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -179,6 +180,9 @@ public class RobotContainer {
         autoChooser.addCmd("Left - Sweep then depot", m_choreo::leftNeutralAutoThenDepot);
         autoChooser.addCmd("Center - Shoot and climb left", m_choreo::shootPreloadAndClimbLeft);
         autoChooser.addCmd("Center - Shoot and climb right", m_choreo::shootPreloadAndClimbRight);
+        autoChooser.addCmd("Bline Test Path", m_autos::getTestPath);
+        autoChooser.addCmd("Bline multiple waypoint test", m_autos::getDepotTest);
+        autoChooser.addCmd("Bline First Sweep Right Neutral", m_autos::rightNeutralAutoFirstSweep);
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());

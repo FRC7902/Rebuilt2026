@@ -765,11 +765,6 @@ public class SwerveSubsystem extends SubsystemBase {
         return m_driveToWaypoint;
     }
 
-    public boolean isAtWaypoint() {
-        return m_driveToWaypoint.minus(getPose()).getTranslation()
-                .getNorm() < AutoConstants.DEFAULT_WAYPOINT_TOLERANCE;
-    }
-
     public boolean isAtWaypoint(double translationToleranceMeters) {
         return m_driveToWaypoint.minus(getPose()).getTranslation()
                 .getNorm() < translationToleranceMeters;
@@ -793,7 +788,6 @@ public class SwerveSubsystem extends SubsystemBase {
                     m_driveToWaypoint.minus(getPose()).getTranslation().getNorm());
             SmartDashboard.putNumber("swerve/rotToWaypoint (deg)",
                     m_driveToWaypoint.getRotation().minus(getPose().getRotation()).getDegrees());
-            SmartDashboard.putBoolean("swerve/isAtWaypoint", isAtWaypoint());
             SmartDashboard.putNumber("swerve/distToTarget", getDistanceToTarget().in(Meters));
         }
     }
