@@ -173,7 +173,7 @@ public final class Constants {
                         public static final Distance RETRACTED_POSITION = SOFT_LIMIT_MIN;
 
                         public static final Distance SHUFFLE_CLOSE_POSITION = Meters.of(0.025);
-                        public static final Distance SHUFFLE_FAR_POSITION = MIDPOINT_POSITION.plus(Meters.of(0.05));
+                        public static final Distance SHUFFLE_FAR_POSITION = MIDPOINT_POSITION.plus(Meters.of(0.10));
                         public static final Distance SHUFFLE_FURTHEST_POSITION = EXTENDED_POSITION
                                         .minus(Meters.of(0.05));
                         public static final Distance SHUFFLE_CLOSE_TO_RETRACT_POSITION = RETRACTED_POSITION
@@ -426,8 +426,8 @@ public final class Constants {
                         public static final int MOTOR_CAN_ID = 23;
                         public static final int BEAM_BREAK_DIO_PORT = 2; // TODO
 
-                        public static final AngularVelocity FEEDER_SPEED = RPM.of(725);
-                        public static final AngularVelocity REVERSE_SPEED = RPM.of(-725);
+                        public static final AngularVelocity FEEDER_SPEED = RPM.of(1000);
+                        public static final AngularVelocity REVERSE_SPEED = RPM.of(-1000);
 
                         public static final DCMotor MOTOR = DCMotor.getKrakenX60Foc(1);
                         public static final GearBox GEARBOX = GearBox.fromStages("5:1", "24:15");
@@ -460,7 +460,7 @@ public final class Constants {
                         public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25);
                         public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25);
 
-                        public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(725);
+                        public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(2000);
                         public static final AngularVelocity SIM_MAX_VELOCITY_RPM = RPM.of(725);
                         public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond
                                         .of(99999); // TODO

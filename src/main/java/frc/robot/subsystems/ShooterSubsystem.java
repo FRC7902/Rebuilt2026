@@ -112,7 +112,7 @@ public class ShooterSubsystem extends SubsystemBase {
                         Commands.waitUntil(() -> isAutoAimReady.get() && isShooterReady(isFeeding.get()))
                                 .andThen(
                                         Commands.sequence(
-                                                m_feederSubsystem.reverse().withTimeout(0.25),
+                                                // m_feederSubsystem.reverse().withTimeout(0.25),
                                                 m_feederSubsystem.feed())))
         // : Commands.sequence(
         // m_feederSubsystem.reverse().withTimeout(0.25),
