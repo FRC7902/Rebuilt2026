@@ -95,6 +95,10 @@ public final class Constants {
         public static final double DRIVE_TO_POSE_ROTATION_kD = 0;
         public static final double DRIVE_TO_POSE_ROTATION_MAX_VELOCITY_RAD = Units.degreesToRadians(360);
         public static final double DRIVE_TO_POSE_ROTATION_MAX_ACCELERATION_RAD = Units.degreesToRadians(180);
+
+        public static final Angle LEFT_LIMELIGHT_CAMERA_YAW_OFFSET = Degrees.of(90); // TODO: Check if should be
+                                                                                     // negative
+        public static final Angle FRONT_LIMELIGHT_CAMERA_YAW_OFFSET = Degrees.of(0);
     }
 
     public static final class OperatorConstants {
