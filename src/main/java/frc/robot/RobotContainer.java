@@ -88,8 +88,8 @@ public class RobotContainer {
      * by angular velocity.
      */
     public SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
-            () -> m_driverController.getLeftY() * -1,
-            () -> m_driverController.getLeftX() * -1)
+            this::getCurvedDriverLeftY,
+            this::getCurvedDriverLeftX)
             .withControllerRotationAxis(() -> m_driverController.getRightX() * -1) // TODO: Check if * -1 is
                                                                                    // needed IRL
             .deadband(OperatorConstants.DEADBAND)
@@ -113,8 +113,8 @@ public class RobotContainer {
             .allianceRelativeControl(false);
 
     SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
-            () -> -m_driverController.getLeftY(),
-            () -> -m_driverController.getLeftX())
+            this::getCurvedDriverLeftY,
+            this::getCurvedDriverLeftX)
             .withControllerRotationAxis(() -> m_driverController.getRawAxis(
                     2))
             .deadband(OperatorConstants.DEADBAND)
@@ -147,6 +147,20 @@ public class RobotContainer {
 
     public DoubleSupplier autoAimHeadingY() {
         return () -> -m_swerveSubsystem.getAutoAimHeading().getSin();
+    }
+
+    private double applyDriverTranslationStickCurve(double input) {
+        return Math.copySign(
+                Math.pow(Math.abs(input), SwerveConstants.DRIVER_TRANSLATION_STICK_CURVE_EXPONENT),
+                input);
+    }
+
+    private double getCurvedDriverLeftX() {
+        return applyDriverTranslationStickCurve(-m_driverController.getLeftX());
+    }
+
+    private double getCurvedDriverLeftY() {
+        return applyDriverTranslationStickCurve(-m_driverController.getLeftY());
     }
 
     public SwerveInputStream driveAutoAim = driveAngularVelocity.copy()
