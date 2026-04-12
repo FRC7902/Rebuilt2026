@@ -200,7 +200,7 @@ public class HoodSubsystem extends SubsystemBase {
     }
 
     public Angle getAngleToTarget(Distance distanceToTarget) {
-        Double angleDeg = m_hoodMap != null ? m_hoodMap.get(distanceToTarget.in(Meters)) : null;
+        Double angleDeg = m_hoodMap.get(distanceToTarget.in(Meters));
         return Degrees.of(angleDeg != null ? angleDeg : HoodConstants.DEFAULT_ANGLE.in(Degrees));
     }
 
