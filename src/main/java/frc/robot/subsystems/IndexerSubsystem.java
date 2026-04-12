@@ -52,18 +52,6 @@ public class IndexerSubsystem extends SubsystemBase {
     }
 
     /**
-     * Sets the indexer motor speed.
-     *
-     * @param speed the desired motor output (-1.0 to 1.0)
-     */
-    public void setSpeed(double speed) {
-        if (speed != m_targetSpeed) {
-            m_targetSpeed = speed;
-            m_motor.set(speed);
-        }
-    }
-
-    /**
      * Stops the indexer motor.
      */
     public Command stop() {
@@ -73,22 +61,22 @@ public class IndexerSubsystem extends SubsystemBase {
     // Helper method to alternate between full and half speed every 0.125 seconds
     private boolean useFullSpeed() {
         double secondFraction = Timer.getFPGATimestamp() % 2.0;
-        return secondFraction >= 0.125;
+        return secondFraction >= 0.10;
     }
 
     // TODO: Understand why alternating between two constants doesn't pulse in
     // simulation, but alternating between a constant and zero does.
     public Command run() {
         return new ConditionalCommand(
-                this.runOnce(() -> setSpeed(IndexerConstants.INDEXER_FULL_SPEED)),
-                this.runOnce(() -> setSpeed(0)),
+                this.runOnce(() -> m_motor.set(IndexerConstants.INDEXER_FULL_SPEED)),
+                this.runOnce(() -> m_motor.set(IndexerConstants.INDEXER_HALF_SPEED)),
                 this::useFullSpeed).repeatedly();
     }
 
     public Command reverse() {
         return new ConditionalCommand(
-                this.runOnce(() -> setSpeed(-IndexerConstants.INDEXER_FULL_SPEED)),
-                this.runOnce(() -> setSpeed(0)),
+                this.runOnce(() -> m_motor.set(-IndexerConstants.INDEXER_FULL_SPEED)),
+                this.runOnce(() -> m_motor.set(-IndexerConstants.INDEXER_HALF_SPEED)),
                 this::useFullSpeed).repeatedly();
     }
 

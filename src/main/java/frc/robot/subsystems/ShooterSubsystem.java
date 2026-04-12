@@ -102,13 +102,9 @@ public class ShooterSubsystem extends SubsystemBase {
                 m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
                 // stationaryShooting ?
                 Commands.sequence(
-                        Commands.waitSeconds(0.25),
-                        m_feederSubsystem.stop(),
+                        m_feederSubsystem.reverse().withTimeout(0.25).andThen(m_feederSubsystem.stop()),
                         Commands.waitUntil(() -> isAutoAimReady.get() && isShooterReady(isFeeding.get()))
-                                .andThen(
-                                        Commands.sequence(
-                                                m_feederSubsystem.reverse().withTimeout(0.25),
-                                                m_feederSubsystem.feed())))
+                                .andThen(m_feederSubsystem.feed()))
         // : Commands.sequence(
         // m_feederSubsystem.reverse().withTimeout(0.25),
         // new ConditionalCommand(
