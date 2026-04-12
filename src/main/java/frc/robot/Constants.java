@@ -326,9 +326,9 @@ public final class Constants {
             public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
             public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
 
-            public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(6000); // TODO
+            public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(6000); // Disable max velocity for now
             public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond
-                    .of(1000000); // TODO
+                    .of(1000000); // Disable acceleration limit for now
 
             public static final Angle SOFT_LIMIT_MIN = Degrees.of(0);
             public static final Angle SOFT_LIMIT_MAX = Degrees.of(42);
