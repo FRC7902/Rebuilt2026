@@ -98,8 +98,11 @@ public class ShooterSubsystem extends SubsystemBase {
     public Command aimAndShoot(Supplier<Distance> getDistanceToTarget, Supplier<Boolean> isAutoAimReady,
             boolean stationaryShooting, Supplier<Boolean> isFeeding) {
         return Commands.parallel(
-                m_hoodSubsystem.setAngle(() -> m_hoodSubsystem.getAngleToTarget(getDistanceToTarget.get())),
-                m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
+                m_hoodSubsystem
+                        .setAngle(() -> m_hoodSubsystem.getAngleToTarget(getDistanceToTarget.get(), isFeeding.get())),
+                m_flywheelSubsystem
+                        .setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get(),
+                                isFeeding.get())),
                 // stationaryShooting ?
                 Commands.sequence(
                         m_feederSubsystem.reverse().withTimeout(0.25).andThen(m_feederSubsystem.stop()),
