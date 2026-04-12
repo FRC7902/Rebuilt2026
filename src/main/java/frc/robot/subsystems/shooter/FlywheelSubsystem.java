@@ -12,18 +12,16 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.controls.TorqueCurrentFOC;
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -35,7 +33,6 @@ import frc.robot.Constants;
 import frc.robot.Constants.MechanismPositionConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.FlywheelConstants;
-import frc.robot.Constants.ShooterConstants.ShooterZone;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.config.MechanismPositionConfig;
@@ -58,6 +55,8 @@ public class FlywheelSubsystem extends SubsystemBase {
     private final Debouncer m_atRPMDebouncer = new Debouncer(
             FlywheelConstants.AT_RPM_DEBOUNCE_TIME.in(Seconds),
             Debouncer.DebounceType.kRising);
+
+    private final InterpolatingDoubleTreeMap m_flywheelMap;
 
     public FlywheelSubsystem() {
         m_leaderMotor = new TalonFX(FlywheelConstants.LEADER_MOTOR_CAN_ID);
@@ -117,6 +116,8 @@ public class FlywheelSubsystem extends SubsystemBase {
                 .withMechanismPositionConfig(robotToMechanism);
 
         m_flywheel = new FlyWheel(flywheelConfig);
+
+        m_flywheelMap = ShooterConstants.createRPMInterpolationMap();
     }
 
     /**
@@ -274,12 +275,11 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
     public AngularVelocity getTargetVelocity(Distance distanceToTarget) {
-        ShooterZone zone = ShooterConstants.MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE.entrySet().stream()
-                .filter(entry -> distanceToTarget.in(Meters) >= entry.getKey().in(Meters))
-                .max((a, b) -> Double.compare(a.getKey().in(Meters), b.getKey().in(Meters)))
-                .map(Map.Entry::getValue)
-                .orElse(ShooterZone.ZONE_1);
-        return ShooterConstants.SHOOTER_MIN_DISTANCE_TO_FLYWHEEL_RPM.getOrDefault(zone,
-                FlywheelConstants.DEFAULT_VELOCITY);
+        Double targetRpm = m_flywheelMap.get(distanceToTarget.in(Meters));
+        if (targetRpm == null) {
+            return FlywheelConstants.DEFAULT_VELOCITY;
+        }
+
+        return RPM.of(targetRpm);
     }
 }

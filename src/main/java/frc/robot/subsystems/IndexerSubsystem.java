@@ -52,12 +52,11 @@ public class IndexerSubsystem extends SubsystemBase {
     }
 
     /**
-     * Sets the indexer motor speed.
-     *
-     * @param speed the desired motor output (-1.0 to 1.0)
+     * Sets the motor speed only if it differs from the current target, reducing
+     * unnecessary CAN writes.
      */
-    public void setSpeed(double speed) {
-        if (speed != m_targetSpeed) {
+    private void setSpeed(double speed) {
+        if (Double.compare(speed, m_targetSpeed) != 0) {
             m_targetSpeed = speed;
             m_motor.set(speed);
         }
@@ -67,13 +66,16 @@ public class IndexerSubsystem extends SubsystemBase {
      * Stops the indexer motor.
      */
     public Command stop() {
-        return this.runOnce(() -> m_motor.stopMotor());
+        return this.runOnce(() -> {
+            m_motor.stopMotor();
+            m_targetSpeed = Double.NaN;
+        });
     }
 
-    // Helper method to alternate between full and half speed every 0.125 seconds
+    // Helper method to alternate between full and half speed
     private boolean useFullSpeed() {
         double secondFraction = Timer.getFPGATimestamp() % 2.0;
-        return secondFraction >= 0.125;
+        return secondFraction >= 0.10;
     }
 
     // TODO: Understand why alternating between two constants doesn't pulse in
@@ -81,14 +83,14 @@ public class IndexerSubsystem extends SubsystemBase {
     public Command run() {
         return new ConditionalCommand(
                 this.runOnce(() -> setSpeed(IndexerConstants.INDEXER_FULL_SPEED)),
-                this.runOnce(() -> setSpeed(0)),
+                this.runOnce(() -> setSpeed(IndexerConstants.INDEXER_HALF_SPEED)),
                 this::useFullSpeed).repeatedly();
     }
 
     public Command reverse() {
         return new ConditionalCommand(
                 this.runOnce(() -> setSpeed(-IndexerConstants.INDEXER_FULL_SPEED)),
-                this.runOnce(() -> setSpeed(0)),
+                this.runOnce(() -> setSpeed(-IndexerConstants.INDEXER_HALF_SPEED)),
                 this::useFullSpeed).repeatedly();
     }
 

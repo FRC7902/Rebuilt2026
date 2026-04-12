@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -25,10 +24,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.ShooterConstants.HoodConstants;
-import frc.robot.Constants.ShooterConstants.ShooterZone;
 import frc.robot.Constants.MechanismPositionConstants;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.ShooterConstants.HoodConstants;
 import frc.robot.Robot;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ArmConfig;
@@ -51,6 +49,8 @@ public class HoodSubsystem extends SubsystemBase {
 
     private final Debouncer m_atAngleDebouncer = new Debouncer(HoodConstants.AT_ANGLE_DEBOUNCE_TIME,
             Debouncer.DebounceType.kRising);
+
+    private final InterpolatingDoubleTreeMap m_hoodMap;
 
     public HoodSubsystem() {
         m_motor = new TalonFX(HoodConstants.MOTOR_CAN_ID);
@@ -113,6 +113,8 @@ public class HoodSubsystem extends SubsystemBase {
         // TODO: Add MOI?
 
         m_hood = new Arm(m_hoodConfig);
+
+        m_hoodMap = ShooterConstants.createHoodInterpolationMap();
     }
 
     /**
@@ -197,17 +199,8 @@ public class HoodSubsystem extends SubsystemBase {
                 getAngleSetpoint().get().isNear(m_hood.getAngle(), HoodConstants.ANGLE_TARGET_ERROR));
     }
 
-    public ShooterZone getSpeedZone(Distance distanceToTarget) {
-        return ShooterConstants.MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE.entrySet().stream()
-                .filter(entry -> distanceToTarget.in(Meters) >= entry.getKey().in(Meters))
-                .max((a, b) -> Double.compare(a.getKey().in(Meters), b.getKey().in(Meters)))
-                .map(Map.Entry::getValue)
-                .orElse(ShooterZone.ZONE_1);
-    }
-
-    public Angle getAngleToTarget(Distance distanceToTarget, ShooterZone zone) {
-        InterpolatingDoubleTreeMap map = ShooterConstants.SHOOTER_DISTANCE_TO_HOOD_ANGLE_INTERPOLATION.get(zone);
-        Double angleDeg = map != null ? map.get(distanceToTarget.in(Meters)) : null;
+    public Angle getAngleToTarget(Distance distanceToTarget) {
+        Double angleDeg = m_hoodMap.get(distanceToTarget.in(Meters));
         return Degrees.of(angleDeg != null ? angleDeg : HoodConstants.DEFAULT_ANGLE.in(Degrees));
     }
 

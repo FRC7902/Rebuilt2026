@@ -21,6 +21,7 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.Map;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -111,8 +112,8 @@ public final class Constants {
         public static final int MOTOR_STATOR_CURRENT_LIMIT = 40;
         public static final int MOTOR_SUPPLY_CURRENT_LIMIT = 40;
 
-        public static final double INDEXER_FULL_SPEED = 1; // TODO
-        public static final double INDEXER_HALF_SPEED = 0; // TODO
+        public static final double INDEXER_FULL_SPEED = 1;
+        public static final double INDEXER_HALF_SPEED = 0.5;
     }
 
     public static class IntakeConstants {
@@ -172,10 +173,10 @@ public final class Constants {
             public static final Distance RETRACTED_POSITION = SOFT_LIMIT_MIN;
 
             public static final Distance SHUFFLE_CLOSE_POSITION = Meters.of(0.025);
-            public static final Distance SHUFFLE_FAR_POSITION = MIDPOINT_POSITION.plus(Meters.of(0.05));
+            public static final Distance SHUFFLE_FAR_POSITION = MIDPOINT_POSITION.plus(Meters.of(0.10));
             public static final Distance SHUFFLE_FURTHEST_POSITION = EXTENDED_POSITION
-                    .minus(Meters.of(0.05));
-            public static final Distance SHUFFLE_CLOSE_TO_RETRACT_POSITION = RETRACTED_POSITION.plus(Meters.of(0.05));
+                    .minus(Meters.of(0.10));
+            public static final Distance SHUFFLE_CLOSE_TO_RETRACT_POSITION = RETRACTED_POSITION.plus(Meters.of(0.10));
 
             public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(12),
                     Inches.of(0),
@@ -184,72 +185,55 @@ public final class Constants {
     }
 
     public static final class ShooterConstants {
-        public static enum ShooterZone {
-            ZONE_1,
-            ZONE_2,
-            ZONE_3,
-            ZONE_4
+
+        public static final Map<Distance, Pair<Angle, AngularVelocity>> SHOOTER_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM = Map
+                .ofEntries(
+                        Map.entry(
+                                Meters.of(1.4625),
+                                Pair.of(Degrees.of(14), RPM.of(3500))),
+                        Map.entry(
+                                Meters.of(2.1997),
+                                Pair.of(Degrees.of(20), RPM.of(3600))),
+                        Map.entry(
+                                Meters.of(2.8742),
+                                Pair.of(Degrees.of(25), RPM.of(3700))),
+                        Map.entry(
+                                Meters.of(3.4100),
+                                Pair.of(Degrees.of(30), RPM.of(3900))),
+                        Map.entry(
+                                Meters.of(3.6500),
+                                Pair.of(Degrees.of(28), RPM.of(3900))),
+                        Map.entry(
+                                Meters.of(4.0068),
+                                Pair.of(Degrees.of(25), RPM.of(4325))),
+                        Map.entry(
+                                Meters.of(4.3896),
+                                Pair.of(Degrees.of(26), RPM.of(4500))),
+                        // NOTE: Removed due to inaccuracy
+                        // Map.entry(
+                        // Meters.of(4.4581),
+                        // Pair.of(Degrees.of(26), RPM.of(4373))),
+                        Map.entry(
+                                Meters.of(4.7953),
+                                Pair.of(Degrees.of(30), RPM.of(4550)))
+
+                );
+
+        public static InterpolatingDoubleTreeMap createHoodInterpolationMap() {
+            InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
+            for (Distance i : SHOOTER_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM.keySet()) {
+                map.put(i.in(Meters), SHOOTER_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM.get(i).getFirst()
+                        .in(Degrees));
+            }
+            return map;
         }
 
-        public static final Map<ShooterZone, Map<Distance, Angle>> SHOOTER_DISTANCE_TO_HOOD_ANGLE = Map
-                .ofEntries(
-                        // 3600 RPM
-                        Map.entry(ShooterZone.ZONE_1, Map.ofEntries(
-                                Map.entry(Meter.of(1.6110), Degrees.of(14.4)),
-                                Map.entry(Meter.of(1.9917), Degrees.of(17.05)),
-                                Map.entry(Meter.of(2.3893), Degrees.of(21.97))
-
-                        )),
-                        // 4100 RPM
-                        Map.entry(ShooterZone.ZONE_2, Map.ofEntries(
-                                Map.entry(Meter.of(3.65), Degrees.of(24)),
-                                Map.entry(Meter.of(3.8718), Degrees.of(28.47)),
-                                Map.entry(Meter.of(3.9895), Degrees.of(31.46)))),
-                        // 4365
-                        Map.entry(ShooterZone.ZONE_3, Map.ofEntries(
-                                Map.entry(Meter.of(4.4034), Degrees.of(24.96)),
-                                Map.entry(Meter.of(4.4520), Degrees.of(27.16)),
-                                Map.entry(Meter.of(4.6569), Degrees.of(29.53)),
-                                Map.entry(Meter.of(4.7916), Degrees.of(30.94)))),
-
-                        // Make everything >11m at max angle
-                        // TODO: Could probably change this to one entry (requires testing)
-                        Map.entry(ShooterZone.ZONE_4, Map.ofEntries(
-                                Map.entry(Meter.of(11), HoodConstants.SOFT_LIMIT_MAX),
-                                Map.entry(Meter.of(12), HoodConstants.SOFT_LIMIT_MAX),
-                                Map.entry(Meter.of(13), HoodConstants.SOFT_LIMIT_MAX),
-                                Map.entry(Meter.of(14),
-                                        HoodConstants.SOFT_LIMIT_MAX))));
-
-        public static final Map<ShooterZone, AngularVelocity> SHOOTER_MIN_DISTANCE_TO_FLYWHEEL_RPM = Map
-                .ofEntries(
-                        Map.entry(ShooterZone.ZONE_1, RPM.of(3600)),
-                        Map.entry(ShooterZone.ZONE_2, RPM.of(4100)),
-                        Map.entry(ShooterZone.ZONE_3, RPM.of(4365)),
-                        Map.entry(ShooterZone.ZONE_4, FlywheelConstants.SOFT_LIMIT_RPM));
-
-        public static final Map<Distance, ShooterZone> MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE = Map
-                .ofEntries(
-                        Map.entry(Meters.of(0), ShooterZone.ZONE_1),
-                        Map.entry(Meters.of(3), ShooterZone.ZONE_2),
-                        Map.entry(Meters.of(4.2), ShooterZone.ZONE_3),
-                        Map.entry(Meters.of(8.2705), ShooterZone.ZONE_4));
-
-        public static final Map<ShooterZone, InterpolatingDoubleTreeMap> SHOOTER_DISTANCE_TO_HOOD_ANGLE_INTERPOLATION = Map
-                .ofEntries(
-                        Map.entry(ShooterZone.ZONE_1,
-                                createHoodInterpolationMap(ShooterZone.ZONE_1)),
-                        Map.entry(ShooterZone.ZONE_2,
-                                createHoodInterpolationMap(ShooterZone.ZONE_2)),
-                        Map.entry(ShooterZone.ZONE_3,
-                                createHoodInterpolationMap(ShooterZone.ZONE_3)),
-                        Map.entry(ShooterZone.ZONE_4,
-                                createHoodInterpolationMap(ShooterZone.ZONE_4)));
-
-        private static InterpolatingDoubleTreeMap createHoodInterpolationMap(ShooterZone zone) {
+        public static InterpolatingDoubleTreeMap createRPMInterpolationMap() {
             InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
-            SHOOTER_DISTANCE_TO_HOOD_ANGLE.get(zone).forEach(
-                    (distance, angle) -> map.put(distance.in(Meters), angle.in(Degrees)));
+            for (Distance i : SHOOTER_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM.keySet()) {
+                map.put(i.in(Meters), SHOOTER_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM.get(i).getSecond()
+                        .in(RPM));
+            }
             return map;
         }
 
@@ -322,7 +306,7 @@ public final class Constants {
             public static final Current STATOR_CURRENT_LIMIT = Amps.of(40);
             public static final Current SUPPLY_CURRENT_LIMIT = Amps.of(40);
 
-            public static final double PID_kP = 200;
+            public static final double PID_kP = 258.857;
             public static final double PID_kI = 0.0;
             public static final double PID_kD = 11.443;
 
@@ -342,9 +326,9 @@ public final class Constants {
             public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
             public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
 
-            public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(6000); // TODO
+            public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(6000); // Disable max velocity for now
             public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond
-                    .of(0.314); // TODO
+                    .of(1000000); // Disable acceleration limit for now
 
             public static final Angle SOFT_LIMIT_MIN = Degrees.of(0);
             public static final Angle SOFT_LIMIT_MAX = Degrees.of(42);

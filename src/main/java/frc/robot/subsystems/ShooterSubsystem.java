@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
-import frc.robot.Constants.ShooterConstants.ShooterZone;
 import frc.robot.Robot;
 import frc.robot.subsystems.shooter.FeederSubsystem;
 import frc.robot.subsystems.shooter.FlywheelSubsystem;
@@ -99,21 +98,13 @@ public class ShooterSubsystem extends SubsystemBase {
     public Command aimAndShoot(Supplier<Distance> getDistanceToTarget, Supplier<Boolean> isAutoAimReady,
             boolean stationaryShooting, Supplier<Boolean> isFeeding) {
         return Commands.parallel(
-                m_hoodSubsystem.setAngle(() -> {
-                    Distance distance = getDistanceToTarget.get();
-                    ShooterZone zone = m_hoodSubsystem.getSpeedZone(distance);
-                    return m_hoodSubsystem.getAngleToTarget(distance, zone);
-                }),
+                m_hoodSubsystem.setAngle(() -> m_hoodSubsystem.getAngleToTarget(getDistanceToTarget.get())),
                 m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
                 // stationaryShooting ?
                 Commands.sequence(
-                        Commands.waitSeconds(0.25),
-                        m_feederSubsystem.stop(),
+                        m_feederSubsystem.reverse().withTimeout(0.25).andThen(m_feederSubsystem.stop()),
                         Commands.waitUntil(() -> isAutoAimReady.get() && isShooterReady(isFeeding.get()))
-                                .andThen(
-                                        Commands.sequence(
-                                                m_feederSubsystem.reverse().withTimeout(0.25),
-                                                m_feederSubsystem.feed())))
+                                .andThen(m_feederSubsystem.feed()))
         // : Commands.sequence(
         // m_feederSubsystem.reverse().withTimeout(0.25),
         // new ConditionalCommand(
@@ -126,11 +117,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public Command aimAndShootIgnoreCheck(Supplier<Distance> getDistanceToTarget, Time delayBeforeShooting) {
         return Commands.parallel(
-                m_hoodSubsystem.setAngle(() -> {
-                    Distance distance = getDistanceToTarget.get();
-                    ShooterZone zone = m_hoodSubsystem.getSpeedZone(distance);
-                    return m_hoodSubsystem.getAngleToTarget(distance, zone);
-                }),
+                m_hoodSubsystem.setAngle(() -> m_hoodSubsystem.getAngleToTarget(getDistanceToTarget.get())),
                 m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
                 new WaitCommand(delayBeforeShooting).andThen(
                         m_feederSubsystem.feed()))
