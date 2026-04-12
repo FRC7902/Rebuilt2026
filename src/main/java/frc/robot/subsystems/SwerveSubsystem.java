@@ -786,15 +786,15 @@ public class SwerveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
-            SmartDashboard.putNumber("swerve/autoAimHeading", getAutoAimHeading().getDegrees());
-            SmartDashboard.putNumber("swerve/currentHeading", getHeading().getDegrees() - 90);
+            SmartDashboard.putNumber("swerve/autoAimHeading (deg)", getAutoAimHeading().getDegrees());
+            SmartDashboard.putNumber("swerve/currentHeading (deg)", getHeading().getDegrees() - 90);
             SmartDashboard.putBoolean("swerve/isAutoAimReady", isAutoAimOnTarget());
             SmartDashboard.putNumber("swerve/distToWaypoint (m)",
                     m_driveToWaypoint.minus(getPose()).getTranslation().getNorm());
             SmartDashboard.putNumber("swerve/rotToWaypoint (deg)",
                     m_driveToWaypoint.getRotation().minus(getPose().getRotation()).getDegrees());
             SmartDashboard.putBoolean("swerve/isAtWaypoint", isAtWaypoint());
-            SmartDashboard.putNumber("swerve/distToTarget", getDistanceToTarget().in(Meters));
+            SmartDashboard.putNumber("swerve/distToTarget (m)", getDistanceToTarget().in(Meters));
         }
     }
 
