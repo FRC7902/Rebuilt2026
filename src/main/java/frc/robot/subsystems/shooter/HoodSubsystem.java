@@ -206,7 +206,7 @@ public class HoodSubsystem extends SubsystemBase {
     }
 
     public Angle getAngleToTarget(Distance distanceToTarget) {
-        InterpolatingDoubleTreeMap map = ShooterConstants.createHoodInterpolationMap();
+        InterpolatingDoubleTreeMap map = ShooterConstants.hoodInterpolationMap;
         Double angleDeg = map != null ? map.get(distanceToTarget.in(Meters)) : null;
         return Degrees.of(angleDeg != null ? angleDeg : HoodConstants.DEFAULT_ANGLE.in(Degrees));
     }
@@ -258,7 +258,6 @@ public class HoodSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("HoodMech/HoodSetpoint (deg)",
                     getAngleSetpoint().map(angle -> angle.in(Degrees)).orElse(Double.NaN));
         }
-        SmartDashboard.putNumber("Current Draw Actual", m_motor.getStatorCurrent().getValueAsDouble());
 
     }
 

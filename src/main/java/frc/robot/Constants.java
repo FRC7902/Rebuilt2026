@@ -186,7 +186,6 @@ public final class Constants {
         }
 
         public static final class ShooterConstants {
-
                 public static final Map<Distance, Pair<Angle, AngularVelocity>> SHOOTER_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM = Map
                                 .ofEntries(
                                                 Map.entry(
@@ -226,6 +225,7 @@ public final class Constants {
                         }
                         return map;
                 }
+                public static InterpolatingDoubleTreeMap hoodInterpolationMap = createHoodInterpolationMap();
 
                 public static InterpolatingDoubleTreeMap createRPMInterpolationMap() {
                         InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
@@ -235,6 +235,7 @@ public final class Constants {
                         }
                         return map;
                 }
+                public static InterpolatingDoubleTreeMap rpmInterpolationMap = createRPMInterpolationMap();
 
                 public static enum ShooterZone {
                         ZONE_1,

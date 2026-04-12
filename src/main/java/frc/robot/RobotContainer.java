@@ -337,8 +337,6 @@ public class RobotContainer {
                 // .beforeStarting(m_shooterSubsystem.stopFeeder()));
 
                 // Manual hood angle and flywheel velocity control for testing
-                SmartDashboard.putNumber("ManualTuning/HoodAngleSetpoint (deg)", 0);
-                SmartDashboard.putNumber("ManualTuning/FlywheelVelocitySetpoint (RPM)", 0);
 
                 m_driverController.R2()
                                 .and(isControllingDriveTrigger.negate())
@@ -347,22 +345,6 @@ public class RobotContainer {
                                                                 m_swerveSubsystem::isAutoAimOnTarget, true,
                                                                 () -> !m_swerveSubsystem.isInAllianceZone())
                                                 .beforeStarting(m_shooterSubsystem.stopFeeder()));
-
-                // m_shooterSubsystem
-                // .aimAndShoot(() -> m_swerveSubsystem.getDistanceToTarget(true),
-                // m_swerveSubsystem::isAutoAimOnTarget, true,
-                // () -> !m_swerveSubsystem.isInAllianceZone())
-                // .beforeStarting(m_shooterSubsystem.stopFeeder()));
-
-                // m_shooterSubsystem.shootWith(
-
-                // () -> Degrees.of(SmartDashboard
-                // .getNumber("ManualTuning/HoodAngleSetpoint (deg)", 0)),
-
-                // () -> RPM.of(SmartDashboard.getNumber(
-                // "ManualTuning/FlywheelVelocitySetpoint (RPM)", 0)))
-
-                // .beforeStarting(m_shooterSubsystem.stopFeeder())
 
                 // Stop shooter subsystem
                 m_driverController.R2()

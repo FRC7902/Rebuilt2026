@@ -280,7 +280,6 @@ public class ShooterSubsystem extends SubsystemBase {
             SmartDashboard.putBoolean("isFlywheelReady (feeding)", m_flywheelSubsystem.isAtTargetRPM(true));
             SmartDashboard.putBoolean("isShooterReady", isShooterReady());
             SmartDashboard.putBoolean("isShooterReady (feeding)", isShooterReady(true));
-            SmartDashboard.putNumber("RPM Map",ShooterConstants.createRPMInterpolationMap().get(3.0));
         }
     }
 
