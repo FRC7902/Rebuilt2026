@@ -52,10 +52,23 @@ public class IndexerSubsystem extends SubsystemBase {
     }
 
     /**
+     * Sets the motor speed only if it differs from the current target, reducing unnecessary CAN writes.
+     */
+    private void setSpeed(double speed) {
+        if (Double.compare(speed, m_targetSpeed) != 0) {
+            m_targetSpeed = speed;
+            m_motor.set(speed);
+        }
+    }
+
+    /**
      * Stops the indexer motor.
      */
     public Command stop() {
-        return this.runOnce(() -> m_motor.stopMotor());
+        return this.runOnce(() -> {
+            m_motor.stopMotor();
+            m_targetSpeed = Double.NaN;
+        });
     }
 
     // Helper method to alternate between full and half speed every 0.125 seconds
@@ -68,15 +81,15 @@ public class IndexerSubsystem extends SubsystemBase {
     // simulation, but alternating between a constant and zero does.
     public Command run() {
         return new ConditionalCommand(
-                this.runOnce(() -> m_motor.set(IndexerConstants.INDEXER_FULL_SPEED)),
-                this.runOnce(() -> m_motor.set(IndexerConstants.INDEXER_HALF_SPEED)),
+                this.runOnce(() -> setSpeed(IndexerConstants.INDEXER_FULL_SPEED)),
+                this.runOnce(() -> setSpeed(IndexerConstants.INDEXER_HALF_SPEED)),
                 this::useFullSpeed).repeatedly();
     }
 
     public Command reverse() {
         return new ConditionalCommand(
-                this.runOnce(() -> m_motor.set(-IndexerConstants.INDEXER_FULL_SPEED)),
-                this.runOnce(() -> m_motor.set(-IndexerConstants.INDEXER_HALF_SPEED)),
+                this.runOnce(() -> setSpeed(-IndexerConstants.INDEXER_FULL_SPEED)),
+                this.runOnce(() -> setSpeed(-IndexerConstants.INDEXER_HALF_SPEED)),
                 this::useFullSpeed).repeatedly();
     }
 
