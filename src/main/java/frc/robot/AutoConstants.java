@@ -4,7 +4,7 @@ import edu.wpi.first.math.controller.PIDController;
 
 public final class AutoConstants {
     // Translation PID (for forward/backward movement)
-    public static final double TRANSLATION_kP = 1.0;
+    public static final double TRANSLATION_kP = 3.0;
     public static final double TRANSLATION_kI = 0.0;
     public static final double TRANSLATION_kD = 0.0;
     public static final PIDController TRANSLATION_PID =
@@ -18,7 +18,7 @@ public final class AutoConstants {
             rotationController();
 
     // Cross-track PID (to correct lateral / cross-track error)
-    public static final double CROSSTRACK_kP = 0.5;
+    public static final double CROSSTRACK_kP = 2.0;
     public static final double CROSSTRACK_kI = 0.0;
     public static final double CROSSTRACK_kD = 0.0;
     public static final PIDController CROSSTRACK_PID =

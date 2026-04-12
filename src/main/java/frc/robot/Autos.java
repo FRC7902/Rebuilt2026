@@ -51,6 +51,10 @@ public class Autos {
 		Path myPath = new Path("Blue_Left_Depot");
 		return pathBuilder.build(myPath);
 	}
+	public Command getRightAutoSweepOnly(){
+		Path myPath = new Path("RightAuto_Sweep");
+		return pathBuilder.build(myPath);
+	}
 	public Command rightNeutralAutoFirstSweep() {
 		return Commands.sequence(
 			new InstantCommand(() -> pathBuilder.withPoseReset(m_swerveSubsystem::resetOdometry)),

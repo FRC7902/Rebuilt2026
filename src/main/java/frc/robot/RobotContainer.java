@@ -183,6 +183,7 @@ public class RobotContainer {
         autoChooser.addCmd("Bline Test Path", m_autos::getTestPath);
         autoChooser.addCmd("Bline multiple waypoint test", m_autos::getDepotTest);
         autoChooser.addCmd("Bline First Sweep Right Neutral", m_autos::rightNeutralAutoFirstSweep);
+        autoChooser.addCmd("Right Auto Sweep Only", m_autos::getRightAutoSweepOnly);
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
