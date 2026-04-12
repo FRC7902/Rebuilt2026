@@ -176,7 +176,8 @@ public final class Constants {
             public static final Distance SHUFFLE_FAR_POSITION = MIDPOINT_POSITION.plus(Meters.of(0.10));
             public static final Distance SHUFFLE_FURTHEST_POSITION = EXTENDED_POSITION
                     .minus(Meters.of(0.10));
-            public static final Distance SHUFFLE_CLOSE_TO_RETRACT_POSITION = RETRACTED_POSITION.plus(Meters.of(0.10));
+            public static final Distance SHUFFLE_CLOSE_TO_RETRACT_POSITION = RETRACTED_POSITION
+                    .plus(Meters.of(0.10));
 
             public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(12),
                     Inches.of(0),
@@ -229,14 +230,30 @@ public final class Constants {
         public static final Map<Distance, Pair<Angle, AngularVelocity>> FEEDING_TARGET_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM = Map
                 .ofEntries(
                         Map.entry(
-                                Meters.of(5.4864),
-                                Pair.of(Degrees.of(20), RPM.of(2800))),
+                                Meters.of(4.8533),
+                                Pair.of(Degrees.of(40), RPM.of(3500))),
                         Map.entry(
-                                Meters.of(6.0960),
-                                Pair.of(Degrees.of(18), RPM.of(3000))),
+                                Meters.of(7.0573),
+                                Pair.of(Degrees.of(40), RPM.of(4600))),
                         Map.entry(
-                                Meters.of(6.7056),
-                                Pair.of(Degrees.of(16), RPM.of(3200))));
+                                Meters.of(10.2642),
+                                Pair.of(Degrees.of(40), RPM.of(5800))),
+                        Map.entry(
+                                Meters.of(11.8006),
+                                Pair.of(Degrees.of(40), RPM.of(6300))),
+                        // Max angle max RPM
+                        Map.entry(
+                                Meters.of(13),
+                                Pair.of(Degrees.of(40), RPM.of(6300))),
+                        Map.entry(
+                                Meters.of(14),
+                                Pair.of(Degrees.of(40), RPM.of(6300))),
+                        Map.entry(
+                                Meters.of(15),
+                                Pair.of(Degrees.of(40), RPM.of(6300))),
+                        Map.entry(
+                                Meters.of(16),
+                                Pair.of(Degrees.of(40), RPM.of(6300))));
 
         public static InterpolatingDoubleTreeMap createHoodInterpolationMap() {
             InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
@@ -259,8 +276,9 @@ public final class Constants {
         public static InterpolatingDoubleTreeMap createFeedingHoodInterpolationMap() {
             InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
             for (Distance i : FEEDING_TARGET_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM.keySet()) {
-                map.put(i.in(Meters), FEEDING_TARGET_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM.get(i).getFirst()
-                        .in(Degrees));
+                map.put(i.in(Meters),
+                        FEEDING_TARGET_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM.get(i).getFirst()
+                                .in(Degrees));
             }
             return map;
         }
@@ -268,8 +286,10 @@ public final class Constants {
         public static InterpolatingDoubleTreeMap createFeedingRPMInterpolationMap() {
             InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
             for (Distance i : FEEDING_TARGET_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM.keySet()) {
-                map.put(i.in(Meters), FEEDING_TARGET_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM.get(i).getSecond()
-                        .in(RPM));
+                map.put(i.in(Meters),
+                        FEEDING_TARGET_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM.get(i)
+                                .getSecond()
+                                .in(RPM));
             }
             return map;
         }
@@ -311,8 +331,8 @@ public final class Constants {
             public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25);
             public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25);
 
-            public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(6960);
-            public static final AngularVelocity SIM_MAX_VELOCITY_RPM = RPM.of(6960);
+            public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(6300);
+            public static final AngularVelocity SIM_MAX_VELOCITY_RPM = RPM.of(6300);
             public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond
                     .of(173);
 
@@ -322,7 +342,7 @@ public final class Constants {
 
             public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(3600);
 
-            public static final AngularVelocity FEEDING_DEFAULT_VELOCITY = RPM.of(3000);
+            public static final AngularVelocity FEEDING_DEFAULT_VELOCITY = RPM.of(3500);
 
             public static final AngularVelocity RPM_TARGET_ERROR = RPM.of(100);
             public static final AngularVelocity RPM_TARGET_ERROR_WHILE_FEEDING = RPM.of(250);
@@ -365,7 +385,8 @@ public final class Constants {
             public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
             public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
 
-            public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(6000); // Disable max velocity for now
+            public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(6000); // Disable max velocity for
+                                                                                 // now
             public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond
                     .of(1000000); // Disable acceleration limit for now
 
