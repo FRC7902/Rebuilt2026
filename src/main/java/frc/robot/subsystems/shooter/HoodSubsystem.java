@@ -51,6 +51,7 @@ public class HoodSubsystem extends SubsystemBase {
             Debouncer.DebounceType.kRising);
 
     private final InterpolatingDoubleTreeMap m_hoodMap;
+    private final InterpolatingDoubleTreeMap m_feedingHoodMap;
 
     public HoodSubsystem() {
         m_motor = new TalonFX(HoodConstants.MOTOR_CAN_ID);
@@ -115,6 +116,7 @@ public class HoodSubsystem extends SubsystemBase {
         m_hood = new Arm(m_hoodConfig);
 
         m_hoodMap = ShooterConstants.createHoodInterpolationMap();
+        m_feedingHoodMap = ShooterConstants.createFeedingHoodInterpolationMap();
     }
 
     /**
@@ -202,6 +204,16 @@ public class HoodSubsystem extends SubsystemBase {
     public Angle getAngleToTarget(Distance distanceToTarget) {
         Double angleDeg = m_hoodMap.get(distanceToTarget.in(Meters));
         return Degrees.of(angleDeg != null ? angleDeg : HoodConstants.DEFAULT_ANGLE.in(Degrees));
+    }
+
+    public Angle getAngleToTarget(Distance distanceToTarget, boolean isFeeding) {
+        InterpolatingDoubleTreeMap map = isFeeding ? m_feedingHoodMap : m_hoodMap;
+        double defaultAngle = isFeeding
+                ? HoodConstants.FEEDING_DEFAULT_ANGLE.in(Degrees)
+                : HoodConstants.DEFAULT_ANGLE.in(Degrees);
+
+        Double angleDeg = map.get(distanceToTarget.in(Meters));
+        return Degrees.of(angleDeg != null ? angleDeg : defaultAngle);
     }
 
     /**

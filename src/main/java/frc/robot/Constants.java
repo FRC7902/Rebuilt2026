@@ -219,6 +219,25 @@ public final class Constants {
 
                 );
 
+        /**
+         * Feeding-target interpolation points.
+         *
+         * Replace these placeholder entries with measured feeding-target data points.
+         * Distances are from robot to feeding target, angles are hood setpoints in
+         * degrees, and velocities are flywheel setpoints in RPM.
+         */
+        public static final Map<Distance, Pair<Angle, AngularVelocity>> FEEDING_TARGET_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM = Map
+                .ofEntries(
+                        Map.entry(
+                                Meters.of(5.4864),
+                                Pair.of(Degrees.of(20), RPM.of(2800))),
+                        Map.entry(
+                                Meters.of(6.0960),
+                                Pair.of(Degrees.of(18), RPM.of(3000))),
+                        Map.entry(
+                                Meters.of(6.7056),
+                                Pair.of(Degrees.of(16), RPM.of(3200))));
+
         public static InterpolatingDoubleTreeMap createHoodInterpolationMap() {
             InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
             for (Distance i : SHOOTER_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM.keySet()) {
@@ -232,6 +251,24 @@ public final class Constants {
             InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
             for (Distance i : SHOOTER_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM.keySet()) {
                 map.put(i.in(Meters), SHOOTER_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM.get(i).getSecond()
+                        .in(RPM));
+            }
+            return map;
+        }
+
+        public static InterpolatingDoubleTreeMap createFeedingHoodInterpolationMap() {
+            InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
+            for (Distance i : FEEDING_TARGET_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM.keySet()) {
+                map.put(i.in(Meters), FEEDING_TARGET_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM.get(i).getFirst()
+                        .in(Degrees));
+            }
+            return map;
+        }
+
+        public static InterpolatingDoubleTreeMap createFeedingRPMInterpolationMap() {
+            InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
+            for (Distance i : FEEDING_TARGET_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM.keySet()) {
+                map.put(i.in(Meters), FEEDING_TARGET_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM.get(i).getSecond()
                         .in(RPM));
             }
             return map;
@@ -285,6 +322,8 @@ public final class Constants {
 
             public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(3600);
 
+            public static final AngularVelocity FEEDING_DEFAULT_VELOCITY = RPM.of(3000);
+
             public static final AngularVelocity RPM_TARGET_ERROR = RPM.of(100);
             public static final AngularVelocity RPM_TARGET_ERROR_WHILE_FEEDING = RPM.of(250);
 
@@ -337,6 +376,8 @@ public final class Constants {
 
             public static final Angle DEFAULT_ANGLE = Degrees.of(8);
             public static final Angle LOWER_HOOD_ANGLE = Degrees.of(15);
+
+            public static final Angle FEEDING_DEFAULT_ANGLE = Degrees.of(18);
 
             public static final Distance LENGTH = Inches.of(8.5);
             public static final Mass MASS = Pounds.of(4.39);

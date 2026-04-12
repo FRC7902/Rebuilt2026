@@ -57,6 +57,7 @@ public class FlywheelSubsystem extends SubsystemBase {
             Debouncer.DebounceType.kRising);
 
     private final InterpolatingDoubleTreeMap m_flywheelMap;
+    private final InterpolatingDoubleTreeMap m_feedingFlywheelMap;
 
     public FlywheelSubsystem() {
         m_leaderMotor = new TalonFX(FlywheelConstants.LEADER_MOTOR_CAN_ID);
@@ -118,6 +119,7 @@ public class FlywheelSubsystem extends SubsystemBase {
         m_flywheel = new FlyWheel(flywheelConfig);
 
         m_flywheelMap = ShooterConstants.createRPMInterpolationMap();
+        m_feedingFlywheelMap = ShooterConstants.createFeedingRPMInterpolationMap();
     }
 
     /**
@@ -278,6 +280,20 @@ public class FlywheelSubsystem extends SubsystemBase {
         Double targetRpm = m_flywheelMap.get(distanceToTarget.in(Meters));
         if (targetRpm == null) {
             return FlywheelConstants.DEFAULT_VELOCITY;
+        }
+
+        return RPM.of(targetRpm);
+    }
+
+    public AngularVelocity getTargetVelocity(Distance distanceToTarget, boolean isFeeding) {
+        InterpolatingDoubleTreeMap map = isFeeding ? m_feedingFlywheelMap : m_flywheelMap;
+        AngularVelocity defaultVelocity = isFeeding
+                ? FlywheelConstants.FEEDING_DEFAULT_VELOCITY
+                : FlywheelConstants.DEFAULT_VELOCITY;
+
+        Double targetRpm = map.get(distanceToTarget.in(Meters));
+        if (targetRpm == null) {
+            return defaultVelocity;
         }
 
         return RPM.of(targetRpm);
