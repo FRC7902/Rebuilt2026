@@ -251,9 +251,9 @@ public class HoodSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        m_hood.updateTelemetry();
-
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
+            m_hood.updateTelemetry();
+
             SmartDashboard.putNumber("HoodMech/angle (deg)", getAngle().in(Degrees));
             SmartDashboard.putNumber("HoodMech/setpoint (deg)",
                     getAngleSetpoint().map(angle -> angle.in(Degrees)).orElse(Double.NaN));

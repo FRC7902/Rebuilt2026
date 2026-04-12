@@ -255,9 +255,9 @@ public class FlywheelSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        m_flywheel.updateTelemetry();
-
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
+            m_flywheel.updateTelemetry();
+
             SmartDashboard.putNumber("FlywheelMech/linearVelocity (fps)", getLinearVelocity().in(FeetPerSecond));
         }
 
