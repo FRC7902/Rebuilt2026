@@ -275,7 +275,11 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
     public AngularVelocity getTargetVelocity(Distance distanceToTarget) {
-        AngularVelocity target = RPM.of(m_flywheelMap.get(distanceToTarget.in(Meters)));
-        return target != null ? target : FlywheelConstants.DEFAULT_VELOCITY;
+        Double targetRpm = m_flywheelMap.get(distanceToTarget.in(Meters));
+        if (targetRpm == null) {
+            return FlywheelConstants.DEFAULT_VELOCITY;
+        }
+
+        return RPM.of(targetRpm);
     }
 }
