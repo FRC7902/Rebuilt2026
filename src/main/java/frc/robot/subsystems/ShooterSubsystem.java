@@ -48,7 +48,6 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return true if the shooter is ready to shoot, false otherwise
      */
     public boolean isShooterReady() {
-        // TODO: Remove this one hood mech simulation is fixed
         if (Robot.isSimulation())
             return m_flywheelSubsystem.isAtTargetRPM();
 
@@ -57,7 +56,6 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean isShooterReady(boolean isFeeding) {
-        // TODO: Remove this one hood mech simulation is fixed
         if (Robot.isSimulation())
             return m_flywheelSubsystem.isAtTargetRPM(isFeeding);
 
@@ -140,9 +138,6 @@ public class ShooterSubsystem extends SubsystemBase {
     public Command aimAndShootIgnoreCheck(Supplier<Distance> getDistanceToTarget) {
         return aimAndShootIgnoreCheck(getDistanceToTarget, Seconds.of(1));
     }
-
-    // TODO: What if we get pushed while we're auto-aiming? This may 'cause
-    // isAutoAimReady to never be true. Maybe lock swerve pose?
 
     public Command shootNoAutoAim() {
         return Commands.parallel(
@@ -237,8 +232,6 @@ public class ShooterSubsystem extends SubsystemBase {
     public Command feederSysId() {
         return m_feederSubsystem.sysId();
     }
-
-    // TODO: isShooterAlmostEmpty()
 
     // Simulation
     public LinearVelocity getFlywheelLinearVelocity() {

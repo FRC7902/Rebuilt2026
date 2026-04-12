@@ -96,9 +96,6 @@ public class Autos {
     }
 
     public Command rightNeutralAuto() {
-
-        // TODO: Add alliance flipping util
-
         return new SequentialCommandGroup(
                 resetOdometry(Position.STARTING_LINE_RIGHT),
                 new InstantCommand(

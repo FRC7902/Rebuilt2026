@@ -57,7 +57,7 @@ public class FlywheelSubsystem extends SubsystemBase {
 
     private final Debouncer m_atRPMDebouncer = new Debouncer(
             FlywheelConstants.AT_RPM_DEBOUNCE_TIME.in(Seconds),
-            Debouncer.DebounceType.kRising);
+            Debouncer.DebounceType.kFalling);
 
     public FlywheelSubsystem() {
         m_leaderMotor = new TalonFX(FlywheelConstants.LEADER_MOTOR_CAN_ID);
@@ -212,13 +212,11 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
     private boolean calculateDebounce(AngularVelocity setpoint, AngularVelocity targetError) {
-        // TODO: Change debouncer to be `kFalling` and remove the negations once the
-        // debouncer is fixed to debounce when the condition becomes true instead of
-        // false
-        return !m_atRPMDebouncer.calculate(
-                !setpoint.times(FlywheelConstants.GEARBOX.getOutputToInputConversionFactor()).isNear(
+        return m_atRPMDebouncer.calculate(
+                        setpoint.times(FlywheelConstants.GEARBOX.getOutputToInputConversionFactor()).isNear(
                         getAngularVelocity(),
-                        targetError));
+                        targetError)
+                        );
     }
 
     public boolean isAtTargetRPM() {
