@@ -52,7 +52,8 @@ public class IndexerSubsystem extends SubsystemBase {
     }
 
     /**
-     * Sets the motor speed only if it differs from the current target, reducing unnecessary CAN writes.
+     * Sets the motor speed only if it differs from the current target, reducing
+     * unnecessary CAN writes.
      */
     private void setSpeed(double speed) {
         if (Double.compare(speed, m_targetSpeed) != 0) {
@@ -71,7 +72,7 @@ public class IndexerSubsystem extends SubsystemBase {
         });
     }
 
-    // Helper method to alternate between full and half speed every 0.125 seconds
+    // Helper method to alternate between full and half speed
     private boolean useFullSpeed() {
         double secondFraction = Timer.getFPGATimestamp() % 2.0;
         return secondFraction >= 0.10;
