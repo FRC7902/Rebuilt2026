@@ -10,7 +10,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -52,6 +51,17 @@ public class IndexerSubsystem extends SubsystemBase {
         m_motor.getConfigurator().apply(m_motorConfig);
     }
 
+    /**
+     * Sets the indexer motor speed.
+     *
+     * @param speed the desired motor output (-1.0 to 1.0)
+     */
+    public void setSpeed(double speed) {
+        if (speed != m_targetSpeed) {
+            m_targetSpeed = speed;
+            m_motor.set(speed);
+        }
+    }
 
     /**
      * Stops the indexer motor.
@@ -63,30 +73,27 @@ public class IndexerSubsystem extends SubsystemBase {
     // Helper method to alternate between full and half speed every 0.125 seconds
     private boolean useFullSpeed() {
         double secondFraction = Timer.getFPGATimestamp() % 2.0;
-        return secondFraction >= 0.10;
+        return secondFraction >= 0.125;
     }
 
     // TODO: Understand why alternating between two constants doesn't pulse in
     // simulation, but alternating between a constant and zero does.
     public Command run() {
         return new ConditionalCommand(
-                this.runOnce(() -> m_motor.set(IndexerConstants.INDEXER_FULL_SPEED)),
-                this.runOnce(() -> m_motor.set(0.5)),
-                this::useFullSpeed
-                ).repeatedly();
+                this.runOnce(() -> setSpeed(IndexerConstants.INDEXER_FULL_SPEED)),
+                this.runOnce(() -> setSpeed(0)),
+                this::useFullSpeed).repeatedly();
     }
 
     public Command reverse() {
         return new ConditionalCommand(
-                this.runOnce(() -> m_motor.set(-IndexerConstants.INDEXER_FULL_SPEED)),
-                this.runOnce(() -> m_motor.set(0)),
+                this.runOnce(() -> setSpeed(-IndexerConstants.INDEXER_FULL_SPEED)),
+                this.runOnce(() -> setSpeed(0)),
                 this::useFullSpeed).repeatedly();
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Indexer - Speed Setpoint", m_targetSpeed);
-        SmartDashboard.putNumber("Indexer - Speed Actual", m_motor.get());
     }
 
     @Override

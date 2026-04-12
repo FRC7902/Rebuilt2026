@@ -205,8 +205,8 @@ public class HoodSubsystem extends SubsystemBase {
                 .orElse(ShooterZone.ZONE_1);
     }
 
-    public Angle getAngleToTarget(Distance distanceToTarget) {
-        InterpolatingDoubleTreeMap map = ShooterConstants.hoodInterpolationMap;
+    public Angle getAngleToTarget(Distance distanceToTarget, ShooterZone zone) {
+        InterpolatingDoubleTreeMap map = ShooterConstants.SHOOTER_DISTANCE_TO_HOOD_ANGLE_INTERPOLATION.get(zone);
         Double angleDeg = map != null ? map.get(distanceToTarget.in(Meters)) : null;
         return Degrees.of(angleDeg != null ? angleDeg : HoodConstants.DEFAULT_ANGLE.in(Degrees));
     }
@@ -258,7 +258,6 @@ public class HoodSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("HoodMech/HoodSetpoint (deg)",
                     getAngleSetpoint().map(angle -> angle.in(Degrees)).orElse(Double.NaN));
         }
-
     }
 
     /**
