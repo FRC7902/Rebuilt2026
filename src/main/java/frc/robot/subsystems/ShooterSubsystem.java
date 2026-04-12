@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.ShooterZone;
 import frc.robot.Robot;
 import frc.robot.subsystems.shooter.FeederSubsystem;
@@ -101,8 +102,7 @@ public class ShooterSubsystem extends SubsystemBase {
         return Commands.parallel(
                 m_hoodSubsystem.setAngle(() -> {
                     Distance distance = getDistanceToTarget.get();
-                    ShooterZone zone = m_hoodSubsystem.getSpeedZone(distance);
-                    return m_hoodSubsystem.getAngleToTarget(distance, zone);
+                    return m_hoodSubsystem.getAngleToTarget(distance);
                 }),
                 m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
                 // stationaryShooting ?
@@ -112,7 +112,7 @@ public class ShooterSubsystem extends SubsystemBase {
                         Commands.waitUntil(() -> isAutoAimReady.get() && isShooterReady(isFeeding.get()))
                                 .andThen(
                                         Commands.sequence(
-                                                m_feederSubsystem.reverse().withTimeout(0.25),
+                                                // m_feederSubsystem.reverse().withTimeout(0.25),
                                                 m_feederSubsystem.feed())))
         // : Commands.sequence(
         // m_feederSubsystem.reverse().withTimeout(0.25),
@@ -128,8 +128,7 @@ public class ShooterSubsystem extends SubsystemBase {
         return Commands.parallel(
                 m_hoodSubsystem.setAngle(() -> {
                     Distance distance = getDistanceToTarget.get();
-                    ShooterZone zone = m_hoodSubsystem.getSpeedZone(distance);
-                    return m_hoodSubsystem.getAngleToTarget(distance, zone);
+                    return m_hoodSubsystem.getAngleToTarget(distance);
                 }),
                 m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
                 new WaitCommand(delayBeforeShooting).andThen(
@@ -155,8 +154,22 @@ public class ShooterSubsystem extends SubsystemBase {
         return Commands.parallel(
                 m_hoodSubsystem.setAngle(angle),
                 m_flywheelSubsystem.setSpeed(RPM),
-                new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(), this::isShooterReady)
-                        .repeatedly());
+                Commands.sequence(
+                        Commands.waitSeconds(0.25),
+                        m_feederSubsystem.stop(),
+                        new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(), this::isShooterReady)
+                                .repeatedly()));
+    }
+
+    public Command shootWith(Supplier<Angle> angle, Supplier<AngularVelocity> RPM) {
+        return Commands.parallel(
+                m_hoodSubsystem.setAngle(angle),
+                m_flywheelSubsystem.setSpeed(RPM),
+                Commands.sequence(
+                        Commands.waitSeconds(0.25),
+                        m_feederSubsystem.stop(),
+                        new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(), this::isShooterReady)
+                                .repeatedly()));
     }
 
     /**
@@ -267,6 +280,7 @@ public class ShooterSubsystem extends SubsystemBase {
             SmartDashboard.putBoolean("isFlywheelReady (feeding)", m_flywheelSubsystem.isAtTargetRPM(true));
             SmartDashboard.putBoolean("isShooterReady", isShooterReady());
             SmartDashboard.putBoolean("isShooterReady (feeding)", isShooterReady(true));
+            SmartDashboard.putNumber("RPM Map",ShooterConstants.createRPMInterpolationMap().get(3.0));
         }
     }
 
