@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
-import frc.robot.Constants.ShooterConstants.ShooterZone;
 import frc.robot.Robot;
 import frc.robot.subsystems.shooter.FeederSubsystem;
 import frc.robot.subsystems.shooter.FlywheelSubsystem;
@@ -101,8 +100,7 @@ public class ShooterSubsystem extends SubsystemBase {
         return Commands.parallel(
                 m_hoodSubsystem.setAngle(() -> {
                     Distance distance = getDistanceToTarget.get();
-                    ShooterZone zone = m_hoodSubsystem.getSpeedZone(distance);
-                    return m_hoodSubsystem.getAngleToTarget(distance, zone);
+                    return m_hoodSubsystem.getAngleToTarget(distance);
                 }),
                 m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
                 // stationaryShooting ?
@@ -128,8 +126,7 @@ public class ShooterSubsystem extends SubsystemBase {
         return Commands.parallel(
                 m_hoodSubsystem.setAngle(() -> {
                     Distance distance = getDistanceToTarget.get();
-                    ShooterZone zone = m_hoodSubsystem.getSpeedZone(distance);
-                    return m_hoodSubsystem.getAngleToTarget(distance, zone);
+                    return m_hoodSubsystem.getAngleToTarget(distance);
                 }),
                 m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
                 new WaitCommand(delayBeforeShooting).andThen(
