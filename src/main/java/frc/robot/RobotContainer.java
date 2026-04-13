@@ -370,8 +370,10 @@ public class RobotContainer {
 
         SmartDashboard.putBoolean("swerve/isAutoAiming", false);
         m_driverController.R2()
-                .onTrue(new InstantCommand(() -> SmartDashboard.putBoolean("swerve/isAutoAiming", true)))
-                .onFalse(new InstantCommand(() -> SmartDashboard.putBoolean("swerve/isAutoAiming", false)));
+                .onTrue(new InstantCommand(
+                        () -> SmartDashboard.putBoolean("swerve/isAutoAiming", true)))
+                .onFalse(new InstantCommand(
+                        () -> SmartDashboard.putBoolean("swerve/isAutoAiming", false)));
 
         if (Robot.isSimulation()) {
             SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(new Translation2d(3, 3)));
@@ -523,10 +525,15 @@ public class RobotContainer {
     }
 
     public void calibrateLinearIntakePosition() {
-        if (m_linearIntakeSubsystem.getExtendedLimitSwitch()) {
-            CommandScheduler.getInstance().schedule(m_linearIntakeSubsystem.setEncoderPositionExtended());
-        } else if (m_linearIntakeSubsystem.getRetractedLimitSwitch()) {
-            CommandScheduler.getInstance().schedule(m_linearIntakeSubsystem.setEncoderPositionRetracted());
+        boolean leftExtended = m_linearIntakeSubsystem.getLeftExtendedLimitSwitch();
+        boolean rightExtended = m_linearIntakeSubsystem.getRightExtendedLimitSwitch();
+        boolean leftRetracted = m_linearIntakeSubsystem.getLeftRetractedLimitSwitch();
+        boolean rightRetracted = m_linearIntakeSubsystem.getRightRetractedLimitSwitch();
+
+        if (leftExtended || rightExtended) {
+            m_linearIntakeSubsystem.setEncoderPositionExtended();
+        } else if (leftRetracted || rightRetracted) {
+            m_linearIntakeSubsystem.setEncoderPositionRetracted();
         }
     }
 

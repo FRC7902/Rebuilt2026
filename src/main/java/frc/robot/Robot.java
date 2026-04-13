@@ -37,11 +37,7 @@ public class Robot extends TimedRobot {
     public void disabledExit() {
     }
 
-    @Override
-    public void autonomousInit() {
-        // Zero gyro (shooter must face away from driver, towards opponent wall)
-        m_robotContainer.zeroGyroWithAlliance();
-
+    private void teleopAndAutonomousInit() {
         CommandScheduler.getInstance().schedule(m_robotContainer.stopAllSubsystems());
 
         // Check the linear intake position and set the encoder position accordingly
@@ -49,6 +45,14 @@ public class Robot extends TimedRobot {
 
         // Start the flywheel at the default RPM when teleop starts
         CommandScheduler.getInstance().schedule(m_robotContainer.m_shooterSubsystem.startFlywheelDefaultRPM());
+    }
+
+    @Override
+    public void autonomousInit() {
+        teleopAndAutonomousInit();
+
+        // Zero gyro (shooter must face away from driver, towards opponent wall)
+        m_robotContainer.zeroGyroWithAlliance();
 
         // Extend the intake to lower the hopper enough to go underneath the trench
         // NOTE: Extend intake fully in auto, due to bug not allowing you to move it
@@ -67,21 +71,17 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        teleopAndAutonomousInit();
+
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
 
-        // Check the linear intake position and set the encoder position accordingly
-        m_robotContainer.calibrateLinearIntakePosition();
-
-        CommandScheduler.getInstance().schedule(m_robotContainer.stopAllSubsystems());
         m_robotContainer.driveAngularVelocity.driveToPoseEnabled(false);
-
-        // Start the flywheel at the default RPM when teleop starts
-        CommandScheduler.getInstance().schedule(m_robotContainer.m_shooterSubsystem.startFlywheelDefaultRPM());
 
         // Extend the intake to lower the hopper enough to go underneath the trench
         CommandScheduler.getInstance().schedule(m_robotContainer.m_linearIntakeSubsystem.midpoint());
+
         try {
             m_robotContainer.getDashboardSubsystem().setInactiveFirst(DriverStation.getGameSpecificMessage().charAt(0));
         } catch (IndexOutOfBoundsException e) {
