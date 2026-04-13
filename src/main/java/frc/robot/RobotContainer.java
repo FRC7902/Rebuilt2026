@@ -368,6 +368,11 @@ public class RobotContainer {
                 .onFalse(m_linearIntakeSubsystem.midpoint()
                         .unless(m_driverController.L2()::getAsBoolean));
 
+        SmartDashboard.putBoolean("swerve/isAutoAiming", false);
+        m_driverController.R2()
+                .onTrue(new InstantCommand(() -> SmartDashboard.putBoolean("swerve/isAutoAiming", true)))
+                .onFalse(new InstantCommand(() -> SmartDashboard.putBoolean("swerve/isAutoAiming", false)));
+
         if (Robot.isSimulation()) {
             SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(new Translation2d(3, 3)));
             m_driverController.R2()
