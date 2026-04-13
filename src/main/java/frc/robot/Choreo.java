@@ -301,4 +301,36 @@ public class Choreo {
                 m_swerveSubsystem.stop(),
                 m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
     }
+		public Command depotTrenchShoot() {
+			return Commands.sequence(
+				m_autoFactory.resetOdometry("DepotIntakeTrench"),
+				m_autoFactory.trajectoryCmd("DepotIntakeTrench"),
+				m_autoFactory.trajectoryCmd("DepotToShoot").deadlineFor(
+						m_intakeRollerSubsystem.stop(),
+						m_indexerSubsystem.stop(),
+						m_linearIntakeSubsystem.retract()
+				),
+				m_swerveSubsystem.stop(),
+				Commands.waitSeconds(4.5).deadlineFor(
+						m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
+						m_shooterSubsystem.aimAndShootIgnoreCheck(
+								() -> m_swerveSubsystem.getDistanceToTarget(true)))
+			);
+		}
+	public Command depotBumpShoot() {
+		return Commands.sequence(
+				m_autoFactory.resetOdometry("DepotIntakeBump"),
+				m_autoFactory.trajectoryCmd("DepotIntakeBump"),
+				m_autoFactory.trajectoryCmd("DepotToShoot").deadlineFor(
+						m_intakeRollerSubsystem.stop(),
+						m_indexerSubsystem.stop(),
+						m_linearIntakeSubsystem.retract()
+				),
+				m_swerveSubsystem.stop(),
+				Commands.waitSeconds(4.5).deadlineFor(
+						m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
+						m_shooterSubsystem.aimAndShootIgnoreCheck(
+								() -> m_swerveSubsystem.getDistanceToTarget(true)))
+		);
+	}
 }
