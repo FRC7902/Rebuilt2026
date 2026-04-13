@@ -347,7 +347,8 @@ public class Choreo {
 						m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
 						m_shooterSubsystem.aimAndShootIgnoreCheck(
 								() -> m_swerveSubsystem.getDistanceToTarget(true))),
-				m_autoFactory.trajectoryCmd("DepotShootClimb").deadlineFor(
+				m_autoFactory.trajectoryCmd("DepotShootClimb"),
+				m_autoFactory.trajectoryCmd("LeftAuto3b").deadlineFor(
 						m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT)
 				),
 				m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT)
@@ -367,7 +368,8 @@ public class Choreo {
 						m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
 						m_shooterSubsystem.aimAndShootIgnoreCheck(
 								() -> m_swerveSubsystem.getDistanceToTarget(true))),
-				m_autoFactory.trajectoryCmd("DepotShootClimb").deadlineFor(
+				m_autoFactory.trajectoryCmd("DepotShootClimb"),
+				m_autoFactory.trajectoryCmd("LeftAuto3b").deadlineFor(
 						m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT)
 				),
 				m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT)
