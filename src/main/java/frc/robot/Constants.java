@@ -396,10 +396,10 @@ public final class Constants {
             public static final Angle HARD_LIMIT_MIN = Degrees.of(0);
             public static final Angle HARD_LIMIT_MAX = Degrees.of(42.1875);
 
-            public static final Angle DEFAULT_ANGLE = Degrees.of(8);
+            public static final Angle DEFAULT_ANGLE = Degrees.of(14.4);
             public static final Angle LOWER_HOOD_ANGLE = Degrees.of(15);
 
-            public static final Angle FEEDING_DEFAULT_ANGLE = Degrees.of(18);
+            public static final Angle FEEDING_DEFAULT_ANGLE = Degrees.of(40);
 
             public static final Distance LENGTH = Inches.of(8.5);
             public static final Mass MASS = Pounds.of(4.39);
