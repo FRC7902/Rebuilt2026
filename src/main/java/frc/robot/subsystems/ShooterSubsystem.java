@@ -106,7 +106,11 @@ public class ShooterSubsystem extends SubsystemBase {
                 // stationaryShooting ?
                 Commands.sequence(
                         m_feederSubsystem.reverse().withTimeout(0.25).andThen(m_feederSubsystem.stop()),
-                        Commands.waitUntil(() -> isAutoAimReady.get() && isShooterReady(isFeeding.get()))
+                        new ConditionalCommand(
+                                Commands.waitUntil(() -> isAutoAimReady.get() && isShooterReady(true))
+                                        .withTimeout(2),
+                                Commands.waitUntil(() -> isAutoAimReady.get() && isShooterReady(false)),
+                                () -> isFeeding.get())
                                 .andThen(m_feederSubsystem.feed()))
         // : Commands.sequence(
         // m_feederSubsystem.reverse().withTimeout(0.25),
