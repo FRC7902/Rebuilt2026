@@ -107,8 +107,12 @@ public class ShooterSubsystem extends SubsystemBase {
                 Commands.sequence(
                         m_feederSubsystem.reverse().withTimeout(0.25).andThen(m_feederSubsystem.stop()),
                         new ConditionalCommand(
-                                Commands.waitUntil(() -> isAutoAimReady.get() && isShooterReady(true))
-                                        .withTimeout(2),
+                                // As a fallback, if we are feeding, consider shooter ready after 2s even if
+                                // flywheel/hood aren't at their targets
+                                Commands.parallel(
+                                        Commands.waitUntil(() -> isAutoAimReady.get()),
+                                        Commands.waitUntil(() -> isShooterReady(true))
+                                                .withTimeout(2)),
                                 Commands.waitUntil(() -> isAutoAimReady.get() && isShooterReady(false)),
                                 () -> isFeeding.get())
                                 .andThen(m_feederSubsystem.feed()))
