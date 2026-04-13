@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
@@ -336,14 +337,14 @@ public class RobotContainer {
                 .and(isControllingDriveTrigger)
                 .onTrue(m_shooterSubsystem.aimAndShoot(
                         () -> m_swerveSubsystem.getDistanceToTarget(true),
-                        m_swerveSubsystem::isAutoAimOnTarget, false,
+                        m_swerveSubsystem::isAutoAimOnTargetShooterReady, false,
                         () -> !m_swerveSubsystem.isInAllianceZone())
                         .beforeStarting(m_shooterSubsystem.stopFeeder()));
         m_driverController.R2()
                 .and(isControllingDriveTrigger.negate())
                 .onTrue(m_shooterSubsystem.aimAndShoot(
                         () -> m_swerveSubsystem.getDistanceToTarget(true),
-                        m_swerveSubsystem::isAutoAimOnTarget, true,
+                        m_swerveSubsystem::isAutoAimOnTargetShooterReady, true,
                         () -> !m_swerveSubsystem.isInAllianceZone())
                         .beforeStarting(m_shooterSubsystem.stopFeeder()));
         // Stop shooter subsystem
