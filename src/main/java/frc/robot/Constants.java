@@ -63,6 +63,7 @@ public final class Constants {
 
         public static final double AUTO_AIM_VELOCITY_COMPENSATION_FACTOR = 1.2; // TODO
         public static final Angle AUTO_AIM_ANGLE_TARGET_ERROR = Degrees.of(2.5);
+        public static final Angle AUTO_AIM_SHOOTER_READY_FEEDING_ANGLE_TARGET_ERROR = Degrees.of(5);
         public static final Angle AUTO_AIM_SHOOTER_READY_ANGLE_TARGET_ERROR = Degrees.of(20);
         public static final double AUTO_AIM_SCALE_TRANSLATION = 0.3; // TODO
 

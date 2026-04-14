@@ -311,6 +311,7 @@ public class RobotContainer {
                                 1.0).scaleRotation(1.0)));
 
         Trigger autoAimOnTarget = new Trigger(m_swerveSubsystem::isAutoAimOnTarget);
+        Supplier<Boolean> isFeeding = () -> !m_swerveSubsystem.isInAllianceZone();
 
         // Auto-aim (swerve heading with calculated hood angle) and shoot
         m_driverController.R2()
@@ -337,15 +338,19 @@ public class RobotContainer {
                 .and(isControllingDriveTrigger)
                 .onTrue(m_shooterSubsystem.aimAndShoot(
                         () -> m_swerveSubsystem.getDistanceToTarget(true),
-                        m_swerveSubsystem::isAutoAimOnTargetShooterReady, false,
-                        () -> !m_swerveSubsystem.isInAllianceZone())
+                        () -> m_swerveSubsystem
+                                .isAutoAimOnTargetShooterReady(isFeeding.get()),
+                        false,
+                        isFeeding)
                         .beforeStarting(m_shooterSubsystem.stopFeeder()));
         m_driverController.R2()
                 .and(isControllingDriveTrigger.negate())
                 .onTrue(m_shooterSubsystem.aimAndShoot(
                         () -> m_swerveSubsystem.getDistanceToTarget(true),
-                        m_swerveSubsystem::isAutoAimOnTargetShooterReady, true,
-                        () -> !m_swerveSubsystem.isInAllianceZone())
+                        () -> m_swerveSubsystem
+                                .isAutoAimOnTargetShooterReady(isFeeding.get()),
+                        true,
+                        isFeeding)
                         .beforeStarting(m_shooterSubsystem.stopFeeder()));
         // Stop shooter subsystem
         m_driverController.R2()

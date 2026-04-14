@@ -620,6 +620,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public boolean isInAllianceZone() {
+        // TODO: Compute this once per CommandScheduler loop instead
         Zone currentZone = getCurrentZone();
         if (isRedAlliance()) {
             return currentZone == Zone.RED_ALLIANCE_LEFT || currentZone == Zone.RED_ALLIANCE_RIGHT;
@@ -742,8 +743,10 @@ public class SwerveSubsystem extends SubsystemBase {
         return isAutoAimOnTarget(SwerveConstants.AUTO_AIM_ANGLE_TARGET_ERROR);
     }
 
-    public boolean isAutoAimOnTargetShooterReady() {
-        return isAutoAimOnTarget(SwerveConstants.AUTO_AIM_SHOOTER_READY_ANGLE_TARGET_ERROR);
+    public boolean isAutoAimOnTargetShooterReady(boolean isFeeding) {
+        Angle tolerance = isFeeding ? SwerveConstants.AUTO_AIM_SHOOTER_READY_FEEDING_ANGLE_TARGET_ERROR
+                : SwerveConstants.AUTO_AIM_SHOOTER_READY_ANGLE_TARGET_ERROR;
+        return isAutoAimOnTarget(tolerance);
     }
 
     /**
