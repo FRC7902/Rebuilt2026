@@ -180,10 +180,9 @@ public class RobotContainer {
         autoChooser.addCmd("Left - Sweep then depot", m_choreo::leftNeutralAutoThenDepot);
         autoChooser.addCmd("Center - Shoot and climb left", m_choreo::shootPreloadAndClimbLeft);
         autoChooser.addCmd("Center - Shoot and climb right", m_choreo::shootPreloadAndClimbRight);
-        autoChooser.addCmd("Bline Test Path", m_autos::getTestPath);
-        autoChooser.addCmd("Bline multiple waypoint test", m_autos::getDepotTest);
-        autoChooser.addCmd("Bline First Sweep Right Neutral", m_autos::rightNeutralAutoFirstSweep);
-        autoChooser.addCmd("Right Auto Sweep Only", m_autos::getRightAutoSweepOnly);
+        autoChooser.addCmd("Right Auto Sweep Only", m_autos::rightAutoSweepOnly);
+        autoChooser.addCmd("Center - Shoot depot", m_autos::depotAuto);
+        autoChooser.addCmd("Center - just paths", m_autos::depotPath);
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
