@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
