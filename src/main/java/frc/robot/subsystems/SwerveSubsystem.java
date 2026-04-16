@@ -729,6 +729,8 @@ public class SwerveSubsystem extends SubsystemBase {
      * to the target rotation for auto-aiming, and checking if the angle error is
      * within a certain tolerance.
      * 
+     * @param tolerance the allowable angle error for considering the robot on
+     *                  target
      * @return true if the robot is on target for auto-aiming, false otherwise
      */
     public boolean isAutoAimOnTarget(Angle tolerance) {
