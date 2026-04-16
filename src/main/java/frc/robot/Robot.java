@@ -53,10 +53,6 @@ public class Robot extends TimedRobot {
 
         // Zero gyro (shooter must face away from driver, towards opponent wall)
         m_robotContainer.zeroGyroWithAlliance();
-
-        // Extend the intake to lower the hopper enough to go underneath the trench
-        // NOTE: Extend intake fully in auto, due to bug not allowing you to move it
-        // during auto without interrupting the auto
     }
 
     @Override
