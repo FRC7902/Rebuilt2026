@@ -51,8 +51,10 @@ public class LinearIntakeSubsystem extends SubsystemBase {
     private final DigitalInput m_rightExtendedLimitSwitch;
     private final DigitalInput m_rightRetractedLimitSwitch;
 
-    private final Trigger m_extendedTrigger;
-    private final Trigger m_retractedTrigger;
+    private final Trigger m_leftExtendedTrigger;
+    private final Trigger m_rightExtendedTrigger;
+    private final Trigger m_leftRetractedTrigger;
+    private final Trigger m_rightRetractedTrigger;
 
     public LinearIntakeSubsystem() {
         m_motor = new TalonFX(LinearIntakeConstants.MOTOR_CAN_ID);
@@ -119,11 +121,15 @@ public class LinearIntakeSubsystem extends SubsystemBase {
         m_rightExtendedLimitSwitch = new DigitalInput(LinearIntakeConstants.RIGHT_EXTENDED_LIMIT_SWITCH_DIO);
         m_rightRetractedLimitSwitch = new DigitalInput(LinearIntakeConstants.RIGHT_RETRACTED_LIMIT_SWITCH_DIO);
 
-        m_extendedTrigger = new Trigger(this::getExtendedLimitSwitch);
-        m_retractedTrigger = new Trigger(this::getRetractedLimitSwitch);
+        m_leftExtendedTrigger = new Trigger(this::getLeftExtendedLimitSwitch);
+        m_rightExtendedTrigger = new Trigger(this::getRightExtendedLimitSwitch);
+        m_leftRetractedTrigger = new Trigger(this::getLeftRetractedLimitSwitch);
+        m_rightRetractedTrigger = new Trigger(this::getRightRetractedLimitSwitch);
 
-        m_extendedTrigger.onTrue(setEncoderPositionExtended());
-        m_retractedTrigger.onTrue(setEncoderPositionRetracted());
+        m_leftExtendedTrigger.onTrue(Commands.runOnce(this::setEncoderPositionExtended));
+        m_rightExtendedTrigger.onTrue(Commands.runOnce(this::setEncoderPositionExtended));
+        m_leftRetractedTrigger.onTrue(Commands.runOnce(this::setEncoderPositionRetracted));
+        m_rightRetractedTrigger.onTrue(Commands.runOnce(this::setEncoderPositionRetracted));
     }
 
     public Command sysId() {
@@ -239,21 +245,36 @@ public class LinearIntakeSubsystem extends SubsystemBase {
         }
     }
 
+    public boolean getLeftExtendedLimitSwitch() {
+        return m_leftExtendedLimitSwitch.get();
+    }
+
+    public boolean getRightExtendedLimitSwitch() {
+        return m_rightExtendedLimitSwitch.get();
+    }
+
+    public boolean getLeftRetractedLimitSwitch() {
+        return m_leftRetractedLimitSwitch.get();
+    }
+
+    public boolean getRightRetractedLimitSwitch() {
+        return m_rightRetractedLimitSwitch.get();
+    }
+
     public boolean getExtendedLimitSwitch() {
-        return m_leftExtendedLimitSwitch.get() || m_rightExtendedLimitSwitch.get();
+        return getLeftExtendedLimitSwitch() || getRightExtendedLimitSwitch();
     }
 
     public boolean getRetractedLimitSwitch() {
-        return m_leftRetractedLimitSwitch.get() || m_rightRetractedLimitSwitch.get();
+        return getLeftRetractedLimitSwitch() || getRightRetractedLimitSwitch();
     }
 
-    public Command setEncoderPositionExtended() {
-        return this.runOnce(() -> m_smartMotorController.setEncoderPosition(LinearIntakeConstants.EXTENDED_POSITION));
+    public void setEncoderPositionExtended() {
+        m_smartMotorController.setEncoderPosition(LinearIntakeConstants.EXTENDED_POSITION);
     }
 
-    public Command setEncoderPositionRetracted() {
-        return this.runOnce(
-                () -> m_smartMotorController.setEncoderPosition(LinearIntakeConstants.RETRACTED_POSITION));
+    public void setEncoderPositionRetracted() {
+        m_smartMotorController.setEncoderPosition(LinearIntakeConstants.RETRACTED_POSITION);
     }
 
     @Override
@@ -266,10 +287,10 @@ public class LinearIntakeSubsystem extends SubsystemBase {
                     getSetpoint().map(pos -> pos.in(Meters)).orElse(Double.NaN));
             SmartDashboard.putString("LinearIntakeMech/currentPositionEnum", getCurrentPositionEnum().name());
 
-            SmartDashboard.putBoolean("LinearIntakeMech/leftExtendedLimitSwitch", m_leftExtendedLimitSwitch.get());
-            SmartDashboard.putBoolean("LinearIntakeMech/leftRetractedLimitSwitch", m_leftRetractedLimitSwitch.get());
-            SmartDashboard.putBoolean("LinearIntakeMech/rightExtendedLimitSwitch", m_rightExtendedLimitSwitch.get());
-            SmartDashboard.putBoolean("LinearIntakeMech/rightRetractedLimitSwitch", m_rightRetractedLimitSwitch.get());
+            SmartDashboard.putBoolean("LinearIntakeMech/leftExtendedLimitSwitch", getLeftExtendedLimitSwitch());
+            SmartDashboard.putBoolean("LinearIntakeMech/leftRetractedLimitSwitch", getLeftRetractedLimitSwitch());
+            SmartDashboard.putBoolean("LinearIntakeMech/rightExtendedLimitSwitch", getRightExtendedLimitSwitch());
+            SmartDashboard.putBoolean("LinearIntakeMech/rightRetractedLimitSwitch", getRightRetractedLimitSwitch());
         }
     }
 
