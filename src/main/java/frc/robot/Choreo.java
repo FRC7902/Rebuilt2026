@@ -125,6 +125,7 @@ public class Choreo {
         return Commands.sequence(
                 m_autoFactory.resetOdometry("LeftAuto1"),
                 m_autoFactory.trajectoryCmd("LeftAuto1").deadlineFor(
+                        m_linearIntakeSubsystem.extend(),
                         m_intakeRollerSubsystem.intake(),
                         m_indexerSubsystem.run()),
                 m_swerveSubsystem.stop());
