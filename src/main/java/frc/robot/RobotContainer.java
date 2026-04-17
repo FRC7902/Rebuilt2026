@@ -279,7 +279,7 @@ public class RobotContainer {
 
     private void configureBindings() {
 
-        m_driverController.cross().whileTrue(m_shooterSubsystem.flywheelSysId());
+        m_driverController.cross().whileTrue(m_shooterSubsystem.hoodSysId());
         m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity);
 
         BooleanSupplier isIdle = () -> Math.abs(m_driverController.getLeftX()) < OperatorConstants.DEADBAND &&
@@ -559,10 +559,10 @@ public class RobotContainer {
     public Command stopAllSubsystems() {
         return Commands.parallel(
                 m_swerveSubsystem.stop(),
-                m_shooterSubsystem.lowerHood()
-                        .andThen(m_shooterSubsystem.stopShooting(
-                                true,
-                                false)),
+                Commands.sequence(
+                        m_shooterSubsystem.stopFeeder(),
+                        m_shooterSubsystem.lowerHood(),
+                        m_shooterSubsystem.stopShooting()),
                 m_indexerSubsystem.stop(),
                 m_intakeRollerSubsystem.stop(),
                 m_linearIntakeSubsystem.midpoint());
