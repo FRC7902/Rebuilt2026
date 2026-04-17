@@ -201,7 +201,7 @@ public class Choreo {
 
     public Command climbLeft() {
         return Commands.sequence(
-                Commands.waitSeconds(2.0).deadlineFor(
+                Commands.waitSeconds(1.0).deadlineFor(
                         m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
                         m_intakeRollerSubsystem.stop(),
                         m_indexerSubsystem.stop(),
@@ -326,10 +326,11 @@ public class Choreo {
                         m_indexerSubsystem.stop(),
                         m_linearIntakeSubsystem.retract()),
                 m_swerveSubsystem.stop(),
-                Commands.waitSeconds(4.5).deadlineFor(
+                Commands.waitSeconds(3.5).deadlineFor(
                         m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
                         m_shooterSubsystem.aimAndShootIgnoreCheck(
-                                () -> m_swerveSubsystem.getDistanceToTarget(true))));
+                                () -> m_swerveSubsystem.getDistanceToTarget(true)),
+                        m_linearIntakeSubsystem.shuffle()));
     }
 
     public Command depotBumpShoot() {
@@ -344,10 +345,11 @@ public class Choreo {
                         m_indexerSubsystem.stop(),
                         m_linearIntakeSubsystem.retract()),
                 m_swerveSubsystem.stop(),
-                Commands.waitSeconds(4.5).deadlineFor(
+                Commands.waitSeconds(3.5).deadlineFor(
                         m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
                         m_shooterSubsystem.aimAndShootIgnoreCheck(
-                                () -> m_swerveSubsystem.getDistanceToTarget(true))));
+                                () -> m_swerveSubsystem.getDistanceToTarget(true)),
+                        m_linearIntakeSubsystem.shuffle()));
     }
 
     public Command depotBumpShootClimb() {
