@@ -806,7 +806,9 @@ public class SwerveSubsystem extends SubsystemBase {
                     getAutoAimHeading().minus(getHeading()).getDegrees() + 90);
             SmartDashboard.putBoolean("swerve/isAutoAimReady", isAutoAimOnTarget());
             SmartDashboard.putBoolean("swerve/isAutoAimReady (shooter ready)",
-                    isAutoAimOnTargetShooterReady());
+                    isAutoAimOnTargetShooterReady(false));
+            SmartDashboard.putBoolean("swerve/isAutoAimReady (shooter ready, feeding)",
+                    isAutoAimOnTargetShooterReady(true));
             SmartDashboard.putNumber("swerve/distToWaypoint (m)",
                     m_driveToWaypoint.minus(getPose()).getTranslation().getNorm());
             SmartDashboard.putNumber("swerve/rotToWaypoint (deg)",
