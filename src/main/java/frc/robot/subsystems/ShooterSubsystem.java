@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
+import frc.robot.Constants.ShooterConstants.HoodConstants;
 import frc.robot.Robot;
 import frc.robot.subsystems.shooter.FeederSubsystem;
 import frc.robot.subsystems.shooter.FlywheelSubsystem;
@@ -198,10 +199,14 @@ public class ShooterSubsystem extends SubsystemBase {
      */
     public Command stopShooting(boolean stopFeeder, boolean stopFlywheel) {
         return Commands.parallel(
-                m_hoodSubsystem.lowerHood(),
+                lowerHood(),
                 stopFeeder ? m_feederSubsystem.stop() : Commands.none(),
                 stopFlywheel ? m_flywheelSubsystem.stop() : m_flywheelSubsystem.setDefaultRPM())
                 .withName("SHTR - Stop Shooting");
+    }
+
+    public Command lowerHood() {
+        return m_hoodSubsystem.runToAngle(HoodConstants.LOWER_HOOD_ANGLE);
     }
 
     public Command stopFeeder() {

@@ -555,7 +555,10 @@ public class RobotContainer {
     public Command stopAllSubsystems() {
         return Commands.parallel(
                 m_swerveSubsystem.stop(),
-                m_shooterSubsystem.stopShooting(true, true),
+                m_shooterSubsystem.lowerHood()
+                        .andThen(m_shooterSubsystem.stopShooting(
+                                true,
+                                false)),
                 m_indexerSubsystem.stop(),
                 m_intakeRollerSubsystem.stop(),
                 m_linearIntakeSubsystem.midpoint());
