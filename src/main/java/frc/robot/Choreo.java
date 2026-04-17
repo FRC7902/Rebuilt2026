@@ -201,11 +201,12 @@ public class Choreo {
 
     public Command climbLeft() {
         return Commands.sequence(
-                m_linearIntakeSubsystem.retract(),
-                m_autoFactory.trajectoryCmd("LeftAuto3b").deadlineFor(
+                Commands.waitSeconds(2.0).deadlineFor(
                         m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
                         m_intakeRollerSubsystem.stop(),
-                        m_indexerSubsystem.stop()),
+                        m_indexerSubsystem.stop(),
+                        m_linearIntakeSubsystem.retract()),
+                m_autoFactory.trajectoryCmd("LeftAuto3b"),
                 m_swerveSubsystem.stop(),
                 m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
     }
