@@ -209,16 +209,16 @@ public class Choreo {
                         m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
                         m_shooterSubsystem.aimAndShootIgnoreCheck(
                                 () -> m_swerveSubsystem.getDistanceToTarget(true))),
-                Commands.waitSeconds(1.0).deadlineFor(
+                Commands.waitSeconds(2.0).deadlineFor(
                         new ConditionalCommand(
                                 m_swerveSubsystem.driveFieldOriented(aimTowardsBlue),
                                 m_swerveSubsystem.driveFieldOriented(aimTowardsRed),
-                                m_swerveSubsystem::isRedAlliance)),
-                m_autoFactory.trajectoryCmd("RightAuto3b").deadlineFor(
+                                m_swerveSubsystem::isRedAlliance),
                         m_intakeRollerSubsystem.stop(),
                         m_indexerSubsystem.stop(),
                         m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
                         m_linearIntakeSubsystem.retract()),
+                m_autoFactory.trajectoryCmd("RightAuto3b"),
                 m_swerveSubsystem.stop(),
                 m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
     }
@@ -242,16 +242,16 @@ public class Choreo {
                         m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
                         m_shooterSubsystem.aimAndShootIgnoreCheck(
                                 () -> m_swerveSubsystem.getDistanceToTarget(true))),
-                Commands.waitSeconds(1.0).deadlineFor(
+                Commands.waitSeconds(2.0).deadlineFor(
                         new ConditionalCommand(
                                 m_swerveSubsystem.driveFieldOriented(aimTowardsBlue),
                                 m_swerveSubsystem.driveFieldOriented(aimTowardsRed),
-                                m_swerveSubsystem::isRedAlliance)),
-                m_autoFactory.trajectoryCmd("LeftAuto3b").deadlineFor(
+                                m_swerveSubsystem::isRedAlliance),
                         m_intakeRollerSubsystem.stop(),
                         m_indexerSubsystem.stop(),
                         m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
                         m_linearIntakeSubsystem.retract()),
+                m_autoFactory.trajectoryCmd("LeftAuto3b"),
                 m_swerveSubsystem.stop(),
                 m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
     }
@@ -265,12 +265,16 @@ public class Choreo {
                         m_shooterSubsystem.aimAndShootIgnoreCheck(
                                 () -> m_swerveSubsystem.getDistanceToTarget(true))),
                 m_autoFactory.trajectoryCmd("CenterToClimbLeft"),
-                m_swerveSubsystem.stop(),
-                m_autoFactory.trajectoryCmd("LeftAuto3b").deadlineFor(
+                Commands.waitSeconds(1.0).deadlineFor(
+                        new ConditionalCommand(
+                                m_swerveSubsystem.driveFieldOriented(aimTowardsBlue),
+                                m_swerveSubsystem.driveFieldOriented(aimTowardsRed),
+                                m_swerveSubsystem::isRedAlliance),
                         m_intakeRollerSubsystem.stop(),
                         m_indexerSubsystem.stop(),
                         m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
                         m_linearIntakeSubsystem.retract()),
+                m_autoFactory.trajectoryCmd("LeftAuto3b"),
                 m_swerveSubsystem.stop(),
                 m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
     }
@@ -284,12 +288,16 @@ public class Choreo {
                         m_shooterSubsystem.aimAndShootIgnoreCheck(
                                 () -> m_swerveSubsystem.getDistanceToTarget(true))),
                 m_autoFactory.trajectoryCmd("CenterToClimbRight"),
-                m_swerveSubsystem.stop(),
-                m_autoFactory.trajectoryCmd("RightAuto3b").deadlineFor(
+                Commands.waitSeconds(1.0).deadlineFor(
+                        new ConditionalCommand(
+                                m_swerveSubsystem.driveFieldOriented(aimTowardsBlue),
+                                m_swerveSubsystem.driveFieldOriented(aimTowardsRed),
+                                m_swerveSubsystem::isRedAlliance),
                         m_intakeRollerSubsystem.stop(),
                         m_indexerSubsystem.stop(),
                         m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
                         m_linearIntakeSubsystem.retract()),
+                m_autoFactory.trajectoryCmd("RightAuto3b"),
                 m_swerveSubsystem.stop(),
                 m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
     }
