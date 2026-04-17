@@ -199,6 +199,18 @@ public class Choreo {
                         m_linearIntakeSubsystem.shuffle()));
     }
 
+    public Command climbLeft() {
+        return Commands.sequence(
+                Commands.waitSeconds(2.0).deadlineFor(
+                        m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
+                        m_intakeRollerSubsystem.stop(),
+                        m_indexerSubsystem.stop(),
+                        m_linearIntakeSubsystem.retract()),
+                m_autoFactory.trajectoryCmd("LeftAuto3b"),
+                m_swerveSubsystem.stop(),
+                m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
+    }
+
     public Command rightNeutralAutoThenClimb() {
         return Commands.sequence(
                 rightNeutralAutoFirstSweep(),
@@ -300,5 +312,55 @@ public class Choreo {
                 m_autoFactory.trajectoryCmd("RightAuto3b"),
                 m_swerveSubsystem.stop(),
                 m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
+    }
+
+    public Command depotTrenchShoot() {
+        return Commands.sequence(
+                m_autoFactory.resetOdometry("DepotIntakeTrench"),
+                m_autoFactory.trajectoryCmd("DepotIntakeTrench").deadlineFor(
+                        m_linearIntakeSubsystem.extend(),
+                        m_intakeRollerSubsystem.intake(),
+                        m_indexerSubsystem.run()),
+                m_autoFactory.trajectoryCmd("DepotToShoot").deadlineFor(
+                        m_intakeRollerSubsystem.stop(),
+                        m_indexerSubsystem.stop(),
+                        m_linearIntakeSubsystem.retract()),
+                m_swerveSubsystem.stop(),
+                Commands.waitSeconds(4.5).deadlineFor(
+                        m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
+                        m_shooterSubsystem.aimAndShootIgnoreCheck(
+                                () -> m_swerveSubsystem.getDistanceToTarget(true))));
+    }
+
+    public Command depotBumpShoot() {
+        return Commands.sequence(
+                m_autoFactory.resetOdometry("DepotIntakeBump"),
+                m_autoFactory.trajectoryCmd("DepotIntakeBump").deadlineFor(
+                        m_linearIntakeSubsystem.extend(),
+                        m_intakeRollerSubsystem.intake(),
+                        m_indexerSubsystem.run()),
+                m_autoFactory.trajectoryCmd("DepotToShoot").deadlineFor(
+                        m_intakeRollerSubsystem.stop(),
+                        m_indexerSubsystem.stop(),
+                        m_linearIntakeSubsystem.retract()),
+                m_swerveSubsystem.stop(),
+                Commands.waitSeconds(4.5).deadlineFor(
+                        m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
+                        m_shooterSubsystem.aimAndShootIgnoreCheck(
+                                () -> m_swerveSubsystem.getDistanceToTarget(true))));
+    }
+
+    public Command depotBumpShootClimb() {
+        return Commands.sequence(
+                depotBumpShoot(),
+                m_autoFactory.trajectoryCmd("DepotShootClimb"),
+                climbLeft());
+    }
+
+    public Command depotTrenchShootClimb() {
+        return Commands.sequence(
+                depotTrenchShoot(),
+                m_autoFactory.trajectoryCmd("DepotShootClimb"),
+                climbLeft());
     }
 }

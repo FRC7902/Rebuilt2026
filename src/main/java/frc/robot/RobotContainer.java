@@ -194,6 +194,10 @@ public class RobotContainer {
         autoChooser.addCmd("Left - Sweep then depot", m_choreo::leftNeutralAutoThenDepot);
         autoChooser.addCmd("Center - Shoot and climb left", m_choreo::shootPreloadAndClimbLeft);
         autoChooser.addCmd("Center - Shoot and climb right", m_choreo::shootPreloadAndClimbRight);
+        autoChooser.addCmd("Left - Trench, depot then shoot", m_choreo::depotTrenchShoot);
+        autoChooser.addCmd("Left - Bump, depot then shoot", m_choreo::depotBumpShoot);
+        autoChooser.addCmd("Left - Trench, depot, shoot then climb", m_choreo::depotTrenchShootClimb);
+        autoChooser.addCmd("Left - Bump, depot, shoot then climb", m_choreo::depotBumpShootClimb);
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
