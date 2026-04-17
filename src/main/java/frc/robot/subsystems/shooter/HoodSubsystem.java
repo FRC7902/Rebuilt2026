@@ -142,6 +142,10 @@ public class HoodSubsystem extends SubsystemBase {
         return m_hood.setAngle(angle);
     }
 
+    public Command runToAngle(Angle angle) {
+        return m_hood.runTo(angle, HoodConstants.ANGLE_TARGET_ERROR);
+    }
+
     /**
      * Directly sets the hood angle.
      *

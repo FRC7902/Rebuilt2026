@@ -24,6 +24,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -619,6 +620,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public boolean isInAllianceZone() {
+        // TODO: Compute this once per CommandScheduler loop instead
         Zone currentZone = getCurrentZone();
         if (isRedAlliance()) {
             return currentZone == Zone.RED_ALLIANCE_LEFT || currentZone == Zone.RED_ALLIANCE_RIGHT;
@@ -727,14 +729,26 @@ public class SwerveSubsystem extends SubsystemBase {
      * to the target rotation for auto-aiming, and checking if the angle error is
      * within a certain tolerance.
      * 
+     * @param tolerance the allowable angle error for considering the robot on
+     *                  target
      * @return true if the robot is on target for auto-aiming, false otherwise
      */
-    public boolean isAutoAimOnTarget() {
+    public boolean isAutoAimOnTarget(Angle tolerance) {
         Rotation2d currentHeading = getHeading();
         calculateAutoAimHeading();
         double angleError = Math
                 .abs(currentHeading.minus(autoAimTargetRotation.plus(Rotation2d.fromDegrees(90))).getDegrees());
-        return angleError < SwerveConstants.AUTO_AIM_ANGLE_TARGET_ERROR.in(Degrees);
+        return angleError < tolerance.in(Degrees);
+    }
+
+    public boolean isAutoAimOnTarget() {
+        return isAutoAimOnTarget(SwerveConstants.AUTO_AIM_ANGLE_TARGET_ERROR);
+    }
+
+    public boolean isAutoAimOnTargetShooterReady(boolean isFeeding) {
+        Angle tolerance = isFeeding ? SwerveConstants.AUTO_AIM_SHOOTER_READY_FEEDING_ANGLE_TARGET_ERROR
+                : SwerveConstants.AUTO_AIM_SHOOTER_READY_ANGLE_TARGET_ERROR;
+        return isAutoAimOnTarget(tolerance);
     }
 
     /**
@@ -788,8 +802,11 @@ public class SwerveSubsystem extends SubsystemBase {
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
             SmartDashboard.putNumber("swerve/autoAimHeading (deg)", getAutoAimHeading().getDegrees());
             SmartDashboard.putNumber("swerve/currentHeading (deg)", getHeading().getDegrees() - 90);
-            SmartDashboard.putNumber("swerve/rotToTarget (deg)", getAutoAimHeading().minus(getHeading()).getDegrees() + 90);
+            SmartDashboard.putNumber("swerve/rotToTarget (deg)",
+                    getAutoAimHeading().minus(getHeading()).getDegrees() + 90);
             SmartDashboard.putBoolean("swerve/isAutoAimReady", isAutoAimOnTarget());
+            SmartDashboard.putBoolean("swerve/isAutoAimReady (shooter ready)",
+                    isAutoAimOnTargetShooterReady());
             SmartDashboard.putNumber("swerve/distToWaypoint (m)",
                     m_driveToWaypoint.minus(getPose()).getTranslation().getNorm());
             SmartDashboard.putNumber("swerve/rotToWaypoint (deg)",

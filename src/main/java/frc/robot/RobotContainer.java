@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
@@ -310,6 +311,7 @@ public class RobotContainer {
                                 1.0).scaleRotation(1.0)));
 
         Trigger autoAimOnTarget = new Trigger(m_swerveSubsystem::isAutoAimOnTarget);
+        Supplier<Boolean> isFeeding = () -> !m_swerveSubsystem.isInAllianceZone();
 
         // Auto-aim (swerve heading with calculated hood angle) and shoot
         m_driverController.R2()
@@ -336,15 +338,19 @@ public class RobotContainer {
                 .and(isControllingDriveTrigger)
                 .onTrue(m_shooterSubsystem.aimAndShoot(
                         () -> m_swerveSubsystem.getDistanceToTarget(true),
-                        m_swerveSubsystem::isAutoAimOnTarget, false,
-                        () -> !m_swerveSubsystem.isInAllianceZone())
+                        () -> m_swerveSubsystem
+                                .isAutoAimOnTargetShooterReady(isFeeding.get()),
+                        false,
+                        isFeeding)
                         .beforeStarting(m_shooterSubsystem.stopFeeder()));
         m_driverController.R2()
                 .and(isControllingDriveTrigger.negate())
                 .onTrue(m_shooterSubsystem.aimAndShoot(
                         () -> m_swerveSubsystem.getDistanceToTarget(true),
-                        m_swerveSubsystem::isAutoAimOnTarget, true,
-                        () -> !m_swerveSubsystem.isInAllianceZone())
+                        () -> m_swerveSubsystem
+                                .isAutoAimOnTargetShooterReady(isFeeding.get()),
+                        true,
+                        isFeeding)
                         .beforeStarting(m_shooterSubsystem.stopFeeder()));
         // Stop shooter subsystem
         m_driverController.R2()
@@ -549,7 +555,10 @@ public class RobotContainer {
     public Command stopAllSubsystems() {
         return Commands.parallel(
                 m_swerveSubsystem.stop(),
-                m_shooterSubsystem.stopShooting(true, true),
+                m_shooterSubsystem.lowerHood()
+                        .andThen(m_shooterSubsystem.stopShooting(
+                                true,
+                                false)),
                 m_indexerSubsystem.stop(),
                 m_intakeRollerSubsystem.stop(),
                 m_linearIntakeSubsystem.midpoint());
