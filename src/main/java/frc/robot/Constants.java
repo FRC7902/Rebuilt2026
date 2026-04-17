@@ -64,8 +64,8 @@ public final class Constants {
         public static final double AUTO_AIM_VELOCITY_COMPENSATION_FACTOR = 1.2; // TODO
         public static final Angle AUTO_AIM_ANGLE_TARGET_ERROR = Degrees.of(2.5);
         public static final Angle AUTO_AIM_SHOOTER_READY_FEEDING_ANGLE_TARGET_ERROR = Degrees.of(5);
-        public static final Angle AUTO_AIM_SHOOTER_READY_ANGLE_TARGET_ERROR = Degrees.of(20);
-        public static final double AUTO_AIM_SCALE_TRANSLATION = 0.3; // TODO
+        public static final Angle AUTO_AIM_SHOOTER_READY_ANGLE_TARGET_ERROR = Degrees.of(10);
+        public static final double AUTO_AIM_SCALE_TRANSLATION = 0.15; // TODO
 
         // Extra distance past the starting line (towards the neutral zone) that would
         // still be considered "in the alliance zone" for the purposes of auto-aiming.
@@ -368,18 +368,18 @@ public final class Constants {
             public static final Current STATOR_CURRENT_LIMIT = Amps.of(40);
             public static final Current SUPPLY_CURRENT_LIMIT = Amps.of(40);
 
-            public static final double PID_kP = 258.857;
+            public static final double PID_kP = 163.0;
             public static final double PID_kI = 0.0;
-            public static final double PID_kD = 11.443;
+            public static final double PID_kD = 2.2627;
 
             public static final double SIM_PID_kP = 16; // TODO
             public static final double SIM_PID_kI = 7; // TODO
             public static final double SIM_PID_kD = 1; // TODO
 
             public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(
-                    0.78,
-                    8.146,
-                    0.669);
+                    0.57868,
+                    8.1781,
+                    0.37522);
             public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(
                     0,
                     0,
@@ -399,7 +399,7 @@ public final class Constants {
             public static final Angle HARD_LIMIT_MAX = Degrees.of(42.1875);
 
             public static final Angle DEFAULT_ANGLE = Degrees.of(14.4);
-            public static final Angle LOWER_HOOD_ANGLE = Degrees.of(14);
+            public static final Angle LOWER_HOOD_ANGLE = Degrees.of(0);
 
             public static final Angle FEEDING_DEFAULT_ANGLE = Degrees.of(40);
 
