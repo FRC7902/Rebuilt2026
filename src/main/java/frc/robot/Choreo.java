@@ -365,4 +365,31 @@ public class Choreo {
                 m_autoFactory.trajectoryCmd("DepotShootClimb"),
                 climbLeft());
     }
+
+    public Command leftAutoBump() {
+        return Commands.sequence(
+                m_autoFactory.resetOdometry("LeftAuto1Bump"),
+                m_autoFactory.trajectoryCmd("LeftAuto1Bump").deadlineFor(
+                        m_intakeRollerSubsystem.intake(),
+                        m_indexerSubsystem.run()),
+                m_autoFactory.trajectoryCmd("LeftAuto2Bump").deadlineFor(
+                        m_indexerSubsystem.stop(),
+                        m_intakeRollerSubsystem.stop(),
+                        m_linearIntakeSubsystem.retract()),
+                m_swerveSubsystem.stop(),
+                Commands.waitSeconds(3.5).deadlineFor(
+                        m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
+                        m_shooterSubsystem.aimAndShootIgnoreCheck(
+                                () -> m_swerveSubsystem.getDistanceToTarget(true)),
+                        m_linearIntakeSubsystem.shuffle()));
+    }
+
+    public Command leftAutoBumpClimb() {
+        return Commands.sequence(
+                leftAutoBump(),
+                m_autoFactory.trajectoryCmd("LeftAuto3Bump").deadlineFor(
+                    m_shooterSubsystem.stopShooting()
+                ),
+                climbLeft());
+    }
 }
