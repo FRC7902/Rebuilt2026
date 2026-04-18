@@ -25,6 +25,7 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -99,6 +100,9 @@ public final class Constants {
         public static final double DRIVE_TO_POSE_ROTATION_kD = 0;
         public static final double DRIVE_TO_POSE_ROTATION_MAX_VELOCITY_RAD = Units.degreesToRadians(360);
         public static final double DRIVE_TO_POSE_ROTATION_MAX_ACCELERATION_RAD = Units.degreesToRadians(180);
+
+        public static final SlewRateLimiter SLEW_RATE_LIMITER_X = new SlewRateLimiter(1);
+        public static final SlewRateLimiter SLEW_RATE_LIMITER_Y = new SlewRateLimiter(1);
     }
 
     public static final class OperatorConstants {
@@ -174,6 +178,7 @@ public final class Constants {
             public static final Distance MIDPOINT_POSITION = Meters.of(0.15);
             public static final Distance POSITION_TARGET_ERROR = Inches.of(0.5);
             public static final Distance RETRACTED_POSITION = SOFT_LIMIT_MIN;
+            public static final Distance CLIMB_RETRACTED_POSITION = Inches.of(-0.5);
 
             public static final Distance SHUFFLE_CLOSE_POSITION = Meters.of(0.025);
             public static final Distance SHUFFLE_FAR_POSITION = MIDPOINT_POSITION.plus(Meters.of(0.10));
@@ -315,7 +320,7 @@ public final class Constants {
             public static final MomentOfInertia MOI = KilogramSquareMeters.of(0.0006438072);
 
             public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(80);
-            public static final Current SUPPLY_CURRENT_LIMIT_AMPS = Amps.of(40);
+            public static final Current SUPPLY_CURRENT_LIMIT_AMPS = Amps.of(30);
 
             public static final double PID_kP = 0.01; // SysID gave 3386E-05
             public static final double PID_kI = 0.0; // TODO
