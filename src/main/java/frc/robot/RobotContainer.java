@@ -202,6 +202,8 @@ public class RobotContainer {
         autoChooser.addCmd("Left - Bump, depot, shoot then climb", m_choreo::depotBumpShootClimb);
         autoChooser.addCmd("Left - Trench, intake, bump, shoot", m_choreo::leftAutoBump);
         autoChooser.addCmd("Left - Trench, intake, bump, shoot, climb", m_choreo::leftAutoBumpClimb);
+        autoChooser.addCmd("Depot from side", m_choreo::depotFromSide);
+        autoChooser.addCmd("Depot from side then climb", m_choreo::depotFromSideThenClimb);
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
@@ -506,7 +508,8 @@ public class RobotContainer {
 
         m_driverController.povUp().onTrue(m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT));
         m_driverController.povUp()
-                .onTrue(m_linearIntakeSubsystem.setPosition(LinearIntakeConstants.CLIMB_RETRACTED_POSITION));
+                .onTrue(m_linearIntakeSubsystem
+                        .setPosition(LinearIntakeConstants.CLIMB_RETRACTED_POSITION));
         m_driverController.povDown().onTrue(m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
 
         // Auto-traverse the trench through left side
