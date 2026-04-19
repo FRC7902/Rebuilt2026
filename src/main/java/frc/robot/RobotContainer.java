@@ -565,7 +565,7 @@ public class RobotContainer {
     public void updateLocalization() {
         if (m_frontLimelight.updateLocalization(m_swerveSubsystem.getSwerveDrive())) {
             m_ll4DontSeeTagTimer.reset();
-        } else if (m_ll4DontSeeTagTimer.hasElapsed(0.5)) {
+        } else if (m_ll4DontSeeTagTimer.hasElapsed(0.5)) { //TODO: need to tune elapsed seconds
             m_sideLimelight.updateLocalization(m_swerveSubsystem.getSwerveDrive());
         }
     }
