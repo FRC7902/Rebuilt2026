@@ -100,9 +100,6 @@ public final class Constants {
         public static final double DRIVE_TO_POSE_ROTATION_kD = 0;
         public static final double DRIVE_TO_POSE_ROTATION_MAX_VELOCITY_RAD = Units.degreesToRadians(360);
         public static final double DRIVE_TO_POSE_ROTATION_MAX_ACCELERATION_RAD = Units.degreesToRadians(180);
-
-        public static final SlewRateLimiter SLEW_RATE_LIMITER_X = new SlewRateLimiter(1);
-        public static final SlewRateLimiter SLEW_RATE_LIMITER_Y = new SlewRateLimiter(1);
     }
 
     public static final class OperatorConstants {
