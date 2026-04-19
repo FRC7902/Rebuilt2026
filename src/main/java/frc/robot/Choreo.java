@@ -396,6 +396,7 @@ public class Choreo {
 
     public Command depotFromSide() {
         return Commands.sequence(
+                m_autoFactory.resetOdometry("DepotFromSide1"),
                 m_autoFactory.trajectoryCmd("DepotFromSide1").deadlineFor(
                         m_linearIntakeSubsystem.extend(),
                         m_intakeRollerSubsystem.intake(),
@@ -409,11 +410,12 @@ public class Choreo {
 
     public Command depotFromSideThenClimb() {
         return Commands.sequence(
+                m_autoFactory.resetOdometry("DepotFromSide1"),
                 m_autoFactory.trajectoryCmd("DepotFromSide1").deadlineFor(
                         m_linearIntakeSubsystem.extend(),
                         m_intakeRollerSubsystem.intake(),
                         m_indexerSubsystem.run()),
-                Commands.waitSeconds(4.5).deadlineFor(
+                Commands.waitSeconds(3.5).deadlineFor(
                         m_swerveSubsystem.driveFieldOriented(stationaryAutoAim),
                         m_shooterSubsystem.aimAndShootIgnoreCheck(
                                 () -> m_swerveSubsystem.getDistanceToTarget(true)),
