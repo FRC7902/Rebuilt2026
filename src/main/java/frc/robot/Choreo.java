@@ -202,10 +202,10 @@ public class Choreo {
     public Command climbLeft() {
         return Commands.sequence(
                 Commands.waitSeconds(1.0).deadlineFor(
-                        m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
                         m_intakeRollerSubsystem.stop(),
                         m_indexerSubsystem.stop(),
-                        m_linearIntakeSubsystem.retract()),
+                        m_linearIntakeSubsystem.retract()
+                                .andThen(m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT))),
                 m_autoFactory.trajectoryCmd("LeftAuto3b"),
                 m_swerveSubsystem.stop(),
                 m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
@@ -228,8 +228,8 @@ public class Choreo {
                                 m_swerveSubsystem::isRedAlliance),
                         m_intakeRollerSubsystem.stop(),
                         m_indexerSubsystem.stop(),
-                        m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
-                        m_linearIntakeSubsystem.retract()),
+                        m_linearIntakeSubsystem.retract().andThen(
+                                m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT))),
                 m_autoFactory.trajectoryCmd("RightAuto3b"),
                 m_swerveSubsystem.stop(),
                 m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
@@ -261,8 +261,8 @@ public class Choreo {
                                 m_swerveSubsystem::isRedAlliance),
                         m_intakeRollerSubsystem.stop(),
                         m_indexerSubsystem.stop(),
-                        m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
-                        m_linearIntakeSubsystem.retract()),
+                        m_linearIntakeSubsystem.retract()
+                                .andThen(m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT))),
                 m_autoFactory.trajectoryCmd("LeftAuto3b"),
                 m_swerveSubsystem.stop(),
                 m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
@@ -284,8 +284,8 @@ public class Choreo {
                                 m_swerveSubsystem::isRedAlliance),
                         m_intakeRollerSubsystem.stop(),
                         m_indexerSubsystem.stop(),
-                        m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
-                        m_linearIntakeSubsystem.retract()),
+                        m_linearIntakeSubsystem.retract()
+                                .andThen(m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT))),
                 m_autoFactory.trajectoryCmd("LeftAuto3b"),
                 m_swerveSubsystem.stop(),
                 m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
@@ -307,8 +307,8 @@ public class Choreo {
                                 m_swerveSubsystem::isRedAlliance),
                         m_intakeRollerSubsystem.stop(),
                         m_indexerSubsystem.stop(),
-                        m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT),
-                        m_linearIntakeSubsystem.retract()),
+                        m_linearIntakeSubsystem.retract()
+                                .andThen(m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT))),
                 m_autoFactory.trajectoryCmd("RightAuto3b"),
                 m_swerveSubsystem.stop(),
                 m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
@@ -355,14 +355,16 @@ public class Choreo {
     public Command depotBumpShootClimb() {
         return Commands.sequence(
                 depotBumpShoot(),
-                m_autoFactory.trajectoryCmd("DepotShootClimb"),
+                m_autoFactory.trajectoryCmd("DepotShootClimb")
+                        .deadlineFor(m_shooterSubsystem.stopShooting()),
                 climbLeft());
     }
 
     public Command depotTrenchShootClimb() {
         return Commands.sequence(
                 depotTrenchShoot(),
-                m_autoFactory.trajectoryCmd("DepotShootClimb"),
+                m_autoFactory.trajectoryCmd("DepotShootClimb")
+                        .deadlineFor(m_shooterSubsystem.stopShooting()),
                 climbLeft());
     }
 
@@ -388,8 +390,7 @@ public class Choreo {
         return Commands.sequence(
                 leftAutoBump(),
                 m_autoFactory.trajectoryCmd("LeftAuto3Bump").deadlineFor(
-                    m_shooterSubsystem.stopShooting()
-                ),
+                        m_shooterSubsystem.stopShooting()),
                 climbLeft());
     }
 }
