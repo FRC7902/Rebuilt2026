@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ClimbConstants.ElevatorConstants;
+import frc.robot.Constants.IntakeConstants.LinearIntakeConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.DashboardSubsystem;
@@ -65,8 +66,9 @@ public class RobotContainer {
 
     private final SimSubsystem m_simSubsystem;
 
-    private final LimelightWrapper m_leftLimelight;
     private final LimelightWrapper m_frontLimelight;
+    private final LimelightWrapper m_sideLimelight;
+    private final LimelightWrapper[] limelights;
 
     // Choreo
     public final AutoFactory m_autoFactory = new AutoFactory(
@@ -204,12 +206,13 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
 
-        m_leftLimelight = new LimelightWrapper("limelight-a", true);
-        m_frontLimelight = new LimelightWrapper("limelight-b", true);
+        m_frontLimelight = new LimelightWrapper("limelight-a", true);
+        m_sideLimelight = new LimelightWrapper("limelight-c", false);
+        limelights = new LimelightWrapper[] { m_frontLimelight, m_sideLimelight };
 
         // Only do this for LL4, so we use heading readings from MT1 from 3G?
-        m_leftLimelight.getSettings().withImuMode(ImuMode.ExternalImu).save();
         m_frontLimelight.getSettings().withImuMode(ImuMode.ExternalImu).save();
+        m_sideLimelight.getSettings().withImuMode(ImuMode.ExternalImu).save();
 
         // PID-tuned auto-align for climbing start position
         driveAngularVelocity.driveToPose(m_swerveSubsystem::getDriveToWaypoint,
@@ -502,7 +505,8 @@ public class RobotContainer {
                                 () -> driveAngularVelocity.driveToPoseEnabled(false))));
 
         m_driverController.povUp().onTrue(m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT));
-        m_driverController.povUp().onTrue(m_linearIntakeSubsystem.retract());
+        m_driverController.povUp()
+                .onTrue(m_linearIntakeSubsystem.setPosition(LinearIntakeConstants.CLIMB_RETRACTED_POSITION));
         m_driverController.povDown().onTrue(m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
 
         // Auto-traverse the trench through left side
@@ -551,7 +555,7 @@ public class RobotContainer {
 
     public void updateLocalization() {
         // TODO: Prioritize LL4 over LL3G
-        for (LimelightWrapper limelight : new LimelightWrapper[] { m_frontLimelight, m_leftLimelight }) {
+        for (LimelightWrapper limelight : limelights) {
             if (limelight.updateLocalization(m_swerveSubsystem.getSwerveDrive())) {
                 break; // Stop once a limelight successfully localizes
             }
