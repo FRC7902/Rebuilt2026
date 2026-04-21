@@ -57,9 +57,8 @@ public final class Constants {
     public static final int DRIVER_CONTROLLER_PORT = 0;
 
     public static final class SwerveConstants {
-        public static final double MAX_SPEED = Units.feetToMeters(16); // TODO: Try increasing this to see if it
-                                                                       // does
-                                                                       // anything
+        public static final double DRIVE_SPEED_MULTIPLIER = 0.1; // Default 10%, adjust as needed
+        public static final double MAX_SPEED = Units.feetToMeters(16) * DRIVE_SPEED_MULTIPLIER;
         public static final double DRIVER_TRANSLATION_STICK_CURVE_EXPONENT = 2.0;
 
         public static final double AUTO_AIM_VELOCITY_COMPENSATION_FACTOR = 1.2; // TODO
@@ -99,8 +98,8 @@ public final class Constants {
         public static final double DRIVE_TO_POSE_ROTATION_kI = 0;
         public static final double DRIVE_TO_POSE_ROTATION_kD = 0;
         public static final double DRIVE_TO_POSE_ROTATION_MAX_VELOCITY_RAD = Units.degreesToRadians(360);
-        public static final double DRIVE_TO_POSE_ROTATION_MAX_ACCELERATION_RAD = Units.degreesToRadians(180);
-    }
+        public static final double DRIVE_TO_POSE_ROTATION_MAX_ACCELERATION_RAD = Units.degreesToRadians(180);      
+}
 
     public static final class OperatorConstants {
 

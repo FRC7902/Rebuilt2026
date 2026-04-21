@@ -30,7 +30,6 @@ import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.ClimbConstants.ElevatorConstants;
 import frc.robot.Constants.IntakeConstants.LinearIntakeConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.SwerveConstants;
@@ -503,12 +502,6 @@ public class RobotContainer {
                         Commands.runEnd(
                                 () -> driveAngularVelocity.driveToPoseEnabled(true),
                                 () -> driveAngularVelocity.driveToPoseEnabled(false))));
-
-        m_driverController.povUp().onTrue(m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT));
-        m_driverController.povUp()
-                .onTrue(m_linearIntakeSubsystem.setPosition(LinearIntakeConstants.CLIMB_RETRACTED_POSITION));
-        m_driverController.povDown().onTrue(m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_LOWER_LIMIT));
-
         // Auto-traverse the trench through left side
         m_driverController.L3().whileTrue(
                 new ConditionalCommand(
