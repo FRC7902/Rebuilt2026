@@ -20,6 +20,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -69,6 +70,8 @@ public class RobotContainer {
     private final LimelightWrapper m_frontLimelight;
     private final LimelightWrapper m_sideLimelight;
     private final LimelightWrapper[] limelights;
+
+    private final Timer m_ll4DontSeeTagTimer;
 
     // Choreo
     public final AutoFactory m_autoFactory = new AutoFactory(
@@ -203,6 +206,8 @@ public class RobotContainer {
         autoChooser.addCmd("Left - Bump, depot, shoot then climb", m_choreo::depotBumpShootClimb);
         autoChooser.addCmd("Left - Trench, intake, bump, shoot", m_choreo::leftAutoBump);
         autoChooser.addCmd("Left - Trench, intake, bump, shoot, climb", m_choreo::leftAutoBumpClimb);
+        autoChooser.addCmd("Depot from side", m_choreo::depotFromSide);
+        autoChooser.addCmd("Depot from side then climb", m_choreo::depotFromSideThenClimb);
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
@@ -231,6 +236,9 @@ public class RobotContainer {
                         new TrapezoidProfile.Constraints(
                                 SwerveConstants.DRIVE_TO_POSE_ROTATION_MAX_VELOCITY_RAD,
                                 SwerveConstants.DRIVE_TO_POSE_ROTATION_MAX_ACCELERATION_RAD)));
+
+        m_ll4DontSeeTagTimer = new Timer();
+        m_ll4DontSeeTagTimer.start();
 
         configureBindings();
     }
@@ -512,11 +520,10 @@ public class RobotContainer {
     }
 
     public void updateLocalization() {
-        // TODO: Prioritize LL4 over LL3G
-        for (LimelightWrapper limelight : limelights) {
-            if (limelight.updateLocalization(m_swerveSubsystem.getSwerveDrive())) {
-                break; // Stop once a limelight successfully localizes
-            }
+        if (m_frontLimelight.updateLocalization(m_swerveSubsystem.getSwerveDrive())) {
+            m_ll4DontSeeTagTimer.reset();
+        } else if (m_ll4DontSeeTagTimer.hasElapsed(0.5)) { //TODO: need to tune elapsed seconds
+            m_sideLimelight.updateLocalization(m_swerveSubsystem.getSwerveDrive());
         }
     }
 
@@ -524,8 +531,7 @@ public class RobotContainer {
         return Commands.parallel(
                 m_swerveSubsystem.stop(),
                 Commands.sequence(
-                        m_shooterSubsystem.stopFeeder(),
-                        m_shooterSubsystem.lowerHood(),
+                        m_shooterSubsystem.stopFeederAndLowerHood(),
                         m_shooterSubsystem.stopShooting()),
                 m_indexerSubsystem.stop(),
                 m_intakeRollerSubsystem.stop(),

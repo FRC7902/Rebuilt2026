@@ -153,8 +153,8 @@ public final class Constants {
             public static final double SIM_PID_kI = 0.0; // TODO
             public static final double SIM_PID_kD = 0.0; // TODO
 
-            public static final ElevatorFeedforward FEEDFORWARD = new ElevatorFeedforward(0.32176, -0.04,
-                    0.6148, 0.021608);
+            public static final ElevatorFeedforward FEEDFORWARD = new ElevatorFeedforward(0.53548, 0.20133,
+                    0.0, 0.63399);
             public static final ElevatorFeedforward SIM_FEEDFORWARD = new ElevatorFeedforward(0.0, 0.0,
                     0.0, 0.0);
 
@@ -168,9 +168,9 @@ public final class Constants {
             public static final Current SUPPLY_CURRENT_LIMIT = Amps.of(10);
 
             public static final Distance SOFT_LIMIT_MIN = Meters.of(0);
-            public static final Distance SOFT_LIMIT_MAX = Meters.of(0.31);
+            public static final Distance SOFT_LIMIT_MAX = Meters.of(0.3132);
             public static final Distance HARD_LIMIT_MIN = Meters.of(0);
-            public static final Distance HARD_LIMIT_MAX = Meters.of(0.31);
+            public static final Distance HARD_LIMIT_MAX = Meters.of(0.3132);
 
             public static final Distance EXTENDED_POSITION = SOFT_LIMIT_MAX;
             public static final Distance MIDPOINT_POSITION = Meters.of(0.15);

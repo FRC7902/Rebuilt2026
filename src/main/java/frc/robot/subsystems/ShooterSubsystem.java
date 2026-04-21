@@ -213,6 +213,12 @@ public class ShooterSubsystem extends SubsystemBase {
         return m_feederSubsystem.stop();
     }
 
+    public Command stopFeederAndLowerHood() {
+        return Commands.parallel(
+                m_hoodSubsystem.runToAngle(HoodConstants.LOWER_HOOD_ANGLE),
+                m_feederSubsystem.stop());
+    }
+
     /**
      * Feeds fuel into the shooter until fuel is detected by the beam break sensor,
      * then reverses the feeder until the fuel is no longer detected, effectively
