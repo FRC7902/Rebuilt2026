@@ -294,6 +294,7 @@ public class RobotContainer {
     private void configureBindings() {
 
         m_driverController.a().whileTrue(m_shooterSubsystem.hoodSysId());
+        m_driverController.x().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyroWithAlliance)));
         m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity);
 
         BooleanSupplier isIdle = () -> Math.abs(m_driverController.getLeftX()) < OperatorConstants.DEADBAND &&
