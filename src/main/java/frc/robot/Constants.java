@@ -237,29 +237,29 @@ public final class Constants {
                 .ofEntries(
                         Map.entry(
                                 Meters.of(4.8533),
-                                Pair.of(Degrees.of(40), RPM.of(3500))),
+                                Pair.of(Degrees.of(0), RPM.of(0))),
                         Map.entry(
                                 Meters.of(7.0573),
-                                Pair.of(Degrees.of(40), RPM.of(4600))),
+                                Pair.of(Degrees.of(0), RPM.of(0))),
                         Map.entry(
                                 Meters.of(10.2642),
-                                Pair.of(Degrees.of(40), RPM.of(5800))),
+                                Pair.of(Degrees.of(0), RPM.of(0))),
                         Map.entry(
                                 Meters.of(11.8006),
-                                Pair.of(Degrees.of(40), RPM.of(6300))),
+                                Pair.of(Degrees.of(0), RPM.of(0))),
                         // Max angle max RPM
                         Map.entry(
                                 Meters.of(13),
-                                Pair.of(Degrees.of(40), RPM.of(6300))),
+                                Pair.of(Degrees.of(0), RPM.of(0))),
                         Map.entry(
                                 Meters.of(14),
-                                Pair.of(Degrees.of(40), RPM.of(6300))),
+                                Pair.of(Degrees.of(0), RPM.of(0))),
                         Map.entry(
                                 Meters.of(15),
-                                Pair.of(Degrees.of(40), RPM.of(6300))),
+                                Pair.of(Degrees.of(0), RPM.of(0))),
                         Map.entry(
                                 Meters.of(16),
-                                Pair.of(Degrees.of(40), RPM.of(6300))));
+                                Pair.of(Degrees.of(0), RPM.of(0))));
 
         public static InterpolatingDoubleTreeMap createHoodInterpolationMap() {
             InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
@@ -346,7 +346,7 @@ public final class Constants {
                                                                                // RPM, true
                                                                                // max of 6600 RPM
 
-            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(0);
+            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(3500);
 
             public static final AngularVelocity FEEDING_DEFAULT_VELOCITY = RPM.of(3500);
 
