@@ -344,7 +344,7 @@ public final class Constants {
                                                                                // RPM, true
                                                                                // max of 6600 RPM
 
-            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(3600);
+            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(0);
 
             public static final AngularVelocity FEEDING_DEFAULT_VELOCITY = RPM.of(3500);
 
