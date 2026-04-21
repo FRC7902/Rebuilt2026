@@ -169,7 +169,8 @@ public class RobotContainer {
     public SwerveInputStream driveAutoAim = driveAngularVelocity.copy()
             .withControllerHeadingAxis(autoAimHeadingX(), autoAimHeadingY())
             .headingWhile(true)
-            .scaleTranslation(SwerveConstants.AUTO_AIM_SCALE_TRANSLATION);
+            .scaleTranslation(SwerveConstants.AUTO_AIM_SCALE_TRANSLATION)
+            .scaleRotation(SwerveConstants.AUTO_AIM_SCALE_ROTATION);
 
     Command driveFieldOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
     Command driveFieldOrientedDirectAngle = m_swerveSubsystem.driveFieldOriented(driveDirectAngle);
