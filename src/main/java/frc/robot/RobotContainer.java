@@ -292,9 +292,7 @@ public class RobotContainer {
             m_swerveSubsystem::getCurrentZone);
 
     private void configureBindings() {
-
-        m_driverController.a().whileTrue(m_shooterSubsystem.hoodSysId());
-        m_driverController.x().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyroWithAlliance)));
+        m_driverController.start().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyroWithAlliance)));
         m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity);
 
         BooleanSupplier isIdle = () -> Math.abs(m_driverController.getLeftX()) < OperatorConstants.DEADBAND &&
@@ -487,24 +485,6 @@ public class RobotContainer {
                                 Commands.parallel(
                                         m_indexerSubsystem.stop(),
                                         m_intakeRollerSubsystem.stop())));
-
-        // Auto-align to left side tower for climbing
-        m_driverController.povLeft().whileTrue(
-                Commands.sequence(
-                        new InstantCommand(
-                                () -> m_swerveSubsystem.setSelectedClimbPose(true)),
-                        Commands.runEnd(
-                                () -> driveAngularVelocity.driveToPoseEnabled(true),
-                                () -> driveAngularVelocity.driveToPoseEnabled(false))));
-
-        // Auto-align to right side tower for climbing
-        m_driverController.povRight().whileTrue(
-                Commands.sequence(
-                        new InstantCommand(
-                                () -> m_swerveSubsystem.setSelectedClimbPose(false)),
-                        Commands.runEnd(
-                                () -> driveAngularVelocity.driveToPoseEnabled(true),
-                                () -> driveAngularVelocity.driveToPoseEnabled(false))));
     }
 
     public void calibrateLinearIntakePosition() {
