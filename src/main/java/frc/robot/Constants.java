@@ -57,9 +57,9 @@ public final class Constants {
     public static final int DRIVER_CONTROLLER_PORT = 0;
 
     public static final class SwerveConstants {
-        public static final double DRIVE_SPEED_MULTIPLIER = 0.1; // Default 10%, adjust as needed
+public static final double DRIVE_SPEED_MULTIPLIER = 0.15; // Defacpmult 10%, adjust as needed
         public static final double ROTATION_SPEED_MULTIPLIER = 0.1; // Default 10%, adjust as needed
-        public static final double AUTO_AIM_SCALE_ROTATION = 0.1; // Default 10%, adjust as needed
+        public static final double AUTO_AIM_SCALE_ROTATION = 0.75; // Default 10%, adjust as needed
         public static final double MAX_SPEED = Units.feetToMeters(16) * DRIVE_SPEED_MULTIPLIER;
         public static final double DRIVER_TRANSLATION_STICK_CURVE_EXPONENT = 2.0;
 
@@ -346,7 +346,7 @@ public final class Constants {
                                                                                // RPM, true
                                                                                // max of 6600 RPM
 
-            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(3500);
+            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(0);
 
             public static final AngularVelocity FEEDING_DEFAULT_VELOCITY = RPM.of(3500);
 
