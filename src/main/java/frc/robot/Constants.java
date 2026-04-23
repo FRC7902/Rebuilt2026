@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.InchesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
-import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
@@ -25,7 +24,6 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -57,10 +55,10 @@ public final class Constants {
     public static final int DRIVER_CONTROLLER_PORT = 0;
 
     public static final class SwerveConstants {
-public static final double DRIVE_SPEED_MULTIPLIER = 0.15; // Defacpmult 10%, adjust as needed
-        public static final double ROTATION_SPEED_MULTIPLIER = 0.1; // Default 10%, adjust as needed
+        public static final double DRIVE_SPEED_MULTIPLIER = 0.15; // Defacpmult 10%, adjust as needed
+        public static final double ROTATION_SPEED_MULTIPLIER = 0.25; // Default 10%, adjust as needed
         public static final double AUTO_AIM_SCALE_ROTATION = 0.75; // Default 10%, adjust as needed
-        public static final double MAX_SPEED = Units.feetToMeters(16) * DRIVE_SPEED_MULTIPLIER;
+        public static final double MAX_SPEED = Units.feetToMeters(16);
         public static final double DRIVER_TRANSLATION_STICK_CURVE_EXPONENT = 2.0;
 
         public static final double AUTO_AIM_VELOCITY_COMPENSATION_FACTOR = 1.2; // TODO
@@ -99,9 +97,10 @@ public static final double DRIVE_SPEED_MULTIPLIER = 0.15; // Defacpmult 10%, adj
         public static final double DRIVE_TO_POSE_ROTATION_kP = 2.7;
         public static final double DRIVE_TO_POSE_ROTATION_kI = 0;
         public static final double DRIVE_TO_POSE_ROTATION_kD = 0;
-        public static final double DRIVE_TO_POSE_ROTATION_MAX_VELOCITY_RAD = Units.degreesToRadians(360 * ROTATION_SPEED_MULTIPLIER);
-        public static final double DRIVE_TO_POSE_ROTATION_MAX_ACCELERATION_RAD = Units.degreesToRadians(180);      
-}
+        public static final double DRIVE_TO_POSE_ROTATION_MAX_VELOCITY_RAD = Units
+                .degreesToRadians(360 * ROTATION_SPEED_MULTIPLIER);
+        public static final double DRIVE_TO_POSE_ROTATION_MAX_ACCELERATION_RAD = Units.degreesToRadians(180);
+    }
 
     public static final class OperatorConstants {
 

@@ -99,7 +99,8 @@ public class RobotContainer {
             .withControllerRotationAxis(() -> m_driverController.getRightX() * -1) // TODO: Check if * -1 is
                                                                                    // needed IRL
             .deadband(OperatorConstants.DEADBAND)
-            .scaleTranslation(1.0)
+            .scaleTranslation(SwerveConstants.DRIVE_SPEED_MULTIPLIER)
+            .scaleRotation(SwerveConstants.ROTATION_SPEED_MULTIPLIER)
             .allianceRelativeControl(true);
 
     /**
@@ -424,32 +425,32 @@ public class RobotContainer {
         // Shoot without auto-aiming, defaulting to a preset hood angle for shooting
         // from directly in front of the hub
         // m_driverController.rightBumper()
-        //         .and(m_driverController.rightTrigger().negate())
-        //         .onTrue(m_shooterSubsystem.shootNoAutoAim())
-        //         .onFalse(new ConditionalCommand(
-        //                 Commands.sequence(
-        //                         m_shooterSubsystem.stopShooting(),
-        //                         m_shooterSubsystem.storeFuel()),
-        //                 m_shooterSubsystem.stopShooting(),
-        //                 m_driverController.leftTrigger()::getAsBoolean));
+        // .and(m_driverController.rightTrigger().negate())
+        // .onTrue(m_shooterSubsystem.shootNoAutoAim())
+        // .onFalse(new ConditionalCommand(
+        // Commands.sequence(
+        // m_shooterSubsystem.stopShooting(),
+        // m_shooterSubsystem.storeFuel()),
+        // m_shooterSubsystem.stopShooting(),
+        // m_driverController.leftTrigger()::getAsBoolean));
         // m_driverController.rightBumper()
-        //         .whileTrue(
-        //                 Commands.sequence(
-        //                         Commands.waitSeconds(0.01),
-        //                         new InstantCommand(m_swerveSubsystem::lock,
-        //                                 m_swerveSubsystem)));
+        // .whileTrue(
+        // Commands.sequence(
+        // Commands.waitSeconds(0.01),
+        // new InstantCommand(m_swerveSubsystem::lock,
+        // m_swerveSubsystem)));
         // m_driverController.rightBumper()
-        //         .and(m_driverController.rightTrigger().negate())
-        //         .onTrue(m_indexerSubsystem.run())
-        //         .onFalse(m_indexerSubsystem.stop()
-        //                 .unless(m_driverController.leftTrigger()::getAsBoolean));
+        // .and(m_driverController.rightTrigger().negate())
+        // .onTrue(m_indexerSubsystem.run())
+        // .onFalse(m_indexerSubsystem.stop()
+        // .unless(m_driverController.leftTrigger()::getAsBoolean));
         // m_driverController.rightBumper()
-        //         .onTrue(
-        //                 Commands.sequence(
-        //                         Commands.waitSeconds(1),
-        //                         m_linearIntakeSubsystem.shuffle()))
-        //         .onFalse(m_linearIntakeSubsystem.midpoint()
-        //                 .unless(m_driverController.leftTrigger()::getAsBoolean));
+        // .onTrue(
+        // Commands.sequence(
+        // Commands.waitSeconds(1),
+        // m_linearIntakeSubsystem.shuffle()))
+        // .onFalse(m_linearIntakeSubsystem.midpoint()
+        // .unless(m_driverController.leftTrigger()::getAsBoolean));
 
         // Extend intake, expand hopper, and run intake rollers
         m_driverController.leftTrigger()
@@ -464,27 +465,29 @@ public class RobotContainer {
                                 m_shooterSubsystem.storeFuel()))
                 .onFalse(
                         m_indexerSubsystem.stop()
-                                .unless(m_driverController.rightTrigger()::getAsBoolean));
+                                .unless(m_driverController
+                                        .rightTrigger()::getAsBoolean));
 
         // m_driverController.leftBumper()
-        //         .and(m_driverController.rightTrigger().negate()) // Not shooting
-        //         .and(m_driverController.leftTrigger().negate()) // Not intaking
+        // .and(m_driverController.rightTrigger().negate()) // Not shooting
+        // .and(m_driverController.leftTrigger().negate()) // Not intaking
 
-        //         // Extend intake, reverse indexer and intake rollers at the same time
-        //         .onTrue(Commands.sequence( // TODO: Check if sequence is needed, or if parallel alone is
-        //                                    // fine
-        //                 m_linearIntakeSubsystem.extend(),
-        //                 Commands.parallel(
-        //                         m_indexerSubsystem.reverse(),
-        //                         m_intakeRollerSubsystem.outtake())))
+        // // Extend intake, reverse indexer and intake rollers at the same time
+        // .onTrue(Commands.sequence( // TODO: Check if sequence is needed, or if
+        // parallel alone is
+        // // fine
+        // m_linearIntakeSubsystem.extend(),
+        // Commands.parallel(
+        // m_indexerSubsystem.reverse(),
+        // m_intakeRollerSubsystem.outtake())))
 
-        //         // Retract intake, then stop indexer and intake rollers
-        //         .onFalse(
-        //                 Commands.sequence(
-        //                         m_linearIntakeSubsystem.midpoint(),
-        //                         Commands.parallel(
-        //                                 m_indexerSubsystem.stop(),
-        //                                 m_intakeRollerSubsystem.stop())));
+        // // Retract intake, then stop indexer and intake rollers
+        // .onFalse(
+        // Commands.sequence(
+        // m_linearIntakeSubsystem.midpoint(),
+        // Commands.parallel(
+        // m_indexerSubsystem.stop(),
+        // m_intakeRollerSubsystem.stop())));
     }
 
     public void calibrateLinearIntakePosition() {
@@ -503,7 +506,7 @@ public class RobotContainer {
     public void updateLocalization() {
         if (m_frontLimelight.updateLocalization(m_swerveSubsystem.getSwerveDrive())) {
             m_ll4DontSeeTagTimer.reset();
-        } else if (m_ll4DontSeeTagTimer.hasElapsed(0.5)) { //TODO: need to tune elapsed seconds
+        } else if (m_ll4DontSeeTagTimer.hasElapsed(0.5)) { // TODO: need to tune elapsed seconds
             m_sideLimelight.updateLocalization(m_swerveSubsystem.getSwerveDrive());
         }
     }
