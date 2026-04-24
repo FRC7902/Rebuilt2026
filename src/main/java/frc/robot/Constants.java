@@ -62,9 +62,9 @@ public final class Constants {
         public static final double DRIVER_TRANSLATION_STICK_CURVE_EXPONENT = 2.0;
 
         public static final double AUTO_AIM_VELOCITY_COMPENSATION_FACTOR = 1.2; // TODO
-        public static final Angle AUTO_AIM_ANGLE_TARGET_ERROR = Degrees.of(2.5);
+        public static final Angle AUTO_AIM_ANGLE_TARGET_ERROR = Degrees.of(1);
         public static final Angle AUTO_AIM_SHOOTER_READY_FEEDING_ANGLE_TARGET_ERROR = Degrees.of(5);
-        public static final Angle AUTO_AIM_SHOOTER_READY_ANGLE_TARGET_ERROR = Degrees.of(10);
+        public static final Angle AUTO_AIM_SHOOTER_READY_ANGLE_TARGET_ERROR = Degrees.of(2.5);
         public static final double AUTO_AIM_SCALE_TRANSLATION = 0.15; // TODO
 
         // Extra distance past the starting line (towards the neutral zone) that would
