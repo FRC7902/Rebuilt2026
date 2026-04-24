@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.io.File;
@@ -346,24 +348,37 @@ public class RobotContainer {
                                 Commands.waitSeconds(0.01),
                                 new InstantCommand(m_swerveSubsystem::lock,
                                         m_swerveSubsystem)));
-        m_driverController.rightTrigger()
-                .and(isControllingDriveTrigger)
-                .onTrue(m_shooterSubsystem.aimAndShoot(
-                        () -> m_swerveSubsystem.getDistanceToTarget(true),
-                        () -> m_swerveSubsystem
-                                .isAutoAimOnTargetShooterReady(isFeeding.get()),
-                        false,
-                        isFeeding)
-                        .beforeStarting(m_shooterSubsystem.stopFeeder()));
+
+        // m_driverController.rightTrigger()
+        // .and(isControllingDriveTrigger)
+        // .onTrue(m_shooterSubsystem.aimAndShoot(
+        // () -> m_swerveSubsystem.getDistanceToTarget(true),
+        // () -> m_swerveSubsystem
+        // .isAutoAimOnTargetShooterReady(isFeeding.get()),
+        // false,
+        // isFeeding)
+        // .beforeStarting(m_shooterSubsystem.stopFeeder()));
+        // m_driverController.rightTrigger()
+        // .and(isControllingDriveTrigger.negate())
+        // .onTrue(m_shooterSubsystem.aimAndShoot(
+        // () -> m_swerveSubsystem.getDistanceToTarget(true),
+        // () -> m_swerveSubsystem
+        // .isAutoAimOnTargetShooterReady(isFeeding.get()),
+        // true,
+        // isFeeding)
+        // .beforeStarting(m_shooterSubsystem.stopFeeder()));
+
+        // Manual hood angle and flywheel velocity control for testing
+        SmartDashboard.putNumber("ManualTuning/HoodAngleSetpoint (deg)", 0);
+        SmartDashboard.putNumber("ManualTuning/FlywheelVelocitySetpoint (RPM)", 0);
+
         m_driverController.rightTrigger()
                 .and(isControllingDriveTrigger.negate())
-                .onTrue(m_shooterSubsystem.aimAndShoot(
-                        () -> m_swerveSubsystem.getDistanceToTarget(true),
-                        () -> m_swerveSubsystem
-                                .isAutoAimOnTargetShooterReady(isFeeding.get()),
-                        true,
-                        isFeeding)
+                .onTrue(m_shooterSubsystem.shootWith(
+                        () -> Degrees.of(SmartDashboard.getNumber("ManualTuning/HoodAngleSetpoint (deg)", 0)),
+                        () -> RPM.of(SmartDashboard.getNumber("ManualTuning/FlywheelVelocitySetpoint (RPM)", 0)))
                         .beforeStarting(m_shooterSubsystem.stopFeeder()));
+
         // Stop shooter subsystem
         m_driverController.rightTrigger()
                 .onFalse(new ConditionalCommand(
