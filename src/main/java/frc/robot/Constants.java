@@ -55,7 +55,7 @@ public final class Constants {
     public static final int DRIVER_CONTROLLER_PORT = 0;
 
     public static final class SwerveConstants {
-        public static final double DRIVE_SPEED_MULTIPLIER = 0.15; // Defacpmult 10%, adjust as needed
+        public static final double DRIVE_SPEED_MULTIPLIER = 0.10; // Defacpmult 10%, adjust as needed
         public static final double ROTATION_SPEED_MULTIPLIER = 0.25; // Default 10%, adjust as needed
         public static final double AUTO_AIM_SCALE_ROTATION = 0.75; // Default 10%, adjust as needed
         public static final double MAX_SPEED = Units.feetToMeters(16);
@@ -124,7 +124,7 @@ public final class Constants {
         public static class IntakeRollerConstants {
             public static final int MOTOR_PWM_ID = 1; // TODO
 
-            public static final double SPEED = 0.5;
+            public static final double SPEED = 0.25;
         }
 
         public static class LinearIntakeConstants {
@@ -196,16 +196,16 @@ public final class Constants {
                 .ofEntries(
                         Map.entry(
                                 Meters.of(1.4567),
-                                Pair.of(Degrees.of(12), RPM.of(3100))),
+                                Pair.of(Degrees.of(12), RPM.of(3150))),
                         Map.entry(
                                 Meters.of(1.5644),
-                                Pair.of(Degrees.of(15), RPM.of(3200))),
+                                Pair.of(Degrees.of(15), RPM.of(3250))),
                         Map.entry(
                                 Meters.of(1.9423),
-                                Pair.of(Degrees.of(18), RPM.of(3300))),
+                                Pair.of(Degrees.of(18), RPM.of(3350))),
                         Map.entry(
                                 Meters.of(2.2913),
-                                Pair.of(Degrees.of(20), RPM.of(3400))),
+                                Pair.of(Degrees.of(20), RPM.of(3450))),
                         Map.entry(
                                 Meters.of(2.7866),
                                 Pair.of(Degrees.of(24), RPM.of(3500))),
@@ -307,7 +307,7 @@ public final class Constants {
             public static final int FOLLOWER_MOTOR_1_CAN_ID = 24;
             public static final int FOLLOWER_MOTOR_2_CAN_ID = 25;
 
-            public static final DCMotor MOTOR = DCMotor.getKrakenX60Foc(2);
+            public static final DCMotor MOTOR = DCMotor.getKrakenX60Foc(3);
             public static final GearBox GEARBOX = GearBox.fromStages("20:24");
 
             public static final MotorMode IDLE_MODE = MotorMode.COAST;
@@ -322,9 +322,9 @@ public final class Constants {
             public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(80);
             public static final Current SUPPLY_CURRENT_LIMIT_AMPS = Amps.of(30);
 
-            public static final double PID_kP = 0.01; // SysID gave 3386E-05
+            public static final double PID_kP = 0.67; // SysID gave 3386E-05
             public static final double PID_kI = 0.0; // TODO
-            public static final double PID_kD = 0.0; // TODO
+            public static final double PID_kD = 0.1; // TODO
 
             public static final double SIM_PID_kP = 0.001; // TODO
             public static final double SIM_PID_kI = 0.0; // TODO
@@ -608,5 +608,5 @@ public final class Constants {
     public static final SmartMotorControllerConfig.TelemetryVerbosity TELEMETRY_VERBOSITY = SmartMotorControllerConfig.TelemetryVerbosity.LOW;
 
     public static final SwerveDriveTelemetry.TelemetryVerbosity SWERVE_TELEMETRY_VERBOSITY = SwerveDriveTelemetry.TelemetryVerbosity.POSE;
-    public static final boolean TELEMETRY = false; // Set to false for competition to reduce network traffic
+    public static final boolean TELEMETRY = true; // Set to false for competition to reduce network traffic
 }
