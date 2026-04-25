@@ -195,33 +195,36 @@ public final class Constants {
         public static final Map<Distance, Pair<Angle, AngularVelocity>> SHOOTER_DISTANCE_TO_HOOD_ANGLE_AND_FLYWHEEL_RPM = Map
                 .ofEntries(
                         Map.entry(
-                                Meters.of(1.4625),
-                                Pair.of(Degrees.of(14), RPM.of(3500))),
+                                Meters.of(1.4567),
+                                Pair.of(Degrees.of(12), RPM.of(3100))),
                         Map.entry(
-                                Meters.of(2.1997),
-                                Pair.of(Degrees.of(20), RPM.of(3600))),
+                                Meters.of(1.5644),
+                                Pair.of(Degrees.of(15), RPM.of(3200))),
                         Map.entry(
-                                Meters.of(2.8742),
-                                Pair.of(Degrees.of(25), RPM.of(3700))),
+                                Meters.of(1.9423),
+                                Pair.of(Degrees.of(18), RPM.of(3300))),
                         Map.entry(
-                                Meters.of(3.4100),
-                                Pair.of(Degrees.of(30), RPM.of(3900))),
+                                Meters.of(2.2913),
+                                Pair.of(Degrees.of(20), RPM.of(3400))),
                         Map.entry(
-                                Meters.of(3.6500),
-                                Pair.of(Degrees.of(28), RPM.of(3900))),
+                                Meters.of(2.7866),
+                                Pair.of(Degrees.of(24), RPM.of(3500))),
                         Map.entry(
-                                Meters.of(4.0068),
-                                Pair.of(Degrees.of(25), RPM.of(4325))),
+                                Meters.of(3.1969),
+                                Pair.of(Degrees.of(30), RPM.of(3800))),
                         Map.entry(
-                                Meters.of(4.3896),
-                                Pair.of(Degrees.of(26), RPM.of(4500))),
+                                Meters.of(3.6407),
+                                Pair.of(Degrees.of(32), RPM.of(3900))),
+                        Map.entry(
+                                Meters.of(3.769),
+                                Pair.of(Degrees.of(33), RPM.of(3900))),
                         // NOTE: Removed due to inaccuracy
                         // Map.entry(
                         // Meters.of(4.4581),
                         // Pair.of(Degrees.of(26), RPM.of(4373))),
                         Map.entry(
-                                Meters.of(4.7953),
-                                Pair.of(Degrees.of(30), RPM.of(4550)))
+                                Meters.of(4.1237),
+                                Pair.of(Degrees.of(36), RPM.of(3900)))
 
                 );
 
