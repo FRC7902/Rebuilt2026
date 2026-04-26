@@ -208,7 +208,7 @@ public final class Constants {
                                 Pair.of(Degrees.of(20), RPM.of(3450))),
                         Map.entry(
                                 Meters.of(2.7866),
-                                Pair.of(Degrees.of(24), RPM.of(3500))),
+                                Pair.of(Degrees.of(24), RPM.of(3600))),
                         Map.entry(
                                 Meters.of(3.1969),
                                 Pair.of(Degrees.of(30), RPM.of(3800))),
@@ -322,9 +322,9 @@ public final class Constants {
             public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(80);
             public static final Current SUPPLY_CURRENT_LIMIT_AMPS = Amps.of(30);
 
-            public static final double PID_kP = 0.67; // SysID gave 3386E-05
+            public static final double PID_kP = 0.6; // SysID gave 3386E-05
             public static final double PID_kI = 0.0; // TODO
-            public static final double PID_kD = 0.1; // TODO
+            public static final double PID_kD = 0.3; // TODO
 
             public static final double SIM_PID_kP = 0.001; // TODO
             public static final double SIM_PID_kI = 0.0; // TODO
