@@ -55,7 +55,7 @@ public final class Constants {
     public static final int DRIVER_CONTROLLER_PORT = 0;
 
     public static final class SwerveConstants {
-        public static final double DRIVE_SPEED_MULTIPLIER = 0.10; // Defacpmult 10%, adjust as needed
+        public static final double DRIVE_SPEED_MULTIPLIER = 0.15; // Defacpmult 10%, adjust as needed
         public static final double ROTATION_SPEED_MULTIPLIER = 0.25; // Default 10%, adjust as needed
         public static final double AUTO_AIM_SCALE_ROTATION = 0.75; // Default 10%, adjust as needed
         public static final double MAX_SPEED = Units.feetToMeters(16);
@@ -319,9 +319,9 @@ public final class Constants {
             public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(80);
             public static final Current SUPPLY_CURRENT_LIMIT_AMPS = Amps.of(30);
 
-            public static final double PID_kP = 0.6; // SysID gave 3386E-05
+            public static final double PID_kP = 0.3; // SysID gave 3386E-05
             public static final double PID_kI = 0.0; // TODO
-            public static final double PID_kD = 0.3; // TODO
+            public static final double PID_kD = 0.0; // TODO
 
             public static final double SIM_PID_kP = 0.001; // TODO
             public static final double SIM_PID_kI = 0.0; // TODO

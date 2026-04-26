@@ -72,7 +72,7 @@ public class Choreo {
                 .withControllerHeadingAxis(() -> 0.0, () -> 1.0);
 
         backUpAndAimRed = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
-                () -> -0.25,
+                () -> -0.50,
                 () -> 0.0)
                 .deadband(OperatorConstants.DEADBAND)
                 .scaleTranslation(1.0)
@@ -82,7 +82,7 @@ public class Choreo {
                 .scaleTranslation(SwerveConstants.AUTO_AIM_SCALE_TRANSLATION);
 
         backUpAndAimBlue = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
-                () -> 0.25,
+                () -> 0.50,
                 () -> 0.0)
                 .deadband(OperatorConstants.DEADBAND)
                 .scaleTranslation(1.0)
@@ -98,7 +98,7 @@ public class Choreo {
                 // m_autoFactory.trajectoryCmd("ShootPreloadAuto"),
                 // new InstantCommand(
                 // () -> m_swerveSubsystem.drive(new Translation2d(-0.25, 0.0), 0, false)),
-                Commands.waitSeconds(3).deadlineFor(new ConditionalCommand(
+                Commands.waitSeconds(5).deadlineFor(new ConditionalCommand(
                         m_swerveSubsystem.driveFieldOriented(backUpAndAimRed),
                         m_swerveSubsystem.driveFieldOriented(backUpAndAimBlue),
                         m_swerveSubsystem::isRedAlliance)),
