@@ -72,6 +72,7 @@ public class RobotContainer {
     private final LimelightWrapper[] limelights;
 
     private final Timer m_ll4DontSeeTagTimer;
+    private boolean m_isIntakeToggledOn = false;
 
     // Choreo
     public final AutoFactory m_autoFactory = new AutoFactory(
@@ -296,6 +297,9 @@ public class RobotContainer {
         m_driverController.start().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyroWithAlliance)));
         m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity);
 
+        m_driverController.leftTrigger().onTrue(Commands.runOnce(this::toggleDriverIntake));
+        Trigger driverIntakeTrigger = new Trigger(this::isDriverIntakeToggledOn);
+
         BooleanSupplier isIdle = () -> Math.abs(m_driverController.getLeftX()) < OperatorConstants.DEADBAND &&
                 Math.abs(m_driverController.getLeftY()) < OperatorConstants.DEADBAND &&
                 Math.abs(m_driverController.getRightX()) < OperatorConstants.DEADBAND &&
@@ -371,20 +375,20 @@ public class RobotContainer {
                                 m_shooterSubsystem.stopShooting(),
                                 m_shooterSubsystem.storeFuel()),
                         m_shooterSubsystem.stopShooting(),
-                        m_driverController.leftTrigger()::getAsBoolean));
+                        this::isDriverIntakeToggledOn));
         m_driverController.rightTrigger()
                 .onTrue(m_indexerSubsystem.run())
                 .onFalse(m_indexerSubsystem.stop()
-                        .unless(m_driverController.leftTrigger()::getAsBoolean));
+                        .unless(this::isDriverIntakeToggledOn));
         m_driverController.rightTrigger()
                 .onTrue(m_intakeRollerSubsystem.intake())
                 .onFalse(m_intakeRollerSubsystem.stop()
-                        .unless(m_driverController.leftTrigger()::getAsBoolean));
+                        .unless(this::isDriverIntakeToggledOn));
         m_driverController.rightTrigger()
                 .onTrue(
                         m_linearIntakeSubsystem.shuffle())
                 .onFalse(m_linearIntakeSubsystem.midpoint()
-                        .unless(m_driverController.leftTrigger()::getAsBoolean));
+                        .unless(this::isDriverIntakeToggledOn));
 
         SmartDashboard.putBoolean("swerve/isAutoAiming", false);
         m_driverController.rightTrigger()
@@ -411,8 +415,8 @@ public class RobotContainer {
                                                     .isAutoAimOnTarget())
                                     .repeatedly());
 
-            m_driverController.leftTrigger()
-                    .onTrue(
+            driverIntakeTrigger
+                    .whileTrue(
                             new ConditionalCommand(m_simSubsystem.startIntake(),
                                     m_simSubsystem.stopIntake(),
                                     () -> m_linearIntakeSubsystem
@@ -453,12 +457,12 @@ public class RobotContainer {
         // .unless(m_driverController.leftTrigger()::getAsBoolean));
 
         // Extend intake, expand hopper, and run intake rollers
-        m_driverController.leftTrigger()
+        driverIntakeTrigger
                 .onTrue(Commands.parallel(
                         m_linearIntakeSubsystem.extend(),
                         m_intakeRollerSubsystem.intake()))
                 .onFalse(m_linearIntakeSubsystem.midpoint().andThen(m_intakeRollerSubsystem.stop()));
-        m_driverController.leftTrigger()
+        driverIntakeTrigger
                 .whileTrue(
                         Commands.parallel(
                                 m_indexerSubsystem.run(),
@@ -490,6 +494,18 @@ public class RobotContainer {
         // m_intakeRollerSubsystem.stop())));
     }
 
+    private void toggleDriverIntake() {
+        setDriverIntakeToggledOn(!m_isIntakeToggledOn);
+    }
+
+    private void setDriverIntakeToggledOn(boolean enabled) {
+        m_isIntakeToggledOn = enabled;
+    }
+    
+    private boolean isDriverIntakeToggledOn() {
+        return m_isIntakeToggledOn;
+    }
+    
     public void calibrateLinearIntakePosition() {
         boolean leftExtended = m_linearIntakeSubsystem.getLeftExtendedLimitSwitch();
         boolean rightExtended = m_linearIntakeSubsystem.getRightExtendedLimitSwitch();
