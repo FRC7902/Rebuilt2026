@@ -46,6 +46,7 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.RobotBase;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
@@ -53,7 +54,15 @@ import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 
 public final class Constants {
-
+    public static final class AdvantageKitConstants{
+        public static final Mode simMode = Mode.SIM;
+        public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
+        public static enum Mode{
+            REAL,
+            SIM,
+            REPLAY
+        }
+    }
     public static final int DRIVER_CONTROLLER_PORT = 0;
 
     public static final class SwerveConstants {
