@@ -4,7 +4,9 @@
 
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
@@ -12,13 +14,20 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -39,9 +48,18 @@ import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class HoodSubsystem extends SubsystemBase {
+    @AutoLog
+    public static class HoodInputs{
+        public Angle pivotPosition = Degrees.of(0);
+        public AngularVelocity pivotVelocity = DegreesPerSecond.of(0);
+        public Angle pivotDesiredPosition = Degrees.of(0);
+        public Voltage pivotAppliedVolts = Volts.of(0);
+        public Current pivotCurrent = Amps.of(0);
+    }
 
+     private final HoodInputsAutoLogged hoodInputs = new HoodInputsAutoLogged();
+     
     private final TalonFX m_motor;
-    // private final CANcoder m_encoder;
 
     private final SmartMotorController m_smartMotorController;
 
@@ -52,7 +70,6 @@ public class HoodSubsystem extends SubsystemBase {
 
     private final InterpolatingDoubleTreeMap m_hoodMap;
     private final InterpolatingDoubleTreeMap m_feedingHoodMap;
-
     public HoodSubsystem() {
         m_motor = new TalonFX(HoodConstants.MOTOR_CAN_ID);
         // m_encoder = new CANcoder(HoodConstants.ENCODER_CAN_ID);
@@ -119,6 +136,13 @@ public class HoodSubsystem extends SubsystemBase {
         m_feedingHoodMap = ShooterConstants.createFeedingHoodInterpolationMap();
     }
 
+    public void updateInputs(){
+        hoodInputs.pivotPosition = m_hood.getAngle();
+        hoodInputs.pivotVelocity = m_smartMotorController.getMechanismVelocity();
+        hoodInputs.pivotAppliedVolts = m_smartMotorController.getVoltage();
+        hoodInputs.pivotCurrent = m_smartMotorController.getStatorCurrent();
+    }
+
     /**
      * Creates a SysId characterization command for the hood.
      *
@@ -163,19 +187,6 @@ public class HoodSubsystem extends SubsystemBase {
      */
     public Command setAngle(Supplier<Angle> angleSupplier) {
         return m_hood.setAngle(angleSupplier);
-    }
-
-    /**
-     * Gets the current hood angle.
-     *
-     * @return the current angle
-     */
-    public Angle getAngle() {
-        return m_hood.getAngle();
-    }
-
-    public Optional<Angle> getAngleSetpoint() {
-        return m_hood.getMechanismSetpoint();
     }
 
     public boolean isAtTargetAngle() {
@@ -260,6 +271,8 @@ public class HoodSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
+        updateInputs();
+        Logger.processInputs("Hood", hoodInputs);
         m_hood.updateTelemetry();
 
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
@@ -275,5 +288,30 @@ public class HoodSubsystem extends SubsystemBase {
     @Override
     public void simulationPeriodic() {
         m_hood.simIterate();
+    }
+    
+    @AutoLogOutput
+    public Angle getAngle() {
+        return m_hood.getAngle();
+    }
+
+    public Optional<Angle> getAngleSetpoint() {
+        return m_hood.getMechanismSetpoint();
+    }
+
+    public AngularVelocity getVelocity() {
+        return hoodInputs.pivotVelocity;
+    }
+
+    public Angle getSetpointAngle() {
+        return hoodInputs.pivotDesiredPosition;
+    }
+
+    public Voltage getVoltage() {
+        return hoodInputs.pivotAppliedVolts;
+    }
+
+    public Current getCurrent() {
+        return hoodInputs.pivotCurrent;
     }
 }
