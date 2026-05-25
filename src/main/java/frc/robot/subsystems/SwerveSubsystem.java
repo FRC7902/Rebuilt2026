@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -351,6 +353,7 @@ public class SwerveSubsystem extends SubsystemBase {
      *
      * @return The robot's pose
      */
+    @AutoLogOutput(key="Odometry/Robot")
     public Pose2d getPose() {
         return swerveDrive.getPose();
     }

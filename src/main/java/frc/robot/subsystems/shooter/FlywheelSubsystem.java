@@ -15,6 +15,8 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -252,7 +254,10 @@ public class FlywheelSubsystem extends SubsystemBase {
             m_smartMotorController.setDutyCycle(0);
         });
     }
-
+    @AutoLogOutput(key="Flywheel/Speed")
+    public AngularVelocity getSpeed(){
+        return m_flywheel.getSpeed();
+    }
     /**
      * Updates flywheel telemetry.
      */

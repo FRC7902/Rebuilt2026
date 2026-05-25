@@ -272,7 +272,6 @@ public class HoodSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        Logger.recordOutput("Hood/Hood angle", getAngle().in(Degrees));
         updateInputs();
         Logger.processInputs("Hood", hoodInputs);
         m_hood.updateTelemetry();
