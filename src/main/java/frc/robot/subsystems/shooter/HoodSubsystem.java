@@ -50,7 +50,7 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 public class HoodSubsystem extends SubsystemBase {
     @AutoLog
     public static class HoodInputs{
-        public Angle pivotPosition = Degrees.of(0);
+        public Angle pivotPosition = ShooterConstants.HoodConstants.DEFAULT_ANGLE;
         public AngularVelocity pivotVelocity = DegreesPerSecond.of(0);
         public Angle pivotDesiredPosition = Degrees.of(0);
         public Voltage pivotAppliedVolts = Volts.of(0);
@@ -139,6 +139,7 @@ public class HoodSubsystem extends SubsystemBase {
     public void updateInputs(){
         hoodInputs.pivotPosition = m_hood.getAngle();
         hoodInputs.pivotVelocity = m_smartMotorController.getMechanismVelocity();
+        hoodInputs.pivotDesiredPosition = getSetpointAngle();
         hoodInputs.pivotAppliedVolts = m_smartMotorController.getVoltage();
         hoodInputs.pivotCurrent = m_smartMotorController.getStatorCurrent();
     }
@@ -271,6 +272,7 @@ public class HoodSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
+        Logger.recordOutput("Hood/Hood angle", getAngle().in(Degrees));
         updateInputs();
         Logger.processInputs("Hood", hoodInputs);
         m_hood.updateTelemetry();
@@ -289,10 +291,10 @@ public class HoodSubsystem extends SubsystemBase {
     public void simulationPeriodic() {
         m_hood.simIterate();
     }
-    
+
     @AutoLogOutput
     public Angle getAngle() {
-        return m_hood.getAngle();
+        return hoodInputs.pivotPosition;
     }
 
     public Optional<Angle> getAngleSetpoint() {
