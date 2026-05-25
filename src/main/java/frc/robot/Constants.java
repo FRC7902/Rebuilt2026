@@ -55,7 +55,7 @@ import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 
 public final class Constants {
     public static final class AdvantageKitConstants{
-        public static final Mode simMode = Mode.REPLAY;
+        public static final Mode simMode = Mode.SIM;
         public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
         public static enum Mode{
             REAL,

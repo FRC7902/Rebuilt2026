@@ -11,13 +11,8 @@ import static edu.wpi.first.units.Units.Meters;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.controller.PIDController;
@@ -356,7 +351,6 @@ public class SwerveSubsystem extends SubsystemBase {
      *
      * @return The robot's pose
      */
-    @AutoLogOutput(key="Odometry/Robot")
     public Pose2d getPose() {
         return swerveDrive.getPose();
     }
@@ -459,7 +453,6 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param headingY Y joystick which controls the angle of the robot.
      * @return {@link ChassisSpeeds} which can be sent to the Swerve Drive.
      */
-    @AutoLogOutput(key = "Odometry/targetSpeeds")
     public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, double headingX, double headingY) {
         Translation2d scaledInputs = SwerveMath.cubeTranslation(new Translation2d(xInput, yInput));
         return swerveDrive.swerveController.getTargetSpeeds(scaledInputs.getX(),
