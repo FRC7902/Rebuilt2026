@@ -11,15 +11,21 @@ import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.Amps;
 
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -36,7 +42,14 @@ import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class FeederSubsystem extends SubsystemBase {
-
+    @AutoLog
+    public static class FeederInputs{
+        public AngularVelocity feederSpeed = RPM.of(0);
+        public Voltage feederVoltage = Volts.of(0);
+        public Current feederCurrent = Amps.of(0);
+    }
+    
+    private FeederInputsAutoLogged feederInputs = new FeederInputsAutoLogged();
     private final TalonFX m_motor;
 
     private final SmartMotorController m_smartMotorController;
@@ -88,7 +101,11 @@ public class FeederSubsystem extends SubsystemBase {
 
         m_feeder = new FlyWheel(feederConfig);
     }
-
+    public void updateInputs(){
+        feederInputs.feederSpeed = m_feeder.getSpeed();
+        feederInputs.feederVoltage = m_smartMotorController.getVoltage();
+        feederInputs.feederCurrent = m_smartMotorController.getStatorCurrent();
+    }
     /**
      * Creates a SysId characterization command for the flywheel.
      *
@@ -202,6 +219,8 @@ public class FeederSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
+        updateInputs();
+        Logger.processInputs("Feeder", feederInputs);
         m_feeder.updateTelemetry();
 
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {

@@ -12,6 +12,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -240,6 +242,10 @@ public class RobotContainer {
         m_ll4DontSeeTagTimer.start();
 
         configureBindings();
+    }
+    @AutoLogOutput(key="Auto/Chosen Auton")
+    public String getAutonomousRoutine(){
+        return autoChooser.selectedCommand().getName();
     }
 
     private final Command selectRedLeftTrenchTraversal = new SelectCommand<>(

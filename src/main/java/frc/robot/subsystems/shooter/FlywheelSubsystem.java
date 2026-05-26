@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -15,7 +16,9 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -25,8 +28,10 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -45,7 +50,15 @@ import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class FlywheelSubsystem extends SubsystemBase {
-
+    
+    @AutoLog
+    public static class FlywheelInputs{
+        public AngularVelocity flywheelSpeed = RotationsPerSecond.of(0);
+        public AngularVelocity flywheelDesiredSpeed = RotationsPerSecond.of(0);
+        public Voltage flywheelVoltage = Volts.of(0);
+        public Current flywheelCurrent = Amps.of(0);
+    }
+    private final FlywheelInputsAutoLogged flywheelInputs = new FlywheelInputsAutoLogged();
     private final TalonFX m_leaderMotor;
     private final TalonFX m_followerMotor1;
     private final TalonFX m_followerMotor2;
@@ -122,6 +135,12 @@ public class FlywheelSubsystem extends SubsystemBase {
 
         m_flywheelMap = ShooterConstants.createRPMInterpolationMap();
         m_feedingFlywheelMap = ShooterConstants.createFeedingRPMInterpolationMap();
+    }
+    public void updateInputs(){
+        flywheelInputs.flywheelSpeed = m_flywheel.getSpeed();
+        flywheelInputs.flywheelDesiredSpeed = getSetpointVelocity().orElse(RPM.of(0));
+        flywheelInputs.flywheelVoltage = m_smartMotorController.getVoltage();
+        flywheelInputs.flywheelCurrent = m_smartMotorController.getStatorCurrent();
     }
 
     /**
@@ -263,6 +282,8 @@ public class FlywheelSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
+        updateInputs();
+        Logger.processInputs("Flywheel", flywheelInputs);
         m_flywheel.updateTelemetry();
 
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
