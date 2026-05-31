@@ -124,7 +124,7 @@ public final class Constants {
         public static class IntakeRollerConstants {
             public static final int MOTOR_PWM_ID = 1; // TODO
 
-            public static final double SPEED = 0.25;
+            public static final double SPEED = 0.5;
         }
 
         public static class LinearIntakeConstants {
