@@ -113,7 +113,7 @@ public final class Constants {
     public static class IndexerConstants {
         public static final int MOTOR_CAN_ID = 19;
 
-        public static final int MOTOR_STATOR_CURRENT_LIMIT = 40;
+        public static final int MOTOR_STATOR_CURRENT_LIMIT = 60;
         public static final int MOTOR_SUPPLY_CURRENT_LIMIT = 40;
 
         public static final double INDEXER_FULL_SPEED = 1;
@@ -345,7 +345,7 @@ public final class Constants {
                                                                                // RPM, true
                                                                                // max of 6600 RPM
 
-            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(0);
+            public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(1500);
 
             public static final AngularVelocity FEEDING_DEFAULT_VELOCITY = RPM.of(3500);
 
@@ -439,7 +439,7 @@ public final class Constants {
             public static final MomentOfInertia MOI = KilogramSquareMeters.of(
                     0.0009446408);
 
-            public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(60);
+            public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(70);
             public static final Current SUPPLY_CURRENT_LIMIT_AMPS = Amps.of(50);
 
             public static final double PID_kP = 0.0; // TODO

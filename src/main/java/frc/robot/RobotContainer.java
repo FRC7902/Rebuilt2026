@@ -333,7 +333,7 @@ public class RobotContainer {
         m_driverController.rightTrigger()
                 .and(isIdleTrigger.negate())
                 .and(autoAimOnTarget)
-                .whileTrue(driveFieldOrientedAutoAim);
+                .whileTrue(driveFieldOrientedAutoAim);    
         m_driverController.rightTrigger()
                 .and(isIdleTrigger)
                 .and(autoAimOnTarget.negate())
@@ -462,15 +462,15 @@ public class RobotContainer {
                         m_linearIntakeSubsystem.extend(),
                         m_intakeRollerSubsystem.intake()))
                 .onFalse(m_linearIntakeSubsystem.midpoint().andThen(m_intakeRollerSubsystem.stop()));
-        driverIntakeTrigger
-                .whileTrue(
-                        Commands.parallel(
-                                m_indexerSubsystem.run(),
-                                m_shooterSubsystem.storeFuel()))
-                .onFalse(
-                        m_indexerSubsystem.stop()
-                                .unless(m_driverController
-                                        .rightTrigger()::getAsBoolean));
+        // driverIntakeTrigger
+        //         .whileTrue(
+        //                 Commands.parallel(
+        //                         m_indexerSubsystem.run(),
+        //                         m_shooterSubsystem.storeFuel()))
+        //         .onFalse(
+        //                 m_indexerSubsystem.stop()
+        //                         .unless(m_driverController
+        //                                 .rightTrigger()::getAsBoolean));
 
         // m_driverController.leftBumper()
         // .and(m_driverController.rightTrigger().negate()) // Not shooting

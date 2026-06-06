@@ -106,7 +106,7 @@ public class ShooterSubsystem extends SubsystemBase {
                                 isFeeding.get())),
                 // stationaryShooting ?
                 Commands.sequence(
-                        m_feederSubsystem.reverse().withTimeout(0.25).andThen(m_feederSubsystem.stop()),
+                        m_feederSubsystem.reverse().withTimeout(1).andThen(m_feederSubsystem.stop()),
                         new ConditionalCommand(
                                 // As a fallback, if we are feeding, consider shooter ready after 2s even if
                                 // flywheel/hood aren't at their targets
@@ -182,7 +182,7 @@ public class ShooterSubsystem extends SubsystemBase {
         return Commands.sequence(
                 m_feederSubsystem.stop(),
                 Commands.deadline(
-                        Commands.waitSeconds(0.5),
+                        Commands.waitSeconds(1),
                         m_feederSubsystem.reverse()),
                 new ParallelCommandGroup(
                         m_hoodSubsystem.lowerHood(),
