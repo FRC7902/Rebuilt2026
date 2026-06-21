@@ -472,26 +472,26 @@ public class RobotContainer {
         //                         .unless(m_driverController
         //                                 .rightTrigger()::getAsBoolean));
 
-        // m_driverController.leftBumper()
-        // .and(m_driverController.rightTrigger().negate()) // Not shooting
-        // .and(m_driverController.leftTrigger().negate()) // Not intaking
+        m_driverController.leftBumper()
+        .and(m_driverController.rightTrigger().negate()) // Not shooting
+        .and(m_driverController.leftTrigger().negate()) // Not intaking
 
-        // // Extend intake, reverse indexer and intake rollers at the same time
-        // .onTrue(Commands.sequence( // TODO: Check if sequence is needed, or if
-        // parallel alone is
-        // // fine
-        // m_linearIntakeSubsystem.extend(),
-        // Commands.parallel(
-        // m_indexerSubsystem.reverse(),
-        // m_intakeRollerSubsystem.outtake())))
+        // Extend intake, reverse indexer and intake rollers at the same time
+        .onTrue(Commands.sequence( // TODO: Check if sequence is needed, or if
+        //parallel alone is
+        // fine
+        m_linearIntakeSubsystem.extend(),
+        Commands.parallel(
+        m_indexerSubsystem.reverse(),
+        m_intakeRollerSubsystem.outtake())))
 
-        // // Retract intake, then stop indexer and intake rollers
-        // .onFalse(
-        // Commands.sequence(
-        // m_linearIntakeSubsystem.midpoint(),
-        // Commands.parallel(
-        // m_indexerSubsystem.stop(),
-        // m_intakeRollerSubsystem.stop())));
+        // Retract intake, then stop indexer and intake rollers
+        .onFalse(
+        Commands.sequence(
+        m_linearIntakeSubsystem.midpoint(),
+        Commands.parallel(
+        m_indexerSubsystem.stop(),
+        m_intakeRollerSubsystem.stop())));
     }
 
     private void toggleDriverIntake() {
