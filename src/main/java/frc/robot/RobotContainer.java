@@ -22,6 +22,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -34,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ClimbConstants.ElevatorConstants;
 import frc.robot.Constants.IntakeConstants.LinearIntakeConstants;
+import frc.robot.lib.BLine.BLineField;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
 import frc.robot.Constants.OperatorConstants;
@@ -93,6 +95,7 @@ public class RobotContainer {
         private final Choreo m_choreo = new Choreo(this);
 
         // B-Line
+        Field2d field = new Field2d();
         FollowPath.Builder builder = new FollowPath.Builder(
                         m_swerveSubsystem,
                         m_swerveSubsystem::getPose,
@@ -103,8 +106,13 @@ public class RobotContainer {
                         new PIDController(0.2, 0, 0))
                         .withDefaultShouldFlip()
                         .withTRatioBasedTranslationHandoffs(true);
+        //builder.registerEventTrigger("intakeOut", m_linearIntakeSubsystem::extend);
 
         Path straight = new Path("straight-line");
+        Path newPath = new Path(
+              new Path.Waypoint(0, 0, Rotation2d.fromDegrees(0)),
+              new Path.EventTrigger(0.35, "intakeOut")  
+        );
 
         public Command firstAuto() {
                 Command firstAuto = builder
