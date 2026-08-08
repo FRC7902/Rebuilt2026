@@ -499,7 +499,7 @@ public final class Constants {
             public static final double SIM_PID_kI = 0; // TODO
             public static final double SIM_PID_kD = 0; // TODO
 
-            public static final LinearVelocity MAX_VELOCITY = InchesPerSecond.of(19.34);
+            public static final LinearVelocity MAX_VELOCITY = InchesPerSecond.of(10.00);
             public static final LinearAcceleration MAX_ACCELERATION = InchesPerSecondPerSecond.of(174.65);
 
             public static final double FEEDFORWARD_kS = 0.24248;
