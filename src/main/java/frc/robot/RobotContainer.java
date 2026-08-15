@@ -239,6 +239,9 @@ public class RobotContainer {
         m_ll4DontSeeTagTimer = new Timer();
         m_ll4DontSeeTagTimer.start();
 
+        //auto hood lower
+        m_shooterSubsystem.setNearTrenchSupplier(m_swerveSubsystem::isNearTrench);
+
         configureBindings();
     }
 

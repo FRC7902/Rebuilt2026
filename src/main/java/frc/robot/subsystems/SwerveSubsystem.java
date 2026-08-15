@@ -17,6 +17,7 @@ import java.util.function.Supplier;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -795,6 +796,17 @@ public class SwerveSubsystem extends SubsystemBase {
 
         return translationError.getNorm() < translationToleranceMeters
                 && Math.abs(rotationError.getDegrees()) < rotationToleranceDegrees;
+    }
+
+    private final Debouncer m_trenchDebouncer = new Debouncer(SwerveConstants.TRENCH_CLEAR_DEBOUNCE_TIME, Debouncer.DebounceType.kFalling);
+
+    public boolean isNearTrench(){
+        Translation2d lookahead = getPose().getTranslation();
+        boolean inYRange = Math.abs(lookahead.getY() - FieldConstants.TRENCH_BOTTOM_Y) < FieldConstants.TRENCH_Y_TOLERANCE
+                || Math.abs(lookahead.getY() - FieldConstants.TRENCH_TOP_Y) < FieldConstants.TRENCH_Y_TOLERANCE;
+        boolean nearBlueTrenchX = Math.abs(lookahead.getX()-FieldConstants.TRENCH_BLUE_X) < FieldConstants.TRENCH_HALF_WIDTH;
+        boolean nearRedTrenchX = Math.abs(lookahead.getX()-FieldConstants.TRENCH_RED_X) < FieldConstants.TRENCH_HALF_WIDTH;
+        return m_trenchDebouncer.calculate((nearBlueTrenchX || nearRedTrenchX) && inYRange);
     }
 
     @Override

@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -52,6 +53,8 @@ public class HoodSubsystem extends SubsystemBase {
 
     private final InterpolatingDoubleTreeMap m_hoodMap;
     private final InterpolatingDoubleTreeMap m_feedingHoodMap;
+
+    private BooleanSupplier m_isNearTrench = () -> false;
 
     public HoodSubsystem() {
         m_motor = new TalonFX(HoodConstants.MOTOR_CAN_ID);
@@ -139,7 +142,7 @@ public class HoodSubsystem extends SubsystemBase {
      * @return the command that sets the angle
      */
     public Command setAngle(Angle angle) {
-        return m_hood.setAngle(angle);
+        return (isNearTrench()) ? lowerHood() : m_hood.setAngle(angle);
     }
 
     public Command runToAngle(Angle angle) {
@@ -253,6 +256,13 @@ public class HoodSubsystem extends SubsystemBase {
 
     public Command setDefaultAngle() {
         return m_hood.setAngle(HoodConstants.DEFAULT_ANGLE);
+    }
+
+    public void setNearTrenchSupplier(BooleanSupplier isNearTrench){
+        m_isNearTrench = isNearTrench;
+    }
+    public boolean isNearTrench(){
+        return m_isNearTrench.getAsBoolean();
     }
 
     /**

@@ -9,6 +9,13 @@ public final class FieldConstants {
     public static final double FIELD_WIDTH = 8.069;
     public static final double FIELD_LENGTH = 16.541;
 
+    public static final double TRENCH_BOTTOM_Y = 0.644;
+    public static final double TRENCH_TOP_Y = 7.425;
+    public static final double TRENCH_BLUE_X=4.626;
+    public static final double TRENCH_RED_X = 11.916;
+    public static final double TRENCH_HALF_WIDTH = 0.639;
+    public static final double TRENCH_Y_TOLERANCE = 0.7; //needs tuning
+
     public static final Translation2d AUTO_AIM_OFFSET = new Translation2d(0.0, 0.0);
 
     public static final Translation2d BLUE_HUB_CENTER = new Translation2d(

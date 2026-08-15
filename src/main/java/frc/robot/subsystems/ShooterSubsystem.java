@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.units.measure.Angle;
@@ -48,6 +49,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return true if the shooter is ready to shoot, false otherwise
      */
     public boolean isShooterReady() {
+        if (m_hoodSubsystem.isNearTrench()) return false;
         // TODO: Remove this one hood mech simulation is fixed
         if (Robot.isSimulation())
             return m_flywheelSubsystem.isAtTargetRPM();
@@ -57,6 +59,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean isShooterReady(boolean isFeeding) {
+        if (m_hoodSubsystem.isNearTrench()) return false;
         // TODO: Remove this one hood mech simulation is fixed
         if (Robot.isSimulation())
             return m_flywheelSubsystem.isAtTargetRPM(isFeeding);
@@ -217,6 +220,9 @@ public class ShooterSubsystem extends SubsystemBase {
         return Commands.parallel(
                 m_hoodSubsystem.runToAngle(HoodConstants.LOWER_HOOD_ANGLE),
                 m_feederSubsystem.stop());
+    }
+    public void setNearTrenchSupplier(BooleanSupplier isNearTrench){
+        m_hoodSubsystem.setNearTrenchSupplier(isNearTrench);
     }
 
     /**
