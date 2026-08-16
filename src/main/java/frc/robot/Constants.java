@@ -116,8 +116,8 @@ public final class Constants {
         public static final int MOTOR_STATOR_CURRENT_LIMIT = 40;
         public static final int MOTOR_SUPPLY_CURRENT_LIMIT = 40;
 
-        public static final double INDEXER_FULL_SPEED = 1;
-        public static final double INDEXER_HALF_SPEED = 0.5;
+        public static final double INDEXER_FULL_SPEED = -1;
+        public static final double INDEXER_HALF_SPEED = -0.5;
     }
 
     public static class IntakeConstants {
@@ -128,7 +128,7 @@ public final class Constants {
         }
 
         public static class LinearIntakeConstants {
-            public static final int MOTOR_CAN_ID = 18;
+            public static final int MOTOR_CAN_ID = 26;
             public static final DCMotor MOTOR = DCMotor.getKrakenX60Foc(1);
 
             public static final int LEFT_EXTENDED_LIMIT_SWITCH_DIO = 3;
@@ -140,7 +140,7 @@ public final class Constants {
             public static final MotorMode IDLE_MODE = MotorMode.COAST;
 
             public static final Distance MOTOR_CIRCUMFERENCE = Inches.of(1).times(Math.PI);
-            public static final GearBox GEARBOX = GearBox.fromStages("54:16", "18:12");
+            public static final GearBox GEARBOX = GearBox.fromStages("50:14", "18:12");
             public static final Mass MECHANISM_MASS = Pounds.of(6.825);
             public static final Angle MECHANISM_ANGLE = Degrees.of(180 + 24.159);
 
